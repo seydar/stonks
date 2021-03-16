@@ -4,6 +4,7 @@ require 'yaml'
 require 'open-uri'
 require 'alpaca/trade/api'
 require './db.rb'
+require './assessor.rb'
 require 'statistics'
 require 'histogram/array'
 
@@ -12,6 +13,20 @@ Alpaca::Trade::Api.configure do |config|
   config.endpoint   = "https://api.alpaca.markets"
   config.key_id     = "AKM406CX3NH9IO9PGC55"
   config.key_secret = "6NC5iRohh75TkdC6NBvOy2pEKhvYbnBPGPGaRFnM"
+end
+
+class Alpaca::Trade::Api::Client
+  def bars(timeframe, symbols, opts={})
+    opts[:limit] ||= 100
+    opts[:symbols] = symbols.join(',')
+
+    validate_timeframe(timeframe)
+    response = get_request(data_endpoint, "v1/bars/#{timeframe}", opts)
+    json = JSON.parse(response.body)
+    json.keys.each_with_object({}) do |symbol, hash|
+      hash[symbol] = json[symbol].map { |bar| Alpaca::Trade::Api::Bar.new(bar) }
+    end
+  end 
 end
 
 CLIENT = Alpaca::Trade::Api::Client.new
@@ -59,7 +74,9 @@ def market_turns(tickers, opts={})
   fin   = fin.is_a?(Time) ? fin : Time.parse(fin.to_s)
 
   ids  = tickers.map {|t| t.id }
-  bars = Bar.where(:time => debut..fin, :ticker_id => ids).order(:time).all
+  bars = Bar.where(:time => debut..fin, :ticker_id => ids)
+            .order(:ticker_id, Sequel.asc(:time))
+            .all
   bars = bars.group_by {|b| b.ticker_id }
 
   bars.map do |ticker_id, bars|
@@ -69,7 +86,7 @@ def market_turns(tickers, opts={})
     changes = bars.each_cons(2).map do |span|
   
       # Consider trends across weekends, but not disjoint periods
-      next if span[0].time - span[1].time > 3 * SPANS[opts[:period]]
+      next if span[0].time - span[1].time > 4 * SPANS[opts[:period]]
   
       # some of the opening prices are 0. this leads to a `percent_change` of
       # Infinity
@@ -81,10 +98,10 @@ def market_turns(tickers, opts={})
     end
   end.flatten.compact.sort_by {|b| b.time }
 end
-
-def recovery_time(bars, gain: nil)
-  bars.map {|b| b.time_to_rise gain }
-end
+#
+#def recovery_time(bars, gain: nil)
+#  bars.map {|b| b.time_to_rise gain }
+#end
 
 # sell the shares after so-many days
 def profits(market_turns, rise: 2)
@@ -94,20 +111,20 @@ def profits(market_turns, rise: 2)
   [((num - fails) * rise.to_f - fails) / num, fails, (num - fails), times.mean]
 end
 
-def price_history(data)
-  data.map do |d|
-    d.ticker.history(:around => d[:bar])
-            .map {|b| [b.open, b.close] }
-            .flatten
-  end
-end
-
-
-def data_to_csv(data, fname)
-  open fname, "w" do |f|
-    price_history(data).each {|row| f.puts row.join(",") }
-  end
-end
+#def price_history(data)
+#  data.map do |d|
+#    d.ticker.history(:around => d[:bar])
+#            .map {|b| [b.open, b.close] }
+#            .flatten
+#  end
+#end
+#
+#
+#def data_to_csv(data, fname)
+#  open fname, "w" do |f|
+#    price_history(data).each {|row| f.puts row.join(",") }
+#  end
+#end
 
 # 0.1.step(:to => 3.0, :by => 0.1).map do |x|
 #   [x] + profts(mses[0.12], :rise => x)
