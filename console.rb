@@ -40,37 +40,29 @@ end
 assessor.assess_buys nyse, :after  => "1 jan #{ARGV[0]}",
                            :before => "31 dec #{ARGV[0]}"
 
-0.05.step(:to => 0.1, :by => 0.05).each do |m|
-  m = -m
-  0.1.step(:to => 10, :by => 0.1).each do |b|
+assessor.sell_when do |original, today|
+  days_held = today.date - original.date
 
-    assessor.sell_when do |original, today|
-      days_held = today.date - original.date
-    
-      today.change_from(original) >= sell_point(days_held, m, b)
-    end
-    
-    sells = assessor.assess_sells
-
-    # TODO this doesn't make any sense. the max rise over a fluctuating period
-    # of time? i don't even know what this is measuring.
-    sells.each {|h| h[:max] = h[:hold] ? h[:buy].max_rise_over(h[:hold]) : [nil, -1] }
-
-    # filter out the crazy stocks that'll throw off the value
-    # why don't i just use `#median`?
-    sells = sells.filter {|h| h[:ROI] < 6 }
-
-    size       = sells.size
-    max_roi    = sells.map {|h| h[:max][1] }
-    max_roi  &&= max_roi.mean
-    mean_roi   = sells.map {|h| h[:ROI] }
-    mean_roi &&= mean_roi.mean
-
-    p [ARGV[0].to_i, size, max_roi, m, b, mean_roi]
-  end
+  today.change_from(original) >= sell_point(days_held)
 end
 
-#binding.pry
+sells = assessor.assess_sells
+
+# TODO this doesn't make any sense. the max rise over a fluctuating period
+# of time? i don't even know what this is measuring.
+sells.each {|h| h[:max] = h[:hold] ? h[:buy].max_rise_over(h[:hold]) : [nil, -1] }
+
+# filter out the crazy stocks that'll throw off the value
+# why don't i just use `#median`?
+sells = sells.filter {|h| h[:ROI] < 6 }
+
+size       = sells.size
+max_roi    = sells.map {|h| h[:max][1] }
+max_roi  &&= max_roi.mean
+mean_roi   = sells.map {|h| h[:ROI] }
+mean_roi &&= mean_roi.mean
+
+binding.pry
 
 # TODO plot the growth curves of all the stocks i want to sell
 # then find the optimal curve to sell 'em all
