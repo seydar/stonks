@@ -37,8 +37,8 @@ assessor.buy_when :history => 5 do |history|
   ].all?
 end
 
-assessor.assess_buys nyse, :after  => '1 jan 2019',
-                           :before => '31 dec 2019'
+assessor.assess_buys nyse, :after  => "1 jan #{ARGV[0]}",
+                           :before => "31 dec #{ARGV[0]}"
 
 0.05.step(:to => 0.1, :by => 0.05).each do |m|
   m = -m
@@ -66,11 +66,11 @@ assessor.assess_buys nyse, :after  => '1 jan 2019',
     mean_roi   = sells.map {|h| h[:ROI] }
     mean_roi &&= mean_roi.mean
 
-    p [m, b, size, max_roi, mean_roi]
+    p [ARGV[0].to_i, size, max_roi, m, b, mean_roi]
   end
 end
 
-binding.pry
+#binding.pry
 
 # TODO plot the growth curves of all the stocks i want to sell
 # then find the optimal curve to sell 'em all
