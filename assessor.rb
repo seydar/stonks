@@ -57,10 +57,46 @@ class Assessor
       end.map {|history| history.last }
     end
 
+    # `@holding` currently references the days that a decision to buy is made
+    # (using the day's closing price), but we don't *actually* buy until the
+    # next morning. So we need to replace these stocks with the next day's
+    # stock.
+    # 
+    # This is key because the `Bar#change_from` method operates on the opening
+    # price of the earlier day.
+    #
+    # If it's `nil` because we're dealing with some HOT OF THE PRESS stock
+    # recommendations, then... I don't really have a plan for that yet.
+    # Then the stock doesn't exist. Send a text, whatever. I need to include
+    # some notification system here.
+    #
+    # TODO include the notification system at this point.
+    #
+    # From here on out, we're dealing with *simulation*.
+    @holding = @holding.map do |stock|
+      index = stock.ticker.bars.index stock
+      stock.ticker.bars[index + 1]
+    end
+    @holding.each {|stock| stock.ticker.normalize! }
+    @holding = @holding.map {|stock| stock.refresh }
   end
 
   def assess_sells
-    @holding.map {|stock| sell? stock.ticker, stock }
+    sales = @holding.map do |stock|
+      bars   = stock.ticker.bars
+      orig_i = bars.index stock
+
+      sell_bar = bars[orig_i..-1].filter do |day|
+        sell? stock, day
+      end.first
+
+      hold = bars.index sell_bar
+
+      {:buy  => stock,
+       :sell => sell_bar,
+       :hold => sell_bar ? (hold - orig_i)  : nil,
+       :ROI  => sell_bar ? (sell_bar.close / stock.open) - 1 : -1 }
+    end
   end
 
   def assess(tickers, opts={})
@@ -68,9 +104,4 @@ class Assessor
     assess_sells
   end
 end
-
-def sell_point(days_held, drop=120.0)
-  [2.0 - days_held / drop, 0].max
-end
-
 

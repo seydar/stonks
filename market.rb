@@ -64,44 +64,6 @@ end
 # In theory, if I sell after making 10% back on the stocks
 ##############################################################
 
-# Significantly faster for the first run. Kinda slower for repeated calls.
-# But still better for memory usage.
-def market_turns(tickers, opts={})
-  opts[:period] ||= 'day'
-  debut = opts[:after] || Time.parse('1 march 1900')
-  debut = debut.is_a?(Time) ? debut : Time.parse(debut.to_s)
-  fin   = opts[:before] || Time.parse(Date.today.to_s)
-  fin   = fin.is_a?(Time) ? fin : Time.parse(fin.to_s)
-
-  ids  = tickers.map {|t| t.id }
-  bars = Bar.where(:time => debut..fin, :ticker_id => ids)
-            .order(:ticker_id, Sequel.asc(:time))
-            .all
-  bars = bars.group_by {|b| b.ticker_id }
-
-  bars.map do |ticker_id, bars|
-    # latest date is first
-    bars    = bars.reverse
-
-    changes = bars.each_cons(2).map do |span|
-  
-      # Consider trends across weekends, but not disjoint periods
-      next if span[0].time - span[1].time > 4 * SPANS[opts[:period]]
-  
-      # some of the opening prices are 0. this leads to a `percent_change` of
-      # Infinity
-      next if span[-1].open == 0
-  
-      change = span[0].change_from span[-1]
-
-      span[0] if change <= opts[:drop]
-    end
-  end.flatten.compact.sort_by {|b| b.time }
-end
-#
-#def recovery_time(bars, gain: nil)
-#  bars.map {|b| b.time_to_rise gain }
-#end
 
 # sell the shares after so-many days
 def profits(market_turns, rise: 2)
@@ -110,21 +72,6 @@ def profits(market_turns, rise: 2)
   fails = times.count -1
   [((num - fails) * rise.to_f - fails) / num, fails, (num - fails), times.mean]
 end
-
-#def price_history(data)
-#  data.map do |d|
-#    d.ticker.history(:around => d[:bar])
-#            .map {|b| [b.open, b.close] }
-#            .flatten
-#  end
-#end
-#
-#
-#def data_to_csv(data, fname)
-#  open fname, "w" do |f|
-#    price_history(data).each {|row| f.puts row.join(",") }
-#  end
-#end
 
 # 0.1.step(:to => 3.0, :by => 0.1).map do |x|
 #   [x] + profts(mses[0.12], :rise => x)

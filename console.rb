@@ -7,59 +7,70 @@ def time
   [Time.now - start, result]
 end
 
-drop = -0.3
 nyse = Ticker.where(:exchange => 'NYSE').all
 spy_ticker = Ticker.where(:symbol => 'SPY').first
 
-#@data = market_turns nyse, :drop  => drop
-
-solid = proc { @data.filter {|b| not b.before_split?(:days => 64) } }
-r2s   = proc {|x| solid[].filter {|b| b.rsquared >= x } }
-mses  = proc {|x| solid[].filter {|b| b.mse <= x } }
-vols  = proc {|xs, v| xs.filter {|b| b.ticker.volume(:at => b).mean >= v } }
-dates = proc {|xs, debut, fin| restrict_dates(xs, debut, fin) }
-spy   = proc do |debut, fin|
+spy = proc do |debut, fin|
   debut = debut.is_a?(Time) ? debut : Time.parse(debut.to_s)
   fin   = fin.is_a?(Time) ? fin : Time.parse(fin.to_s)
 
-  buy  = spy_ticker.bars.filter {|b| b.time == debut }[0]
-  sell = spy_ticker.bars.filter {|b| b.time == fin }[0]
+  buy   = spy_ticker.bars.filter {|b| b.time == debut }[0]
+  sell  = spy_ticker.bars.filter {|b| b.time == fin }[0]
   (sell.close / buy.close) - 1
 end
 
-#@data = market_turns nyse, :drop   => -0.25,
-#                           :after  => "1 jan #{ARGV[0] || 2019}",
-#                           :before => "31 dec #{ARGV[1] || 2019}"
-#
-#@data.each {|b| b.ticker.normalize! }
-#@data = @data.map {|b| b.refresh }
-#
-#rises = @data.map {|b| [b, b.max_rise_over(90)] }
-#
-#filters = 1_000_000.step(:by => 100_000, :to => 10_000_000).map do |i|
-#  [i, rises.filter {|r| r[0].volumes.mean > i }.map {|r| r[1][1] }.mean]
-#end
-#
-#goods = rises.filter {|r| r[0].volumes.mean > 7_700_000 }
-#goods.each {|g| g << g[0].time_to_rise(g[1][1]) }
+######################################
+
+# drop = -0.3, vol > 10M, m = -0.05, b = 7.5
+def sell_point(days_held, m=-0.05, b=7.5)
+  [m * days_held + b, 0].max
+end
 
 assessor = Assessor.new
-assessor.buy_when :history => 2 do |history|
+assessor.buy_when :history => 5 do |history|
   today     = history[-1]
   yesterday = history[-2]
 
-  today.change_from(yesterday) <= -0.3 #or
-    #today.change_from(today)   <= -0.3
+  [(today.change_from(yesterday) <= -0.3 or
+    today.change_from(today)     <= -0.3),
+   history.map {|b| b.volume }.mean >= 10_000_000
+  ].all?
 end
 
-assessor.sell_when do |ticker, original|
-  today = ticker.history[-1]
-  days_held = today.date - original.date
+assessor.assess_buys nyse, :after  => '1 jan 2019',
+                           :before => '31 dec 2019'
 
-  today.change_from(original) >= sell_point(days_held)
+0.05.step(:to => 0.1, :by => 0.05).each do |m|
+  m = -m
+  0.1.step(:to => 10, :by => 0.1).each do |b|
+
+    assessor.sell_when do |original, today|
+      days_held = today.date - original.date
+    
+      today.change_from(original) >= sell_point(days_held, m, b)
+    end
+    
+    sells = assessor.assess_sells
+
+    # TODO this doesn't make any sense. the max rise over a fluctuating period
+    # of time? i don't even know what this is measuring.
+    sells.each {|h| h[:max] = h[:hold] ? h[:buy].max_rise_over(h[:hold]) : [nil, -1] }
+
+    # filter out the crazy stocks that'll throw off the value
+    # why don't i just use `#median`?
+    sells = sells.filter {|h| h[:ROI] < 6 }
+
+    size       = sells.size
+    max_roi    = sells.map {|h| h[:max][1] }
+    max_roi  &&= max_roi.mean
+    mean_roi   = sells.map {|h| h[:ROI] }
+    mean_roi &&= mean_roi.mean
+
+    p [m, b, size, max_roi, mean_roi]
+  end
 end
-
-#assessor.assess nyse, :after  => '1 jan 2019',
-#                      :before => '31 dec 2019'
 
 binding.pry
+
+# TODO plot the growth curves of all the stocks i want to sell
+# then find the optimal curve to sell 'em all

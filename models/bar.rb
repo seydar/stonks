@@ -63,8 +63,8 @@ class Bar < Sequel::Model
 
   def max_rise_over(days)
     index = ticker.bars.index self
-    range = ticker.bars[(index + 1)..(index + days)]
-    range.map {|b| [b, b.change_from(self)] }.max {|a, b| a[1] <=> b[1] }
+    range = ticker.bars[index..(index + days)]
+    range.map {|b| [b, b.change_from(self)] }.max_by {|a| a[1] }
   end
 
   def change_from(bar)
