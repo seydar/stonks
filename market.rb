@@ -5,6 +5,7 @@ require 'open-uri'
 require 'alpaca/trade/api'
 require './db.rb'
 require './assessor.rb'
+require './simulator.rb'
 require 'statistics'
 require 'histogram/array'
 

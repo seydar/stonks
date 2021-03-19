@@ -1,5 +1,5 @@
 require 'pry'
-require './market2.rb'
+require './market.rb'
 
 def time
   start  = Time.now

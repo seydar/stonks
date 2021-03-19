@@ -75,7 +75,7 @@ class Assessor
     # From here on out, we're dealing with *simulation*.
     @holding = @holding.map do |stock|
       index = stock.ticker.bars.index stock
-      stock.ticker.bars[index + 1]
+      stock.ticker.bars[index + 1] || stock
     end
     @holding.each {|stock| stock.ticker.normalize! }
     @holding = @holding.map {|stock| stock.refresh }

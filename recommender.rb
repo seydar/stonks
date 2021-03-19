@@ -1,4 +1,4 @@
-require '/home/ari/servers/stocks/market.rb'
+require './market.rb'
 #require "../auberge.rb"
 
 nyse = Ticker.where(:exchange => 'NYSE').all
@@ -11,10 +11,24 @@ spy = proc do |debut, fin|
   (sell.close / buy.close) - 1
 end
 
+def text_ari(buy: [], sell: [])
+  unless buy.empty?
+    `ruby /home/ari/servers/stocks/text_ari.rb buy #{buy.map {|b| b.ticker.symbol }}`
+  end
+
+  unless sell.empty?
+    `ruby /home/ari/servers/stocks/text_ari.rb sell #{sell.map {|b| b.ticker.symbol }}`
+  end
+end
+
+def uusi(txt); "<span id='future'>#{txt}</span>"; end
+def money(num); "$%0.3f" % num; end
+def perc(num); "%0.3f%%" % num; end
+
 # download and save the latest information
 # i acknowledge that this assumes that all tickers are updated at the same time
 unless Time.parse((Date.today - 1).to_s) == nyse[5].bars.last.time
-  puts "downloading data..."
+  puts "downloading data after #{nyse[5].bars.last.time}..."
   updates = Bar.download nyse, :after => (nyse[5].bars.last.time - SPANS['day'])
   puts "\tsaving data..."
   updates.each do |sym, bz|
@@ -27,78 +41,63 @@ unless Time.parse((Date.today - 1).to_s) == nyse[5].bars.last.time
   puts "\tdone!"
 end
 
-# find the stocks that have had a downturn
-drop = -0.3
-data = market_turns nyse, :drop  => drop,
-                          :after => Time.parse("1 april 2020")
+sim = Simulator.new :stocks => nyse, :after => '1 jan 2020', :before => Time.now
+results = sim.run
 
-weekdays = 64 # 90 days, including weekends
-mse  = 0.12
-rise = 2.0
-days = (weekdays * 7.0 / 5).floor # includes weekends
-recs = data.filter {|b| b.mse <= mse }.reverse
-
-# text me
-new_recs = recs.filter {|b| b.time == Time.parse(Date.today.to_s) }
-if new_recs.size > 0
-  #Auberge::Phone.sms :to => "16037297097", :body => "invest in #{new_recs.map {|b| b.ticker.symbol }.join ', '}"
-  `ruby /home/ari/servers/stocks/text_ari.rb #{new_recs.map {|b| b.ticker.symbol }}`
+# how well would we have done if we had just invested in SPY?
+results.each do |h|
+  sell_date = h[:sell] ? h[:sell].time : h[:buy].ticker.bars.last.time
+  h[:spy] = spy[h[:buy].time, sell_date]
 end
 
-rows = recs.map do |rec|
-  bz = rec.ticker.bars
-  buy_bar_i  = bz.index(rec) + 1
-  buy_bar    = bz[buy_bar_i] # buy the next morning
-  wait_time = buy_bar ? buy_bar.time_to_rise(rise) : -1 # rise by 200%, tripling in price
+# could be the day after the deciding day, or it could be the deciding day (if
+# there's no new bar after it, aka it's bleeding edge)
+new_buys  = results.filter {|h| h[:buy].date >= Date.today }
+new_sells = results.filter {|h| h[:sell] && h[:sell].date == Date.today }
 
-  if buy_bar && buy_bar.before_split?(:days => wait_time)
-    puts "normalizing #{rec.ticker.symbol}"
-    rec.ticker.normalize!
-    rec = bz[buy_bar_i - 1]
-    wait_time = buy_bar.time_to_rise rise # rise by 200%, tripling in price
-  end
+text_ari :buy => new_buys, :sell => new_sells
 
-  if buy_bar
-    buy_date  = buy_bar.time.strftime("%Y-%m-%d")
-    buy_price = "$%0.3f" % buy_bar.open
+#  <th><b>Symbol</b></th>
+#  <th><b>10-Day Trade Volume</b></th>
+#  <th><b>Buy Date</b></th>
+#  <th><b>Buy Price</b></th>
+#  <th><b>Days Held</b></th>
+#  <th><b>ROI Threshold</b></th>
+#  <th><b>Sell Price</b></th>
+#  <th><b>Sell ROI</b></th>
+#  <th><b>SPY ROI</b></th>
 
-    sell_bar   = wait_time == -1 ? bz[-1] : bz[buy_bar_i + wait_time]
-    sell_date  = sell_bar.time.strftime("%Y-%m-%d")
-    sell_price = "$%0.3f" % sell_bar.close
-    sell_roi   = "%0.3f%%" % ((100 * sell_bar.close / buy_bar.open) - 100)
-    market_roi = "%0.3f%%" % (100 * spy[buy_bar.time, sell_bar.time]) # i'm repeating myself but i don't care
-  else # only for the bleeding-edge stock tips
-    buy_date   = Time.now + SPANS['day']
-    until (1..5).include? buy_date.wday
-      buy_date += SPANS['day']
-    end
-    buy_date   = buy_date.strftime("%Y-%m-%d")
-    buy_price  = "-"
+rows = results.sort_by {|r| r[:buy].date }.reverse.map do |rec|
+  buy = rec[:buy]
+  latest = buy.ticker.bars.last
+  latest_roi = (latest.close / buy.open) - 1
 
-    sell_price = "-"
-    sell_roi   = "-"
-    market_roi = "-"
-  end
+  symbol     = "<a href='https://finance.yahoo.com/quote/" +
+                 "#{buy.ticker.symbol}'>#{buy.ticker.symbol}</a>"
+  symbol    += "*" if buy.id == nil # it means the price is adjusted to reflect a stock split
+  vol_avg    = buy.volumes(:prior => 10).mean.round(0)
+  buy_date   = buy.date == Date.today ? uusi(buy.date.strftime("%Y-%m-%d")) : buy.date.strftime("%Y-%m-%d")
+  buy_price  = buy.date == Date.today ? uusi(money(buy.close)) : money(buy.open)
+  days_held  = rec[:hold] ? rec[:hold] : Date.today - buy.date
+  roi_thresh = perc([-0.05 * days_held + 7.5, 0].max)
+  days_held  = rec[:hold] ? days_held.to_i : uusi(days_held.to_i)
+  roi_thresh = rec[:hold] ? roi_thresh : uusi(roi_thresh)
+  sell_date  = rec[:sell] ? rec[:sell].date.strftime("%Y-%m-%d") : uusi("-")
+  sell_price = rec[:sell] ? money(rec[:sell].close) : uusi(money(latest.close))
+  sell_roi   = rec[:ROI] ? perc(rec[:ROI] * 100) : uusi(perc(latest_roi * 100))
+  spy_roi    = money(rec[:spy])
 
-
-  if wait_time == -1
-    sell_price = "<span id='future'>#{sell_price}</span>"
-    sell_roi   = "<span id='future'>#{sell_roi}</span>"
-    market_roi = "<span id='future'>#{market_roi}</span"
-  end
-
-  symbol = "<a href='https://finance.yahoo.com/quote/#{rec.ticker.symbol}'>#{rec.ticker.symbol}</a>"
 
   [symbol,
-   rec.mse.round(5),
-   rec.rsquared.round(5),
+   vol_avg,
    buy_date,
    buy_price,
+   days_held,
+   roi_thresh,
    sell_date,
-   wait_time,
    sell_price,
    sell_roi,
-   market_roi]
+   spy_roi]
 end
 
 out = <<-END
@@ -121,11 +120,12 @@ out = <<-END
     i'm looking for:
     <br/>
     <ul>
-      <li>30% price drop in 2 days</li>
-      <li>MSE <= 0.12 on a regression of the prior 10 days</li>
+      <li>30% price drop in 3 days</li>
+      <li>Trading volume > 10,000,000 trades/day</li>
     </ul>
   </div>
 </p>
+<p>* next to a stock symbol means the price is adjusted to reflect a split/reverse-split that occurred after that date</p>
 <p>drop occurs on one day, buy the next morning. prior 10 days is in reference to before the drop</p>
 <p><b>sell only when the price has tripled (200% growth)</b></p>
 <p><span id='future'>blue</span> figures are taken from the latest closing prices, since the price has not yet tripled</p>
@@ -133,15 +133,15 @@ out = <<-END
 <table>
   <tr>
     <th><b>Symbol</b></th>
-    <th><b>10-Day MSE</b></th>
-    <th><b>10-Day R^2</b></th>
+    <th><b>10-Day Trade Volume</b></th>
     <th><b>Buy Date</b></th>
     <th><b>Buy Price</b></th>
+    <th><b>Days Held</b></th>
+    <th><b>ROI Threshold</b></th>
     <th><b>Sell Date</b></th>
-    <th><b>Time to Rise</b></th>
     <th><b>Sell Price</b></th>
     <th><b>Sell ROI</b></th>
-    <th><b>Market ROI</b></th>
+    <th><b>SPY ROI</b></th>
   </tr>
 END
 
