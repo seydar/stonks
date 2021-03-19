@@ -49,27 +49,37 @@ rows = recs.map do |rec|
   bz = rec.ticker.bars
   buy_bar_i  = bz.index(rec) + 1
   buy_bar    = bz[buy_bar_i] # buy the next morning
-  buy_bar  ||= rec # yes it's a little wrong, but oh well
-  wait_time  = buy_bar.time_to_rise rise # rise by 200%, tripling in price
+  wait_time = buy_bar ? buy_bar.time_to_rise(rise) : -1 # rise by 200%, tripling in price
 
-  if buy_bar.before_split? :days => wait_time
+  if buy_bar && buy_bar.before_split?(:days => wait_time)
     puts "normalizing #{rec.ticker.symbol}"
     rec.ticker.normalize!
     rec = bz[buy_bar_i - 1]
     wait_time = buy_bar.time_to_rise rise # rise by 200%, tripling in price
   end
 
-  sell_bar   = wait_time == -1 ? bz[-1] : bz[buy_bar_i + wait_time]
-  sell_date  = sell_bar.time
-  sell_price = "$%0.3f" % sell_bar.close
-  sell_roi   = "%0.3f%%" % ((100 * sell_bar.close / buy_bar.open) - 100)
-  market_roi = "%0.3f%%" % (100 * spy[buy_bar.time, sell_date]) # i'm repeating myself but i don't care
+  if buy_bar
+    buy_date  = buy_bar.time.strftime("%Y-%m-%d")
+    buy_price = "$%0.3f" % buy_bar.open
 
-  #if wait_time == -2 #buy_bar.before_split? :days => wait_time
-  #  sell_price = "<span id='split'>split</span>"
-  #  sell_roi   = sell_price
-  #  market_roi = sell_price
-  #end
+    sell_bar   = wait_time == -1 ? bz[-1] : bz[buy_bar_i + wait_time]
+    sell_date  = sell_bar.time.strftime("%Y-%m-%d")
+    sell_price = "$%0.3f" % sell_bar.close
+    sell_roi   = "%0.3f%%" % ((100 * sell_bar.close / buy_bar.open) - 100)
+    market_roi = "%0.3f%%" % (100 * spy[buy_bar.time, sell_bar.time]) # i'm repeating myself but i don't care
+  else # only for the bleeding-edge stock tips
+    buy_date   = Time.now + SPANS['day']
+    until (1..5).include? buy_date.wday
+      buy_date += SPANS['day']
+    end
+    buy_date   = buy_date.strftime("%Y-%m-%d")
+    buy_price  = "-"
+
+    sell_price = "-"
+    sell_roi   = "-"
+    market_roi = "-"
+  end
+
 
   if wait_time == -1
     sell_price = "<span id='future'>#{sell_price}</span>"
@@ -82,9 +92,9 @@ rows = recs.map do |rec|
   [symbol,
    rec.mse.round(5),
    rec.rsquared.round(5),
-   buy_bar.time.strftime("%Y-%m-%d"),
-   "$%0.3f" % buy_bar.open,
-   sell_date.strftime("%Y-%m-%d"),
+   buy_date,
+   buy_price,
+   sell_date,
    wait_time,
    sell_price,
    sell_roi,
