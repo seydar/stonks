@@ -1,35 +1,13 @@
 # stocks.rb
 require 'pp'
-require 'yaml'
-require 'open-uri'
-require 'alpaca/trade/api'
+require 'alphavantagerb'
 require './db.rb'
 require './assessor.rb'
 require 'statistics'
 require 'histogram/array'
 
-# Configure the Alpaca API
-Alpaca::Trade::Api.configure do |config|
-  config.endpoint   = "https://api.alpaca.markets"
-  config.key_id     = "AKM406CX3NH9IO9PGC55"
-  config.key_secret = "6NC5iRohh75TkdC6NBvOy2pEKhvYbnBPGPGaRFnM"
-end
-
-class Alpaca::Trade::Api::Client
-  def bars(timeframe, symbols, opts={})
-    opts[:limit] ||= 100
-    opts[:symbols] = symbols.join(',')
-
-    validate_timeframe(timeframe)
-    response = get_request(data_endpoint, "v1/bars/#{timeframe}", opts)
-    json = JSON.parse(response.body)
-    json.keys.each_with_object({}) do |symbol, hash|
-      hash[symbol] = json[symbol].map { |bar| Alpaca::Trade::Api::Bar.new(bar) }
-    end
-  end 
-end
-
-CLIENT = Alpaca::Trade::Api::Client.new
+# Configure the AlphaVantage API
+CLIENT = Alphavantage::Client.new :key => "GI387ZJ0874WXW5S"
 
 SPANS  = {'day'   => 86400,
           '15min' => 900,
