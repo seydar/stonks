@@ -71,6 +71,13 @@ class Bar < Sequel::Model
     (close - bar.open).to_f / bar.open
   end
 
+  def trading_days_from(from)
+    raise unless from.ticker == ticker
+
+    bars = ticker.bars
+    (bars.index(self) - bars.index(from)).abs # this may bite me
+  end
+
   def rsquared(prior: 10)
     ticker.rsquared(:at => self, :prior => prior)
   end

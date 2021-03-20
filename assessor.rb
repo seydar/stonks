@@ -86,16 +86,16 @@ class Assessor
       bars   = stock.ticker.bars
       orig_i = bars.index stock
 
+      p orig_i
       sell_bar = bars[orig_i..-1].filter do |day|
+        p [stock.open, day.close, sell?(stock, day)]
         sell? stock, day
       end.first
 
-      hold = bars.index sell_bar
-
       {:buy  => stock,
        :sell => sell_bar,
-       :hold => sell_bar ? (hold - orig_i)  : nil,
-       :ROI  => sell_bar ? (sell_bar.close / stock.open) - 1 : -1 }
+       :hold => sell_bar ? sell_bar.trading_days_from(stock)  : nil,
+       :ROI  => sell_bar ? sell_bar.change_from(stock) : -1 }
     end
   end
 

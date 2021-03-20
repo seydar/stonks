@@ -34,9 +34,6 @@ DB.create_table? :splits do
   index :ticker_id
 end
 
-binding.pry
-__END__
-
 #old = Sequel.connect "sqlite://tickers.db"
 #tickers = old[:tickers].all
 #tickers.each {|t| t.delete :id }

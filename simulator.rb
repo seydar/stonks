@@ -41,12 +41,13 @@ class Simulator
     
     # drop = -0.3, vol > 10M, m = -0.05, b = 7.5
     @assessor.sell_when do |original, today|
-      days_held = today.date - original.date
+      days_held = today.trading_days_from original
       
       m = -0.05
       b = 7.5
       sell_point = [m * days_held + b, 0].max
     
+      puts "\t#{[days_held, sell_point, today.change_from(original)].inspect}"
       today.change_from(original) >= sell_point
     end
   end
