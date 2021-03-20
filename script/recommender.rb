@@ -1,5 +1,8 @@
 require './market.rb'
-#require "../auberge.rb"
+
+START = "1 jan #{ARGV[0] || 2020}"
+FIN   = ARGV[0] ? "31 dec #{ARGV[0]}" : Date.today.strftime("%d %M %Y")
+KIND  = ARGV[0] || "latest"
 
 nyse = Ticker.where(:exchange => 'NYSE').all
 spy_ticker = Ticker.where(:symbol => 'SPY').first
@@ -30,6 +33,8 @@ def perc(num); "%0.3f%%" % (num * 100); end
 unless Time.parse((Date.today - 1).to_s) == nyse[5].bars.last.time
   puts "downloading data after #{nyse[5].bars.last.time}..."
   updates = Bar.download nyse, :after => (nyse[5].bars.last.time - SPANS['day'])
+  updates.merge! Bar.download([spy_ticker], :after => (spy_ticker.bars.last.time - SPANS['day']))
+
   puts "\tsaving data..."
   updates.each do |sym, bz|
     bz.each do |b|
@@ -41,7 +46,7 @@ unless Time.parse((Date.today - 1).to_s) == nyse[5].bars.last.time
   puts "\tdone!"
 end
 
-sim = Simulator.new :stocks => nyse, :after => '1 jan 2020', :before => Time.now
+sim = Simulator.new :stocks => nyse, :after => START, :before => FIN
 results = sim.run
 
 # how well would we have done if we had just invested in SPY?
@@ -57,15 +62,16 @@ new_sells = results.filter {|h| h[:sell] && h[:sell].date == Date.today }
 
 text_ari :buy => new_buys, :sell => new_sells
 
-#  <th><b>Symbol</b></th>
-#  <th><b>10-Day Trade Volume</b></th>
-#  <th><b>Buy Date</b></th>
-#  <th><b>Buy Price</b></th>
-#  <th><b>Days Held</b></th>
-#  <th><b>ROI Threshold</b></th>
-#  <th><b>Sell Price</b></th>
-#  <th><b>Sell ROI</b></th>
-#  <th><b>SPY ROI</b></th>
+# <th><b>Symbol</b></th>
+# <th><b>5-Day Trade Volume</b></th>
+# <th><b>Buy Date</b></th>
+# <th><b>Buy Price</b></th>
+# <th><b>Days Held</b></th>
+# <th><b>ROI Threshold</b></th>
+# <th><b>Sell Date</b></th>
+# <th><b>Sell Price</b></th>
+# <th><b>Sell ROI</b></th>
+# <th><b>SPY ROI</b></th>
 
 rows = results.sort_by {|r| r[:buy].date }.reverse.map do |rec|
   buy = rec[:buy]
@@ -74,8 +80,7 @@ rows = results.sort_by {|r| r[:buy].date }.reverse.map do |rec|
 
   symbol     = "<a href='https://finance.yahoo.com/quote/" +
                  "#{buy.ticker.symbol}'>#{buy.ticker.symbol}</a>"
-  symbol    += "*" if buy.id == nil # it means the price is adjusted to reflect a stock split
-  vol_avg    = buy.volumes(:prior => 10).mean.round(0)
+  vol_avg    = buy.volumes(:prior => 5).mean.round(0)
   buy_date   = buy.date == Date.today ? uusi(buy.date.strftime("%Y-%m-%d")) : buy.date.strftime("%Y-%m-%d")
   buy_price  = buy.date == Date.today ? uusi(money(buy.close)) : money(buy.open)
   days_held  = rec[:hold] ? rec[:hold] : Date.today - buy.date
@@ -100,6 +105,16 @@ rows = results.sort_by {|r| r[:buy].date }.reverse.map do |rec|
    spy_roi]
 end
 
+mean_ROI       = perc(results.map {|r| r[:ROI] }.mean)
+liquidated_ROI = results.map do |r|
+  if r[:sell]
+    r[:ROI]
+  else
+    (r[:buy].ticker.bars.last.close / r[:buy].open) - 1
+  end
+end.mean
+liquidated_ROI = perc(liquidated_ROI)
+
 out = <<-END
 <!DOCTYPE HTML>
 <html lang="en">
@@ -116,20 +131,34 @@ out = <<-END
 </p>
 <hr/>
 <p>
+  <a href='/files/stock_recs.latest.html'>latest</a> |
+  <a href='/files/stock_recs.2020.html'>2020</a> |
+  <a href='/files/stock_recs.2019.html'>2019</a> |
+  <a href='/files/stock_recs.2018.html'>2018</a>
+</p>
+<p>
   <div id='reasons'>
-    i'm looking for:
+    buy when:
     <br/>
     <ul>
-      <li>30% price drop in 3 days</li>
+      <li>30% price drop in 2 days</li>
       <li>Trading volume > 10,000,000 trades/day</li>
+    </ul>
+
+    sell when:
+    <br/>
+    <ul>
+      <li>(fraction, not a percentage) ROI > -0.05 * trading_days_held + 7.5</li>
     </ul>
   </div>
 </p>
-<p>* next to a stock symbol means the price is adjusted to reflect a split/reverse-split that occurred after that date</p>
-<p>drop occurs on one day, buy the next morning. prior 10 days is in reference to before the drop</p>
-<p><b>sell only when the price has tripled (200% growth)</b></p>
-<p><span id='future'>blue</span> figures are taken from the latest closing prices, since the price has not yet tripled</p>
+<p>prices may be adjusted to reflect a split/reverse-split that occurred after that date</p>
+<p>drop occurs on one day, buy the next morning. prior 5 days is including the day of the drop</p>
+<p><span id='future'>blue</span> figures are taken from the latest closing prices, since the threshold to sell has not yet been reached</p>
 <br/>
+<p>SPY ROI for #{START.upcase} - #{FIN.upcase}: #{uusi(perc(spy[Time.parse(START), Time.parse(FIN)]))}</p>
+<p>mean ROI for trades shown: #{uusi(mean_ROI)}</p>
+<p>mean ROI if you were to also sell everything you're still holding: #{uusi(liquidated_ROI)}</p>
 <table>
   <tr>
     <th><b>Symbol</b></th>
@@ -152,6 +181,6 @@ rows.each do |row|
 end
 
 out << "</table></body></html>"
-open("/home/ari/servers/default/public/files/stock_recs.html", "w") {|f| f.write out }
+open("/home/ari/servers/default/public/files/stock_recs.#{KIND}.html", "w") {|f| f.write out }
 puts "file made!"
 
