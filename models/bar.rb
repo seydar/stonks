@@ -29,7 +29,6 @@ class Bar < Sequel::Model
 
   # the "rise" part of the name is baked into the `>=`
   def time_to_rise(percent)
-    # most recent is first
     bars  = self.ticker.bars
     index = bars.index self
     #i = bars[index..-1].index

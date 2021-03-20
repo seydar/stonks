@@ -87,10 +87,7 @@ class Assessor
       orig_i = bars.index stock
 
       p orig_i
-      sell_bar = bars[orig_i..-1].filter do |day|
-        p [stock.open, day.close, sell?(stock, day)]
-        sell? stock, day
-      end.first
+      sell_bar = bars[orig_i..-1].find {|day| sell? stock, day }
 
       {:buy  => stock,
        :sell => sell_bar,
