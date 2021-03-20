@@ -60,18 +60,18 @@ end
 
 
 
-# TODO this doesn't make any sense. the max rise over a fluctuating period
-# of time? i don't even know what this is measuring.
-sells.each {|h| h[:max] = h[:hold] ? h[:buy].max_rise_over(h[:hold]) : [nil, -1] }
-
-# filter out the crazy stocks that'll throw off the value
-# why don't i just use `#median`?
-sells = sells.filter {|h| h[:ROI] < 6 }
-
-size       = sells.size
-max_roi    = sells.map {|h| h[:max][1] }
-max_roi  &&= max_roi.mean
-mean_roi   = sells.map {|h| h[:ROI] }
-mean_roi &&= mean_roi.mean
-
-p [ARGV[0].to_i, size, max_roi, mean_roi]
+# # TODO this doesn't make any sense. the max rise over a fluctuating period
+# # of time? i don't even know what this is measuring.
+# sells.each {|h| h[:max] = h[:hold] ? h[:buy].max_rise_over(h[:hold]) : [nil, -1] }
+# 
+# # filter out the crazy stocks that'll throw off the value
+# # why don't i just use `#median`?
+# sells = sells.filter {|h| h[:ROI] < 6 }
+# 
+# size       = sells.size
+# max_roi    = sells.map {|h| h[:max][1] }
+# max_roi  &&= max_roi.mean
+# mean_roi   = sells.map {|h| h[:ROI] }
+# mean_roi &&= mean_roi.mean
+# 
+# p [ARGV[0].to_i, size, max_roi, mean_roi]
