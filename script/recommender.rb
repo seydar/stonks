@@ -23,7 +23,7 @@ end
 
 def uusi(txt); "<span id='future'>#{txt}</span>"; end
 def money(num); "$%0.3f" % num; end
-def perc(num); "%0.3f%%" % num; end
+def perc(num); "%0.3f%%" % (num * 100); end
 
 # download and save the latest information
 # i acknowledge that this assumes that all tickers are updated at the same time
@@ -84,8 +84,8 @@ rows = results.sort_by {|r| r[:buy].date }.reverse.map do |rec|
   roi_thresh = rec[:hold] ? roi_thresh : uusi(roi_thresh)
   sell_date  = rec[:sell] ? rec[:sell].date.strftime("%Y-%m-%d") : uusi("-")
   sell_price = rec[:sell] ? money(rec[:sell].close) : uusi(money(latest.close))
-  sell_roi   = rec[:ROI] ? perc(rec[:ROI] * 100) : uusi(perc(latest_roi * 100))
-  spy_roi    = money(rec[:spy])
+  sell_roi   = rec[:sell] ? perc(rec[:ROI]) : uusi(perc(latest_roi))
+  spy_roi    = perc(rec[:spy])
 
 
   [symbol,
