@@ -86,7 +86,6 @@ class Assessor
       bars   = stock.ticker.bars
       orig_i = bars.index stock
 
-      p orig_i
       sell_bar = bars[orig_i..-1].find {|day| sell? stock, day }
 
       {:buy  => stock,
