@@ -32,8 +32,8 @@ def perc(num); "%0.3f%%" % (num * 100); end
 # i acknowledge that this assumes that all tickers are updated at the same time
 unless Time.parse((Date.today - 1).to_s) == nyse[5].bars.last.time
   puts "downloading data after #{nyse[5].bars.last.time}..."
-  updates = Bar.download nyse, :after => (nyse[5].bars.last.time - SPANS['day'])
-  updates.merge! Bar.download([spy_ticker], :after => (spy_ticker.bars.last.time - SPANS['day']))
+  updates = Bar.download nyse, :after => nyse[5].bars.last.time
+  updates.merge! Bar.download([spy_ticker], :after => spy_ticker.bars.last.time)
 
   puts "\tsaving data..."
   updates.each do |sym, bz|
@@ -84,7 +84,7 @@ rows = results.sort_by {|r| r[:buy].date }.reverse.map do |rec|
   buy_date   = buy.date == Date.today ? uusi(buy.date.strftime("%Y-%m-%d")) : buy.date.strftime("%Y-%m-%d")
   buy_price  = buy.date == Date.today ? uusi(money(buy.close)) : money(buy.open)
   days_held  = rec[:hold] ? rec[:hold] : Date.today - buy.date
-  roi_thresh = perc([-0.05 * days_held + 7.5, 0].max)
+  roi_thresh = perc([-0.05 * days_held + 4.6, 0].max)
   days_held  = rec[:hold] ? days_held.to_i : uusi(days_held.to_i)
   roi_thresh = rec[:hold] ? roi_thresh : uusi(roi_thresh)
   sell_date  = rec[:sell] ? rec[:sell].date.strftime("%Y-%m-%d") : uusi("-")
@@ -148,7 +148,7 @@ out = <<-END
     sell when:
     <br/>
     <ul>
-      <li>(fraction, not a percentage) ROI > -0.05 * trading_days_held + 7.5</li>
+      <li>(fraction, not a percentage) ROI > -0.05 * trading_days_held + 4.6</li>
     </ul>
   </div>
 </p>
