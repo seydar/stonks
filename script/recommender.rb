@@ -1,8 +1,8 @@
 require './market.rb'
 
-START = "1 jan #{ARGV[0] || 2020}"
-FIN   = ARGV[0] ? "31 dec #{ARGV[0]}" : Date.today.strftime("%d %M %Y")
-KIND  = ARGV[0] || "latest"
+START = "1 jan #{ARGV[0] || 2021}"
+FIN   = ARGV[0] ? "31 dec #{ARGV[0]}" : Date.today.strftime("%d %b %Y")
+KIND  = ARGV[0] || "2021"
 
 nyse = Ticker.where(:exchange => 'NYSE').all
 spy_ticker = Ticker.where(:symbol => 'SPY').first
@@ -134,7 +134,7 @@ out = <<-END
 </p>
 <hr/>
 <p>
-  <a href='/files/stock_recs.latest.html'>latest</a> |
+  <a href='/files/stock_recs.2021.html'>2021</a> |
   <a href='/files/stock_recs.2020.html'>2020</a> |
   <a href='/files/stock_recs.2019.html'>2019</a> |
   <a href='/files/stock_recs.2018.html'>2018</a>
@@ -184,6 +184,7 @@ rows.each do |row|
 end
 
 out << "</table></body></html>"
-#open("/home/ari/servers/default/public/files/stock_recs.#{KIND}.html", "w") {|f| f.write out }
-puts "file made!"
+fname = "/home/ari/servers/default/public/files/stock_recs.#{KIND}.html"
+open(fname, "w") {|f| f.write out }
+puts "file made @ #{fname}"
 
