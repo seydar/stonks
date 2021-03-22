@@ -4,7 +4,7 @@ require 'alpaca/trade/api'
 require 'ruby_linear_regression'
 require 'linefit'
 
-DB = Sequel.connect "sqlite://tickers.db"
+DB = Sequel.connect "sqlite://data/tickers.db"
 
 DB.create_table? :bars do
   primary_key :id
@@ -42,8 +42,7 @@ require './models/bar.rb'
 
 class Alpaca::Trade::Api::Bar
   def save(symbol, period)
-    ::Bar.create :symbol => symbol,
-                 :span   => period,
+    ::Bar.create :span   => period,
                  :close  => @close,
                  :high   => @high,
                  :low    => @low,

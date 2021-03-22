@@ -25,7 +25,7 @@ nyse.each do |sym|
   trs = trs.map {|tr| tr.children.map {|td| td.text } }[1..-1] # strip the headers
   
   trs.each do |tds|
-    date = Time.parse(DateTime.strptime(tds[0], "%m/%d/%Y").to_s
+    date = Time.parse(DateTime.strptime(tds[0], "%m/%d/%Y").to_s)
 
     next if Split.where(:ticker_id => sym.id,
                         :ratio     => tds[-1],
@@ -33,7 +33,7 @@ nyse.each do |sym|
 
     Split.create :ticker_id => sym.id,
                  :ratio     => tds[-1],
-                 :ex        => date)
+                 :ex        => date
     print "."
   end
 end

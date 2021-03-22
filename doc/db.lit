@@ -1,0 +1,114 @@
+@code_type ruby .rb
+@comment_type # %s
+
+@title Database and Models
+
+@s Database Schema
+
+We're using an Sqlite3 database, because I'm a simple man with simple
+pleasures.
+
+--- db.rb
+require 'sqlite3'
+require 'sequel'
+require 'alpaca/trade/api'
+require 'ruby_linear_regression'
+require 'linefit'
+
+DB = Sequel.connect "sqlite://tickers.db"
+
+@{Bar table}
+
+@{Ticker table}
+
+@{Split table}
+
+# Load the models for handling the data
+require './models/ticker.rb'
+require './models/split.rb'
+require './models/bar.rb'
+
+@{Alpaca Ruby API integration}
+---
+
+@s Bar Table
+
+Just a way to track the standard OHLC data. We also want to know the volume,
+and we track the "span" because we want to be prepared to handle intraday data
+as well.
+
+--- Bar table
+DB.create_table? :bars do
+  primary_key :id
+  foreign_key :ticker_id, :tickers
+  index :ticker_id
+  float :close
+  float :high
+  float :low
+  float :open
+  datetime :time
+  integer :volume
+  string :span # day, 15 min, 5 min, 1 min
+end
+---
+
+@s
+
+No surprises here. Not all sources provide a complete list of all stock
+tickers, so it's good to keep track of them here. AlphaVantage, for instance,
+does not offer a complete listing, so when I query that API, I have to base the
+query off of tickers provided by AlpacaMarkets.
+
+--- Ticker table
+DB.create_table? :tickers do
+  primary_key :id
+  string :symbol
+  string :exchange
+end
+---
+
+@s
+
+Split information is important to correct for quantum price shifts. The data
+from Alpaca (and Yahoo! Finance) is uncorrected, which means if a split occurs
+on June 2, the price will appear to have (potentially) jumped 450%.
+
+I get my split information from https://stocksplithistory.com, and update the
+database through a separate script.
+
+I used to get my information from a different source, but I found that it was
+incomplete. That is why I use "ex" as a column name: it means "execution date".
+
+--- Split table
+DB.create_table? :splits do
+  primary_key :id
+  foreign_key :ticker_id, :tickers
+  index :ticker_id
+
+  string :ratio
+  datetime :ex
+end
+---
+
+@s
+
+Just a helper method for quickly saving the results from a web query.
+
+--- Alpaca Ruby API integration
+class Alpaca::Trade::Api::Bar
+  def save(symbol, period)
+    ::Bar.create :span   => period,
+                 :close  => @close,
+                 :high   => @high,
+                 :low    => @low,
+                 :open   => @open,
+                 :time   => @time,
+                 :volume => @volume,
+                 :ticker_id => ::Ticker.where(:symbol => symbol).first.id
+  end
+end
+---
+
+@s Bar Model
+
+

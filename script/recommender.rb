@@ -16,11 +16,11 @@ end
 
 def text_ari(buy: [], sell: [])
   unless buy.empty?
-    `ruby /home/ari/servers/stocks/text_ari.rb buy #{buy.map {|b| b.ticker.symbol }}`
+    `ruby /home/ari/servers/stocks/text_ari.rb buy #{buy.map {|b| b[:buy].ticker.symbol }}`
   end
 
   unless sell.empty?
-    `ruby /home/ari/servers/stocks/text_ari.rb sell #{sell.map {|b| b.ticker.symbol }}`
+    `ruby /home/ari/servers/stocks/text_ari.rb sell #{sell.map {|b| b[:sell].ticker.symbol }}`
   end
 end
 
@@ -36,14 +36,17 @@ unless Time.parse((Date.today - 1).to_s) == nyse[5].bars.last.time
   updates.merge! Bar.download([spy_ticker], :after => spy_ticker.bars.last.time)
 
   puts "\tsaving data..."
+  stocks_updated = 0
   updates.each do |sym, bz|
     bz.each do |b|
+      stocks_updated += 1
+
       unless b.time == Time.parse(Date.today.to_s) && Time.now < Time.parse('17:00')
         b.save sym, 'day'
       end
     end
   end
-  puts "\tdone!"
+  puts "\t#{stocks_updated} stocks updated"
 end
 
 sim = Simulator.new :stocks => nyse, :after => START, :before => FIN
@@ -181,6 +184,6 @@ rows.each do |row|
 end
 
 out << "</table></body></html>"
-open("/home/ari/servers/default/public/files/stock_recs.#{KIND}.html", "w") {|f| f.write out }
+#open("/home/ari/servers/default/public/files/stock_recs.#{KIND}.html", "w") {|f| f.write out }
 puts "file made!"
 

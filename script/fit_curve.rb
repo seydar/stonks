@@ -41,9 +41,9 @@ STDERR.puts "holding #{assessor.holding.size}"
     end
     
     # filter out the crazy stocks that'll throw off the value
-    # why don't i just use `#median`?
     sells = sells.filter {|h| h[:ROI] < 6 }
     
+    # why don't i just use `#median` instead of `#mean`?
     size       = sells.size
     max_roi    = sells.map {|h| h[:max][1] }
     max_roi  &&= max_roi.mean

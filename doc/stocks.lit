@@ -1,0 +1,78 @@
+@code_type ruby .rb
+@comment_type # %s
+
+@title Computer-aided Day Trading
+
+@s Computer-aided Day Trading
+
+The stock market generally overreacts. When good news is published, the price
+rises before subsequently falling some amount. When bad news is published, the
+price plummets before subsequently rising some amount. One method of automation
+would be scanning the news for headlines, measuring the sentiment, and then
+investing when the price drops -- the news tells you where to look. Another
+option is to scan the entire market and look for drops.
+
+My method is to do exactly that: scan the entire market for a precipitous drop
+in price over two days (opening of the first to closing of the second), and
+then invest. These stocks tend to rise, collectively, over 100%. How can we
+take advantage of that? How do we know when to sell? When should we be
+satisfied with a stock's performance?
+
+@s The Process
+
+For each stock ticker, see if it is experiencing a predefined trend. If the
+stock meets enough of the trends, recommend it for buying.
+
+--- market.rb
+require 'open-uri'
+require 'alpaca/trade/api'
+require './db.rb'
+require './assessor.rb'
+require './simulator.rb'
+require 'statistics'
+require 'histogram/array'
+
+@{Configure the Alpaca API}
+---
+
+@s
+
+As a matter of boilerplate, we need to link up to the Alpaca API in order to
+trade.
+
+--- Configure the Alpaca API
+Alpaca::Trade::Api.configure do |config|
+  config.endpoint   = "https://api.alpaca.markets"
+  config.key_id     = "AKM406CX3NH9IO9PGC55"
+  config.key_secret = "6NC5iRohh75TkdC6NBvOy2pEKhvYbnBPGPGaRFnM"
+end
+
+CLIENT = Alpaca::Trade::Api::Client.new
+
+@{Enhance the Alpaca Ruby API}
+--- 
+
+@s
+
+Minor issue with the Ruby API: it only allows you to specify the symbols and
+limit the number of results returned. The below change allows you to supply
+arbitrary options so that the usage of the `CLIENT.bars` can match the web API.
+
+--- Enhance the Alpaca Ruby API
+class Alpaca::Trade::Api::Client
+  # This takes care of the issue where I was not able to provide other options
+  # to the GET request. Now, I can specify "before" and "after" IAW the API.
+  def bars(timeframe, symbols, opts={})
+    opts[:limit] ||= 100
+    opts[:symbols] = symbols.join(',')
+
+    validate_timeframe(timeframe)
+    response = get_request(data_endpoint, "v1/bars/#{timeframe}", opts)
+    json = JSON.parse(response.body)
+    json.keys.each_with_object({}) do |symbol, hash|
+      hash[symbol] = json[symbol].map { |bar| Alpaca::Trade::Api::Bar.new(bar) }
+    end
+  end 
+end
+---
+

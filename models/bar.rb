@@ -46,20 +46,6 @@ class Bar < Sequel::Model
     -1
   end
 
-  def time_to_rise_norm(percent)
-    wait_time = time_to_rise percent
-
-    if before_split? :days => wait_time
-      index = ticker.bars.index self
-      ticker.bars
-      ticker.normalize!
-      rec = ticker.bars[index] # the object won't be the same
-      wait_time = rec.time_to_rise percent
-    end
-
-    wait_time
-  end
-
   def max_rise_over(days)
     index = ticker.bars.index self
     range = ticker.bars[index..(index + days)]

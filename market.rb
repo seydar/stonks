@@ -1,6 +1,3 @@
-# stocks.rb
-require 'pp'
-require 'yaml'
 require 'open-uri'
 require 'alpaca/trade/api'
 require './db.rb'
@@ -16,7 +13,11 @@ Alpaca::Trade::Api.configure do |config|
   config.key_secret = "6NC5iRohh75TkdC6NBvOy2pEKhvYbnBPGPGaRFnM"
 end
 
+CLIENT = Alpaca::Trade::Api::Client.new
+
 class Alpaca::Trade::Api::Client
+  # This takes care of the issue where I was not able to provide other options
+  # to the GET request. Now, I can specify "before" and "after" IAW the API.
   def bars(timeframe, symbols, opts={})
     opts[:limit] ||= 100
     opts[:symbols] = symbols.join(',')
@@ -30,38 +31,18 @@ class Alpaca::Trade::Api::Client
   end 
 end
 
-CLIENT = Alpaca::Trade::Api::Client.new
-
-SPANS  = {'day'   => 86400,
-          '15min' => 900,
-          '5min'  => 300,
-          'min'   => 60}
-
-class Array
-  def median
-    sort[size / 2]
-  end
-end
-
-######
-# TODO how do i define stock volatility? generally, it assumes a stable mean,
-# but what happens when the mean is stably trending upwardss?
-######
-
 ##############################################################
 # How do we define what a precipitous drop in stock price is?
 #
-# {-100..-0.3 => 48,
-#  -0.3..-0.2 => 155,
-#  -0.2..-0.1 => 1589,
-#  -0.1.. 0   => 106486,
-#   0  .. 0.1 => 116388,
-#   0.1.. 0.2 => 3102,
-#   0.2.. 0.3 => 453,
-#   0.3.. 100 => 242}
+# {-100..-0.3 => 99,
+#  -0.3..-0.2 => 243,
+#  -0.2..-0.1 => 2532,
+#  -0.1.. 0   => 267752,
+#   0  .. 0.1 => 309317,
+#   0.1.. 0.2 => 3218,
+#   0.2.. 0.3 => 377,
+#   0.3.. 100 => 151}
 #
-# These are across the NYSE, with an average of 70 days of data per stock.
-# So over 70 days, how many trades do I want to take place?
-# In theory, if I sell after making 10% back on the stocks
+# This is across the NYSE from 1 JAN 2019 to 31 DEC 2019.
 ##############################################################
 

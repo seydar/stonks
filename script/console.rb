@@ -1,6 +1,12 @@
 require 'pry'
 require './market.rb'
 
+class Array
+  def median
+    sort[size / 2]
+  end
+end
+
 def time
   start  = Time.now
   result = yield
