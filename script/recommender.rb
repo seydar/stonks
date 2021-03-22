@@ -16,11 +16,11 @@ end
 
 def text_ari(buy: [], sell: [])
   unless buy.empty?
-    `ruby /home/ari/servers/stocks/scripts/text_ari.rb buy #{buy.map {|b| b[:buy].ticker.symbol }}`
+    `ruby /home/ari/servers/stocks/script/text_ari.rb buy #{buy.map {|b| b[:buy].ticker.symbol }}`
   end
 
   unless sell.empty?
-    `ruby /home/ari/servers/stocks/scripts/text_ari.rb sell #{sell.map {|b| b[:sell].ticker.symbol }}`
+    `ruby /home/ari/servers/stocks/script/text_ari.rb sell #{sell.map {|b| b[:sell].ticker.symbol }}`
   end
 end
 
