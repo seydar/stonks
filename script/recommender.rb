@@ -30,9 +30,10 @@ def perc(num); "%0.3f%%" % (num * 100); end
 
 # download and save the latest information
 # i acknowledge that this assumes that all tickers are updated at the same time
-unless Time.parse((Date.today - 1).to_s) == nyse[5].bars.last.time
-  puts "downloading data after #{nyse[5].bars.last.time}..."
-  updates = Bar.download nyse, :after => nyse[5].bars.last.time
+latest_bar = nyse[5].bars.last.time
+unless Time.parse((Date.today - 1).to_s) == latest_bar
+  puts "downloading data after #{latest_bar}..."
+  updates = Bar.download nyse, :after => latest_bar
   updates.merge! Bar.download([spy_ticker], :after => spy_ticker.bars.last.time)
 
   puts "\tsaving data..."
@@ -60,8 +61,12 @@ end
 
 # could be the day after the deciding day, or it could be the deciding day (if
 # there's no new bar after it, aka it's bleeding edge)
-new_buys  = results.filter {|h| h[:buy].date >= Date.today }
-new_sells = results.filter {|h| h[:sell] && h[:sell].date == Date.today }
+new_buys  = results.filter {|h| h[:buy].date >= latest_bar }
+new_sells = results.filter {|h| h[:sell] && h[:sell].date >= latest_bar }
+puts "buy:"
+puts "\t#{new_buys.map {|t| t.symbol }.join ", "}"
+puts "sell:"
+puts "\t#{new_sells.map {|t| t.symbol }.join ", "}"
 
 text_ari :buy => new_buys, :sell => new_sells
 
