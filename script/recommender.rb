@@ -145,6 +145,9 @@ out = <<-END
   <a href='/files/stock_recs.2018.html'>2018</a>
 </p>
 <p>
+a full explanation is available <a href="/files/stocks.html">here</a>
+</p>
+<p>
   <div id='reasons'>
     buy when:
     <br/>
