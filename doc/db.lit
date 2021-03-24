@@ -8,6 +8,8 @@
 I'm using an SQLite3 database, because I'm a simple man with simple
 pleasures.
 
+The rest of the program is discussed [here](/files/stocks.html).
+
 --- db.rb
 require 'sqlite3'
 require 'sequel'
