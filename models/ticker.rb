@@ -8,7 +8,7 @@ class Ticker < Sequel::Model
     bars[[idx - prior + 1, 0].max..(idx + post)]
   end
 
-  def volume(at: nil, prior: 10, post: 0)
+  def volumes(at: nil, prior: 10, post: 0)
     history(:around => at, :prior => prior, :post => post).map {|b| b.volume }
   end
 

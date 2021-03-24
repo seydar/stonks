@@ -1,3 +1,5 @@
+@code_type ruby .rb
+@comment_type # %s
 @include layout.lit
 @title Database and Models
 

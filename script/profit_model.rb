@@ -6,9 +6,9 @@ FIN   = ARGV[0] ? "31 dec #{ARGV[0]}" : Date.today.strftime("%d %M %Y")
 
 nyse = Ticker.where(:exchange => 'NYSE').all
 if File.exists? "#{ARGV[0]}.sim"
-  res = open("#{ARGV[0]}.sim", "r") {|f| Marshal.load f.read }
+  res = open("data/#{ARGV[0]}.sim", "r") {|f| Marshal.load f.read }
 elsif ARGV[0] == "all"
-  res = (2018..2021).map {|y| open("#{y}.sim", "r") {|f| Marshal.load f.read } }
+  res = (2018..2021).map {|y| open("data/#{y}.sim", "r") {|f| Marshal.load f.read } }
                     .inject {|s, v| s + v }
 else
   sim  = Simulator.new :stocks => nyse, :after => START, :before => FIN

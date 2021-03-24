@@ -1,3 +1,5 @@
+@code_type ruby .rb
+@comment_type # %s
 @include layout.lit
 @title Computer-aided Day Trading
 
@@ -30,11 +32,31 @@ intermediate step, I've settled on the below figures.
 
 What a great question.
 
+We buy when the price drops and we are confident that the price will go back up.
+
+#### Price Drop
+
 First off, what does a "drop in price" look like? What kinds of drops are there?
 Reviewing the data from the NYSE for 2019 (1 January - 31 December), we get the
-following numbers:
+following numbers for the fractional 2-day change (from opening of one day to
+the close of the next):
 
 --- Price Change and Occurrences
+tids  = Ticker.where(:exchange => 'NYSE').all.map {|t| t.id }
+debut = Time.parse('1 jan 2019')
+fin   = Time.parse('31 dec 2019')
+bars  = Bar.where(:time => debut..fin, :ticker_id => tids)
+           .order(:ticker_id, Sequel.asc(:time))
+           .all
+groups  = bars.group_by {|b| b.ticker_id }
+changes = groups.map do |ticker_id, bars|
+  bars.each_cons(2).map {|a, b| b.change_from a }
+end.flatten
+
+hist = changes.histogram [-0.35, -0.25, -0.15, -0.05, 0.05, 0.15, 0.25, 0.35]
+---
+
+--- Price Change and Occurrences :=
 "Fractional 2-day Change" => "# of Occurrences"
                -100..-0.3 => 99
                -0.3..-0.2 => 243
@@ -47,22 +69,98 @@ following numbers:
 ---
 
 I therefore decided that the 99 occurrences/year would be sufficient for my
-tastes; the odds that a >30% drop is an overreaction to some degree is likely
-high.
+tastes; the odds that a >30% drop is an overreaction due to bad news to some
+degree is likely high. Thus: we're set the default value in the simulator as
+`-0.3`.
+
+#### Price Movement
+
+The logic here is based on my theory of price change: the price of a stock
+changes when enough sales have occurred to raise the price (an unenlightening
+statement), with $\Delta P_{min}$ being the minimum increase in a stock's price:
+
+<br/>
+<div align="center">
+$\Delta P_{day} = \Delta P_{min} * N_{trades}$
+</div>
+<br/>
+
+With a larger minimum price increase, then fewer sales are required to raise the
+price to meet a certain threshold. Dividing both sides by $P_{day - 1}$, we get
+the fractional change in price:
+
+<br/>
+<div align="center">
+$\frac{\Delta P_{day}}{P_{day - 1}} = \frac{\Delta P_{min}}{P_{day - 1}} *
+N_{trades}$
+</div>
+<br/>
+
+This now represents the fractional ROI. Assuming the $P_{min}$ is constant for
+all stocks, $\frac{\Delta P_{min}}{P_{day - 1}}$ will be greater when $P$ is
+lower. We want to maximize $N_{trades}$ and minimize $P$, which is summarized in
+our maximization of $\frac{N_{trades}}{P_{day - 1}}$.
+
+The change in price works in both directions, so maximizing the above monomial
+could also lead to a sever price drop. But since we're minimizing the $P_{day}$
+involved, we're limiting how much the price can drop.
+
+<br/>
+**TODO**: This would be a really good thing to check instead of simply volume.
+Maybe ensure that a stock is in the top 30% or something? Or meets some minimum
+threshold that roughly represents that bracket?
+
+--- Price Theory Optimization
+vals = nyse.map do |t|
+  if t.bars.empty?
+    [t, nil]
+  else
+    [t, t.volumes(:prior => 10).mean / t.bars[-1].close]
+  end
+end.to_h
+vals.each {|k, v| vals.delete k if v.nil? }
+---
+
+#### N<sub>trades</sub>
+
+But because I'm an idiot and didn't do sufficient math as I was developing this
+program, I only check for $N_{trades}$ instead of $\frac{N_{trades}}{P_{day -
+1}}$. 10,000,000 was chosen because after looking at the trades that dropped,
+there were more losers than winners in the < 10,000,000 trades/day crowd. I
+found that I could increase my average ROI by culling the herd.
 
 --- When Do We Buy?
     @assessor.buy_when :history => 5 do |history|
       today     = history[-1]
       yesterday = history[-2]
     
-      [(today.change_from(yesterday) <= drop or
-        today.change_from(today)     <= drop),
+      [[today.change_from(yesterday) <= drop,
+        today.change_from(today)     <= drop].any?,
+
        history.map {|b| b.volume }.mean >= vol
       ].all?
     end
 ---
 
 @s When Do We Sell?
+
+As time goes on, more opportunities to invest will arise, and, being a man with
+limited impulse control, I am going to invest in them.
+
+=> This means that as time goes on, I am risking more and more of my money.
+
+=> Since I am risking more and more of my money, I get more and more desperate
+to get it back.
+
+=> Since I am getting desperate, I am going to lower my standards for the kinds
+of returns that I will accept.
+
+#### What Degree of Polynomial?
+
+The line that marks the threshold above which I will sell a stock could be
+anything, so from one perspective, I need to try polynomials of all different
+degrees. However, a polynomial would imply that there is a grand, overarching
+pattern to the way stocks rise after a drop.
 
 --- When Do We Sell?
     # drop = -0.3, vol > 10M, m = -0.05, b = 4.6

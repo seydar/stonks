@@ -15,8 +15,9 @@ class Simulator
       today     = history[-1]
       yesterday = history[-2]
     
-      [(today.change_from(yesterday) <= drop or
-        today.change_from(today)     <= drop),
+      [[today.change_from(yesterday) <= drop,
+        today.change_from(today)     <= drop].any?,
+
        history.map {|b| b.volume }.mean >= vol
       ].all?
     end
