@@ -1,6 +1,4 @@
-@code_type ruby .rb
-@comment_type # %s
-
+@include layout.lit
 @title Computer-aided Day Trading
 
 @s Computer-aided Day Trading
@@ -14,14 +12,125 @@ option is to scan the entire market and look for drops.
 
 My method is to do exactly that: scan the entire market for a precipitous drop
 in price over two days (opening of the first to closing of the second), and
-then invest. These stocks tend to rise, collectively, over 100%. How can we
-take advantage of that? How do we know when to sell? When should we be
+then invest. These stocks tend to rise, collectively, over 100%. How can I
+take advantage of that? How do I know when to sell? When should I be
 satisfied with a stock's performance?
 
 @s The Process
 
-For each stock ticker, see if it is experiencing a predefined trend. If the
-stock meets enough of the trends, recommend it for buying.
+The process starts simply: we answer the questions of "when do we buy" and "when
+do we sell".
+
+A stock price will drop and then it will go back up. We are measuring several
+different dimensions for the best outcome, which make this a difficult
+(annoying?) problem to solve without the help of more computing power. As an
+intermediate step, I've settled on the below figures.
+
+@s When Do We Buy?
+
+What a great question.
+
+First off, what does a "drop in price" look like? What kinds of drops are there?
+Reviewing the data from the NYSE for 2019 (1 January - 31 December), we get the
+following numbers:
+
+--- Price Change and Occurrences
+"Fractional 2-day Change" => "# of Occurrences"
+               -100..-0.3 => 99
+               -0.3..-0.2 => 243
+               -0.2..-0.1 => 2532
+               -0.1.. 0   => 267752
+                0  .. 0.1 => 309317
+                0.1.. 0.2 => 3218
+                0.2.. 0.3 => 377
+                0.3.. 100 => 151
+---
+
+I therefore decided that the 99 occurrences/year would be sufficient for my
+tastes; the odds that a >30% drop is an overreaction to some degree is likely
+high.
+
+--- When Do We Buy?
+    @assessor.buy_when :history => 5 do |history|
+      today     = history[-1]
+      yesterday = history[-2]
+    
+      [(today.change_from(yesterday) <= drop or
+        today.change_from(today)     <= drop),
+       history.map {|b| b.volume }.mean >= vol
+      ].all?
+    end
+---
+
+@s When Do We Sell?
+
+--- When Do We Sell?
+    # drop = -0.3, vol > 10M, m = -0.05, b = 4.6
+    @assessor.sell_when do |original, today|
+      days_held = today.trading_days_from original
+      
+      m = -0.05
+      b =  4.6
+      sell_point = [m * days_held + b, 0].max
+    
+      today.change_from(original) >= sell_point
+    end
+---
+
+@s The Simulator
+
+While @{The Assessor} provides the framework for routinely and cleanly assessing
+the data, the contents of that framework, the actual algorithm, are contained in
+the simulator.
+
+--- simulator.rb
+class Simulator
+  attr_accessor :results
+  attr_accessor :assessor
+  attr_accessor :stocks
+  attr_accessor :after
+  attr_accessor :before
+
+  def initialize(stocks: nil, drop: -0.3, vol: 10_000_000, after: nil, before: nil)
+    @stocks = stocks
+    @after  = after
+    @before = before
+
+    @assessor = Assessor.new
+
+    @{When Do We Buy?}
+
+    @{When Do We Sell?}
+  end
+
+  def run
+    @assessor.assess_buys @stocks, :after  => @after,
+                                   :before => @before
+    @results = @assessor.assess_sells
+  end
+
+end
+---
+
+@s The Assessor
+
+--- assessor.rb
+class Assessor
+  attr_accessor :buying_plan
+  attr_accessor :selling_plan
+  attr_accessor :history_requirement
+
+  attr_accessor :holding
+
+
+end
+---
+
+@s Accessing Market Data
+
+I use Alpaca.Markets to access market data. At the moment, I only use daily
+data. Alpaca's data is unadjusted for splits, and I have found at least one
+unresolved issue with their data (January 2018 data for AFL).
 
 --- market.rb
 require 'open-uri'
@@ -35,9 +144,9 @@ require 'histogram/array'
 @{Configure the Alpaca API}
 ---
 
-@s
+@s Configure the Alpaca API
 
-As a matter of boilerplate, we need to link up to the Alpaca API in order to
+As a matter of boilerplate, I need to link up to the Alpaca API in order to
 trade.
 
 --- Configure the Alpaca API
@@ -52,7 +161,7 @@ CLIENT = Alpaca::Trade::Api::Client.new
 @{Enhance the Alpaca Ruby API}
 --- 
 
-@s
+@s Enhance the Alpaca Ruby API
 
 Minor issue with the Ruby API: it only allows you to specify the symbols and
 limit the number of results returned. The below change allows you to supply

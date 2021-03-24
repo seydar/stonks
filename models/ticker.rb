@@ -12,18 +12,9 @@ class Ticker < Sequel::Model
     history(:around => at, :prior => prior, :post => post).map {|b| b.volume }
   end
 
-  # just looks at the standard deviation of the open and close prices
-  #
-  # :at => starting point
-  # :prior => how many days prior
-  def volatility_stddev(at: nil, prior: 10)
-    domain = history(:around => at, :prior => prior)[0..-2]
-    prices = domain.map {|b| [b.open, b.close] }.flatten
-    prices.standard_deviation / prices.mean
-  end
-
-  # MSE is abritrary. Find a way to normalize it against stock price
-  # Maybe divide it by the standard deviation? or the mean price?
+  # This is an absolute value, so a line with 3% shift of a trend at $600 will
+  # have a greater MSE than a line with 3% shift of a trend at $6.
+  # The cheaper a stock is, the more volatility it is allowed to have.
   def mse(at: nil, prior: 10)
     regression(:at => at, :prior => prior).meanSqError
   end
@@ -47,18 +38,16 @@ class Ticker < Sequel::Model
     line_fit
   end
 
-  def volatility(at: nil, prior: 10)
-    rsquared :at => at, :prior => prior
-  end
-
-  def drop(drop)
+  # Find all 2-day drops of at least `drop`
+  def drops(drop)
     # oldest bar is first
     bars.each_cons(2).filter do |span|
       span[-1].change_from(span[0]) <= drop
     end
   end
 
-  def rise(rise)
+  # Find all 2-day rises of at least `rise`
+  def rises(rise)
     # oldest bar is first
     bars.each_cons(2).filter do |span|
       span[-1].change_from(span[0]) >= rise
@@ -89,6 +78,8 @@ class Ticker < Sequel::Model
       unnormalized[0..-2].map do |b|
         b.close *= ratio
         b.open  *= ratio
+        b.high  *= ratio
+        b.low   *= ratio
       end
     end
 

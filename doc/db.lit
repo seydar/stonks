@@ -1,11 +1,9 @@
-@code_type ruby .rb
-@comment_type # %s
-
+@include layout.lit
 @title Database and Models
 
 @s Database Schema
 
-We're using an Sqlite3 database, because I'm a simple man with simple
+I'm using an SQLite3 database, because I'm a simple man with simple
 pleasures.
 
 --- db.rb
@@ -15,7 +13,7 @@ require 'alpaca/trade/api'
 require 'ruby_linear_regression'
 require 'linefit'
 
-DB = Sequel.connect "sqlite://tickers.db"
+DB = Sequel.connect "sqlite://data/tickers.db"
 
 @{Bar table}
 
@@ -33,8 +31,8 @@ require './models/bar.rb'
 
 @s Bar Table
 
-Just a way to track the standard OHLC data. We also want to know the volume,
-and we track the "span" because we want to be prepared to handle intraday data
+Just a way to track the standard OHLC data. I also want to know the volume,
+and I track the "span" because I want to be prepared to handle intraday data
 as well.
 
 --- Bar table
@@ -52,7 +50,159 @@ DB.create_table? :bars do
 end
 ---
 
-@s
+@s Bar Model
+
+--- models/bar.rb
+class Bar < Sequel::Model
+  many_to_one :ticker
+
+  @{Alpaca Bar Integration}
+
+  def inspect
+    "#<Bar id => #{id}, sym => #{ticker.symbol}, time => #{time.strftime "%Y-%m-%d"}, o => #{open}, c => #{close}, h => #{high}, l => #{low}>"
+  end
+
+  def date
+    time.to_datetime
+  end
+
+  def date=(val)
+    self.time = Time.parse(val.to_s)
+  end
+
+  def trading_days_from(from)
+    raise unless from.ticker == ticker
+
+    bars = ticker.bars
+    (bars.index(self) - bars.index(from)).abs # this may bite me
+  end
+
+  @{Bar Normalization}
+
+  @{Measurements of Future Bar Change}
+
+  @{Measurements of Past Bar Performance}
+end
+---
+
+@s Bar normalization
+
+Because Alpaca data is unadjusted for splits/reverse splits, I have to do that
+adjustment ourselves. This involves aggregating split data and then normalizing
+the stock data from before the splits accordingly.
+
+Since it is inefficient to take every ticker, normalize the entire history of
+data, and /then/ perform our analyses, I conduct the analyses on the unadjusted
+data first and normalize afterwards in order to find the proper sell date.
+
+Refreshing allows us to retrieve the normalized version of a bar, from the
+perspective of the bar.
+
+TODO: While rare, this introduces a bug where a standard stock split (1 share
+becomes 2) is incorrectly identified as a drop in price.
+
+--- Bar Normalization
+  def refresh
+    ticker.bars.filter {|b| b.time == time }[0]
+  end
+---
+
+@s Measurements of Future Bar Change
+
+Useful methods for determining how the stock does in the future from this bar.
+I look at how a stock fares over a given number of days, and how many days it
+takes for a stock to meet a certain metric.
+
+TODO: In the same way that there's Bar#history, there should probably be a
+Bar#future.
+
+--- Measurements of Future Bar Change
+  # the "rise" part of the name is baked into the `>=`
+  # How many trading days does it take to rise by `percent`?
+  # Returns -1 if it never does.
+  def time_to_rise(percent)
+    bars  = self.ticker.bars
+    index = bars.index self
+    #i = bars[index..-1].index
+
+    (index..bars.size - 1).each do |j|
+      if bars[j].change_from(bars[index]) >= percent
+        #if self.before_split?(:days => j - index)
+        #  return -2
+        #else
+          return j - index
+        #end
+      end
+    end
+
+    -1
+  end
+
+  # What is the maximum percent rise when compared to `self` over the next
+  # `days` trading days?
+  def max_rise_over(days)
+    index = ticker.bars.index self
+    range = ticker.bars[index..(index + days)]
+    range.map {|b| [b, b.change_from(self)] }.max_by {|a| a[1] }
+  end
+
+  # When is the first two-day period that drops by `drop`, after this bar?
+  def drop(drop)
+    i    = ticker.bars.index self
+    fin  = ticker.bars.size - 1
+    bars = ticker.bars[i..fin]
+
+    # oldest bar is first
+    bars.each_cons(2).find do |span|
+      span[-1].change_from(span[0]) <= drop
+    end
+  end
+
+  # When is the first two-day period that rises by `rise`, after this bar?
+  def rise(rise)
+    i    = ticker.bars.index self
+    fin  = ticker.bars.size - 1
+    bars = ticker.bars[i..fin]
+
+    # oldest bar is first
+    bars.each_cons(2).find do |span|
+      span[-1].change_from(span[0]) >= rise
+    end
+  end
+---
+
+@s Measurements of Past Bar Performance
+
+Tools for evaluating a stock's previous performance. The algorithm has at times
+used the $r^2$ value, the MSE from the $r^2$, and the average volume.
+
+--- Measurements of Past Bar Performance
+  def change_from(bar)
+    (close - bar.open).to_f / bar.open
+  end
+
+  def rsquared(prior: 10)
+    ticker.rsquared(:at => self, :prior => prior)
+  end
+
+  def mse(prior: 10)
+    ticker.mse(:at => self, :prior => prior)
+  end
+
+  def history(prior: 10, post: 0)
+    ticker.history(:around => self, :prior => prior, :post => post)
+  end
+
+  def volumes(prior: 10)
+    history(:prior => prior).map {|b| b.volume }
+  end
+
+  def regression(prior: 10)
+    ticker.regression(:at => self, :prior => prior)
+  end
+---
+
+@s Ticker Table
 
 No surprises here. Not all sources provide a complete list of all stock
 tickers, so it's good to keep track of them here. AlphaVantage, for instance,
@@ -67,17 +217,135 @@ DB.create_table? :tickers do
 end
 ---
 
-@s
+@s Ticker Model
+
+Models a stock ticker: its symbol, the exchange it's traded on, the splits it's
+done, and the bars of data I have for it.
+
+--- models/ticker.rb
+class Ticker < Sequel::Model
+  one_to_many :bars, :order => :time
+  one_to_many :splits, :order => :ex
+
+  @{Measurements of Past Ticker Performance}
+
+  @{Measurements of Future Ticker Change}
+
+  @{Split Handling}
+end
+---
+
+@s Measurements of Past Ticker Performance
+
+--- Measurements of Past Ticker Performance
+  # bar history based on a bar
+  def history(around: nil, prior: 10, post: 5)
+    idx  = around ? bars.index(around) : -1
+    bars[[idx - prior + 1, 0].max..(idx + post)]
+  end
+
+  def volume(at: nil, prior: 10, post: 0)
+    history(:around => at, :prior => prior, :post => post).map {|b| b.volume }
+  end
+
+  # This is an absolute value, so a line with 3% shift of a trend at $600 will
+  # have a greater MSE than a line with 3% shift of a trend at $6.
+  # The cheaper a stock is, the more volatility it is allowed to have.
+  def mse(at: nil, prior: 10)
+    regression(:at => at, :prior => prior).meanSqError
+  end
+
+  # r^2 = 1 - NMSE
+  #
+  # Since I was originally using MSE and then I wanted to normalize it,
+  # r^2 became an easier figure to use. Still gotta write my own function
+  # for it (and particularly NMSE) so I can claim I understand it.
+  def rsquared(at: nil, prior: 10)
+    regression(:at => at, :prior => prior).rSquared
+  end
+
+  def regression(at: nil, prior: 10)
+    domain   = history(:around => at, :prior => prior, :post => 0)[0..-2]
+    prices   = domain.map {|b| [b.open, b.close] }.flatten
+    xs       = (1..prices.size).to_a
+
+    line_fit = LineFit.new
+    line_fit.setData xs, prices 
+    line_fit
+  end
+---
+
+@s Measurements of Future Ticker Change
+
+--- Measurements of Future Ticker Change
+  # Find all 2-day drops of at least `drop`
+  def drops(drop)
+    # oldest bar is first
+    bars.each_cons(2).filter do |span|
+      span[-1].change_from(span[0]) <= drop
+    end
+  end
+
+  # Find all 2-day rises of at least `rise`
+  def rises(rise)
+    # oldest bar is first
+    bars.each_cons(2).filter do |span|
+      span[-1].change_from(span[0]) >= rise
+    end
+  end
+---
+
+@s Split Handling
+
+A common bug here and everywhere is whether I'm measuring trading days or
+calendar days. I should always be counting trading days.
+
+--- Split Handling
+  # measure trading days, not calendar days, because
+  # we need to be consistent. the only way to look at trading
+  # days is to look at what we have the data for (otherwise we
+  # need some *serious* calendar skillz)
+  def split_after?(bar, days: 64)
+    sell = bars[bars.index(bar) + days] || bars.last
+    splits.any? do |split|
+      split.ex <= sell.time and split.ex >= bar.time
+    end
+  end
+
+  # normalize the prices to get rid of splits
+  # percentage drops will still be evident
+  def normalize!
+    return @normalized if @normalized
+    bars.each {|b| b.id = nil }
+
+    splits.each do |split|
+      unnormalized = bars.filter {|b| b.time <= split.ex }
+      next unless unnormalized.size >= 2
+      ratio = unnormalized[-1].open / unnormalized[-2].close
+      unnormalized[0..-2].map do |b|
+        b.close *= ratio
+        b.open  *= ratio
+        b.high  *= ratio
+        b.low   *= ratio
+      end
+    end
+
+    @normalized = true
+  end
+
+  def normalized?; @normalized; end
+---
+
+@s Split Table
 
 Split information is important to correct for quantum price shifts. The data
-from Alpaca (and Yahoo! Finance) is uncorrected, which means if a split occurs
-on June 2, the price will appear to have (potentially) jumped 450%.
+from Alpaca (and Yahoo! Finance) is uncorrected, which means if a split occurs,
+the price will appear to have jumped (e.g.) 450% from before to after.
 
 I get my split information from https://stocksplithistory.com, and update the
-database through a separate script.
-
-I used to get my information from a different source, but I found that it was
-incomplete. That is why I use "ex" as a column name: it means "execution date".
+database through a separate script. I used to get my information from a
+different source, but I found that it was incomplete. That is why I use "ex" as
+a column name: it means "execution date".
 
 --- Split table
 DB.create_table? :splits do
@@ -90,7 +358,15 @@ DB.create_table? :splits do
 end
 ---
 
-@s
+@s Split Model
+
+--- models/split.rb
+class Split < Sequel::Model
+  many_to_one :ticker
+end
+---
+
+@s Alpaca Ruby API Integration
 
 Just a helper method for quickly saving the results from a web query.
 
@@ -109,6 +385,30 @@ class Alpaca::Trade::Api::Bar
 end
 ---
 
-@s Bar Model
+@s Alpaca Integration
 
+Easy way to download data within the Bar class. The time component is a String
+from the CLI, a Time object from SQLite3, and the Alpaca web API wants a String
+that is conveniently formatted from a DateTime object.
 
+This is a common theme in the code.
+
+--- Alpaca Bar Integration
+  def self.download(tickers, opts={})
+    span = opts.delete(:span) || 'day'
+
+    opts.each do |k, v| 
+      if [String, Date, DateTime, Time].include? v.class
+        opts[k] = DateTime.parse(v.to_s).to_s
+      end
+    end
+
+    # `CLIENT.bars` returns a hash, so this will also merge them all
+    # into one. key collision will only happen if the key is duplicated
+    # in the `ticker` argument.
+    symbols = tickers.map {|t| t.symbol }
+    symbols.each_slice(50).map do |ticks|
+      CLIENT.bars span, ticks, opts
+    end.inject({}) {|h, v| h.merge v }
+  end
+---

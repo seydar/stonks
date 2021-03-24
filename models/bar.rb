@@ -23,11 +23,32 @@ class Bar < Sequel::Model
     "#<Bar id => #{id}, sym => #{ticker.symbol}, time => #{time.strftime "%Y-%m-%d"}, o => #{open}, c => #{close}, h => #{high}, l => #{low}>"
   end
 
+  def date
+    time.to_datetime
+  end
+
+  def date=(val)
+    self.time = Time.parse(val.to_s)
+  end
+
+  def trading_days_from(from)
+    raise unless from.ticker == ticker
+
+    bars = ticker.bars
+    (bars.index(self) - bars.index(from)).abs # this may bite me
+  end
+
+  def before_split?(days: 90)
+    ticker.split_after? self, :days => days
+  end
+
   def refresh
     ticker.bars.filter {|b| b.time == time }[0]
   end
 
   # the "rise" part of the name is baked into the `>=`
+  # How many trading days does it take to rise by `percent`?
+  # Returns -1 if it never does.
   def time_to_rise(percent)
     bars  = self.ticker.bars
     index = bars.index self
@@ -46,21 +67,40 @@ class Bar < Sequel::Model
     -1
   end
 
+  # What is the maximum percent rise when compared to `self` over the next
+  # `days` trading days?
   def max_rise_over(days)
     index = ticker.bars.index self
     range = ticker.bars[index..(index + days)]
     range.map {|b| [b, b.change_from(self)] }.max_by {|a| a[1] }
   end
 
-  def change_from(bar)
-    (close - bar.open).to_f / bar.open
+  # When is the first two-day period that drops by `drop`, after this bar?
+  def drop(drop)
+    i    = ticker.bars.index self
+    fin  = ticker.bars.size - 1
+    bars = ticker.bars[i..fin]
+
+    # oldest bar is first
+    bars.each_cons(2).find do |span|
+      span[-1].change_from(span[0]) <= drop
+    end
   end
 
-  def trading_days_from(from)
-    raise unless from.ticker == ticker
+  # When is the first two-day period that rises by `rise`, after this bar?
+  def rise(rise)
+    i    = ticker.bars.index self
+    fin  = ticker.bars.size - 1
+    bars = ticker.bars[i..fin]
 
-    bars = ticker.bars
-    (bars.index(self) - bars.index(from)).abs # this may bite me
+    # oldest bar is first
+    bars.each_cons(2).find do |span|
+      span[-1].change_from(span[0]) >= rise
+    end
+  end
+
+  def change_from(bar)
+    (close - bar.open).to_f / bar.open
   end
 
   def rsquared(prior: 10)
@@ -81,40 +121,6 @@ class Bar < Sequel::Model
 
   def regression(prior: 10)
     ticker.regression(:at => self, :prior => prior)
-  end
-
-  def drop(drop)
-    i    = ticker.bars.index self
-    fin  = ticker.bars.size - 1
-    bars = ticker.bars[i..fin]
-
-    # oldest bar is first
-    bars.each_cons(2).filter do |span|
-      span[-1].change_from(span[0]) <= drop
-    end
-  end
-
-  def rise(rise)
-    i    = ticker.bars.index self
-    fin  = ticker.bars.size - 1
-    bars = ticker.bars[i..fin]
-
-    # oldest bar is first
-    bars.each_cons(2).filter do |span|
-      span[-1].change_from(span[0]) >= rise
-    end
-  end
-
-  def before_split?(days: 90)
-    ticker.split_after? self, :days => days
-  end
-
-  def date
-    time.to_datetime
-  end
-
-  def date=(val)
-    self.time = Time.parse(val.to_s)
   end
 end
 
