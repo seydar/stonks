@@ -61,12 +61,12 @@ end
 
 # could be the day after the deciding day, or it could be the deciding day (if
 # there's no new bar after it, aka it's bleeding edge)
-new_buys  = results.filter {|h| h[:buy].date >= latest_bar }
-new_sells = results.filter {|h| h[:sell] && h[:sell].date >= latest_bar }
+new_buys  = results.filter {|h| h[:buy].time >= latest_bar }
+new_sells = results.filter {|h| h[:sell] && h[:sell].time >= latest_bar }
 puts "buy:"
-puts "\t#{new_buys.map {|t| t.symbol }.join ", "}"
+puts "\t#{new_buys.map {|t| t[:buy].ticker.symbol }.join ", "}"
 puts "sell:"
-puts "\t#{new_sells.map {|t| t.symbol }.join ", "}"
+puts "\t#{new_sells.map {|t| t[:buy].ticker.symbol }.join ", "}"
 
 text_ari :buy => new_buys, :sell => new_sells
 
@@ -91,7 +91,7 @@ rows = results.sort_by {|r| r[:buy].date }.reverse.map do |rec|
   vol_avg    = buy.volumes(:prior => 5).mean.round(0)
   buy_date   = buy.date == Date.today ? uusi(buy.date.strftime("%Y-%m-%d")) : buy.date.strftime("%Y-%m-%d")
   buy_price  = buy.date == Date.today ? uusi(money(buy.close)) : money(buy.open)
-  days_held  = rec[:hold] ? rec[:hold] : Date.today - buy.date
+  days_held  = rec[:hold] ? rec[:hold] : buy.trading_days_from(latest)
   roi_thresh = perc([-0.05 * days_held + 4.6, 0].max)
   days_held  = rec[:hold] ? days_held.to_i : uusi(days_held.to_i)
   roi_thresh = rec[:hold] ? roi_thresh : uusi(roi_thresh)
