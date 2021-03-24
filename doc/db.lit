@@ -100,7 +100,9 @@ data first and normalize afterwards in order to find the proper sell date.
 Refreshing allows us to retrieve the normalized version of a bar, from the
 perspective of the bar.
 
-TODO: While rare, this introduces a bug where a standard stock split (1 share
+<br/>
+
+**TODO**: While rare, this introduces a bug where a standard stock split (1 share
 becomes 2) is incorrectly identified as a drop in price.
 
 --- Bar Normalization
@@ -115,7 +117,9 @@ Useful methods for determining how the stock does in the future from this bar.
 I look at how a stock fares over a given number of days, and how many days it
 takes for a stock to meet a certain metric.
 
-TODO: In the same way that there's Bar#history, there should probably be a
+<br/>
+
+**TODO**: In the same way that there's Bar#history, there should probably be a
 Bar#future.
 
 --- Measurements of Future Bar Change

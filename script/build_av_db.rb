@@ -43,6 +43,7 @@ end
 tickers = DB[:tickers].where(:exchange => 'NYSE').all.filter do |t|
   !t[:symbol].include?("-") && !t[:symbol].include?(".")
 end
+#tickers = DB[:tickers].where(:symbol => 'SPY').all
 puts "#{tickers.size} tickers"
 client  = Alphavantage::Client.new :key => "GI387ZJ0874WXW5S"
 

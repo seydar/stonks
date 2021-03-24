@@ -102,6 +102,7 @@ could also lead to a sever price drop. But since we're minimizing the $P_{day}$
 involved, we're limiting how much the price can drop.
 
 <br/>
+
 **TODO**: This would be a really good thing to check instead of simply volume.
 Maybe ensure that a stock is in the top 30% or something? Or meets some minimum
 threshold that roughly represents that bracket?
@@ -160,8 +161,10 @@ pattern to the way stocks rise after a drop, which I do not believe to be true,
 so I'm just looking to manage my risk appropriately.
 
 <br/>
+
 **TODO**: Appropriate risk management could very well involve trying many
 different polynomials of many different degrees.
+
 <br/>
 
 Anyways, I figured a linear drop ($y = m * x + b$) would be good enough, so I
@@ -189,6 +192,7 @@ that amount evenly across an estimated value of opportunities that will occur
 during the year).
 
 <br/>
+
 Each row in the data represents one trial: a given year, $m$, and $b$.
 
 --- Fit Results
