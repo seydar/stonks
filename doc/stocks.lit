@@ -79,27 +79,23 @@ The logic here is based on my theory of price change: the price of a stock
 changes when enough sales have occurred to raise the price (an unenlightening
 statement), with $\Delta P_{min}$ being the minimum increase in a stock's price:
 
-<br/>
-<div align="center">
-$\Delta P_{day} = \Delta P_{min} * N_{trades}$
-</div>
-<br/>
+$$\Delta P_{day} = \Delta P_{min} * N_{trades}$$
 
 With a larger minimum price increase, then fewer sales are required to raise the
 price to meet a certain threshold. Dividing both sides by $P_{day - 1}$, we get
 the fractional change in price:
 
-<br/>
-<div align="center">
-$\frac{\Delta P_{day}}{P_{day - 1}} = \frac{\Delta P_{min}}{P_{day - 1}} *
-N_{trades}$
-</div>
-<br/>
+$$\frac{\Delta P_{day}}{P_{day - 1}} = \frac{\Delta P_{min}}{P_{day - 1}} *
+N_{trades}$$
 
 This now represents the fractional ROI. Assuming the $P_{min}$ is constant for
 all stocks, $\frac{\Delta P_{min}}{P_{day - 1}}$ will be greater when $P$ is
 lower. We want to maximize $N_{trades}$ and minimize $P$, which is summarized in
-our maximization of $\frac{N_{trades}}{P_{day - 1}}$.
+our maximization of $\frac{N_{trades}}{P_{day - 1}}$, visible in the following
+rephrasing:
+
+
+$$\frac{\Delta P_{day}}{P_{day - 1}} = \Delta P_{min} * \frac{N_{trades}}{P_{day - 1}}$$
 
 The change in price works in both directions, so maximizing the above monomial
 could also lead to a sever price drop. But since we're minimizing the $P_{day}$
@@ -160,7 +156,77 @@ of returns that I will accept.
 The line that marks the threshold above which I will sell a stock could be
 anything, so from one perspective, I need to try polynomials of all different
 degrees. However, a polynomial would imply that there is a grand, overarching
-pattern to the way stocks rise after a drop.
+pattern to the way stocks rise after a drop, which I do not believe to be true,
+so I'm just looking to manage my risk appropriately.
+
+<br/>
+**TODO**: Appropriate risk management could very well involve trying many
+different polynomials of many different degrees.
+<br/>
+
+Anyways, I figured a linear drop ($y = m * x + b$) would be good enough, so I
+ran 1,000 tests on the data to find which curve would give me the best results.
+It looked roughly like this:
+
+--- Line Fitting
+0.05.step(:to => 0.1, :by => 0.005) do |m|
+  m = -m
+  1.step(:to => 10, :by => 0.1) do |b|
+    assessor.sell_when do |original, today|
+      # ...
+    end
+    sells = assessor.assess_sells
+
+    # ...
+  end
+end
+---
+
+The results were then saved to textfiles and then processed to see which line
+would give the best results, thinking I am going to invest the same amount per
+investment opportunity (instead of investing the same amount per year, splitting
+that amount evenly across an estimated value of opportunities that will occur
+during the year).
+
+<br/>
+Each row in the data represents one trial: a given year, $m$, and $b$.
+
+--- Fit Results
+hash = {}
+num = 127 # the number of buying opportunities in 2018-2020
+
+files = Dir['data/roi_*.txt']
+data  = files.map do |f|
+  txt = File.read f
+  txt.split("\n").map {|l| l.split "," }
+end.flatten 1
+
+# Conduct a weighted mean
+data.each do |r|
+  # r = [Timeframe, m, b, Buys, Max ROI, Mean ROI]
+  key = [r[1], r[2]] # [m, b]
+  hash[key] ||= 0
+  hash[key] += r[-1].to_f * r[3].to_f
+end
+hash.each {|k, v| hash[k] = hash[k] / num.to_f }
+hash.max_by {|k, v| v }
+---
+
+The maximum ROI seen on that stock is taken from the time that the stock is to
+be held (according to the $m$ and $b$ combination) plus 30 days. It allows me to
+judge how well the line is meeting the potential on that set of stocks.
+
+--- Max Buy-based Average
+[m = -0.05, b = 4.6] => 0.7704006488746548
+
+| Timeframe |   m   |  b  | Buys |   Max ROI   |  Mean ROI  |
+|-----------|-------|-----|------|-------------|------------|
+|   2018    | -0.05 | 4.6 |   7  | 0.745668795 | 0.669367097|
+|   2019    | -0.05 | 4.6 |   8  | 1.311737151 | 0.780366784|
+|   2020    | -0.05 | 4.6 |  112 | 1.375183827 | 0.776003379|
+---
+
+At this point, it's just a matter of setting up the line:
 
 --- When Do We Sell?
     # drop = -0.3, vol > 10M, m = -0.05, b = 4.6
@@ -177,7 +243,7 @@ pattern to the way stocks rise after a drop.
 
 @s The Simulator
 
-While @{The Assessor} provides the framework for routinely and cleanly assessing
+While the assessor provides the framework for routinely and cleanly assessing
 the data, the contents of that framework, the actual algorithm, are contained in
 the simulator.
 
@@ -212,6 +278,8 @@ end
 
 @s The Assessor
 
+
+
 --- assessor.rb
 class Assessor
   attr_accessor :buying_plan
@@ -220,6 +288,100 @@ class Assessor
 
   attr_accessor :holding
 
+  def buy_when(history: 2, &b)
+    @buying_plan = b
+    @history_requirement = history
+  end
+
+  def sell_when(&b)
+    @selling_plan = b
+  end
+
+  def buy?(ticker)
+    buying_plan[ticker]
+  end
+
+  def sell?(ticker, original)
+    selling_plan[ticker, original]
+  end
+
+  def assess_buys(tickers, opts={})
+    tids = tickers.map {|t| t.id }
+
+    debut  = opts[:after] || Time.parse('1 march 1900')
+    debut  = debut.is_a?(Time) ? debut : Time.parse(debut.to_s)
+    fin    = opts[:before] || Time.parse(Date.today.to_s)
+    fin    = fin.is_a?(Time) ? fin : Time.parse(fin.to_s)
+
+    bars   = Bar.where(:time => debut..fin, :ticker_id => tids)
+                .order(:ticker_id, Sequel.asc(:time))
+                .all
+    groups = bars.group_by {|b| b.ticker_id }
+
+    @holding = []
+
+    # create groups of size `@history_requirement`, and then
+    # pass that history to the checker
+    # most recent bar is at -1, oldest bar is at 0
+    groups.map do |ticker_id, bars|
+      # assume the history is 
+      histories = bars.each_cons history_requirement
+
+      @holding += histories.filter do |history|
+
+        # verify that the history is consecutive
+        day_deltas = history.each_cons(2).map {|a, b| b.date - a.date }
+
+        if day_deltas.any? {|v| v > 4 }
+          false
+        else
+          buy? history
+        end
+      end.map {|history| history.last }
+    end
+
+    # `@holding` currently references the days that a decision to buy is made
+    # (using the day's closing price), but we don't *actually* buy until the
+    # next morning. So we need to replace these stocks with the next day's
+    # stock.
+    # 
+    # This is key because the `Bar#change_from` method operates on the opening
+    # price of the earlier day.
+    #
+    # If it's `nil` because we're dealing with some HOT OF THE PRESS stock
+    # recommendations, then... I don't really have a plan for that yet.
+    # Then the stock doesn't exist. Send a text, whatever. I need to include
+    # some notification system here.
+    #
+    # TODO include the notification system at this point.
+    #
+    # From here on out, we're dealing with *simulation*.
+    @holding = @holding.map do |stock|
+      index = stock.ticker.bars.index stock
+      stock.ticker.bars[index + 1] || stock
+    end
+    @holding.each {|stock| stock.ticker.normalize! }
+    @holding = @holding.map {|stock| stock.refresh }
+  end
+
+  def assess_sells
+    sales = @holding.map do |stock|
+      bars   = stock.ticker.bars
+      orig_i = bars.index stock
+
+      sell_bar = bars[orig_i..-1].find {|day| sell? stock, day }
+
+      {:buy  => stock,
+       :sell => sell_bar,
+       :hold => sell_bar ? sell_bar.trading_days_from(stock)  : nil,
+       :ROI  => sell_bar ? sell_bar.change_from(stock) : -1 }
+    end
+  end
+
+  def assess(tickers, opts={})
+    assess_buys tickers, opts
+    assess_sells
+  end
 
 end
 ---

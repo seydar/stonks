@@ -31,8 +31,8 @@ class Assessor
     fin    = fin.is_a?(Time) ? fin : Time.parse(fin.to_s)
 
     bars   = Bar.where(:time => debut..fin, :ticker_id => tids)
-              .order(:ticker_id, Sequel.asc(:time))
-              .all
+                .order(:ticker_id, Sequel.asc(:time))
+                .all
     groups = bars.group_by {|b| b.ticker_id }
 
     @holding = []
