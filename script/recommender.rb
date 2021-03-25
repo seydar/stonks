@@ -138,35 +138,130 @@ out = <<-END
   by a program
 </p>
 <hr/>
-<p>
-  <a href='/files/stock_recs.2021.html'>2021</a> |
-  <a href='/files/stock_recs.2020.html'>2020</a> |
-  <a href='/files/stock_recs.2019.html'>2019</a> |
-  <a href='/files/stock_recs.2018.html'>2018</a>
-</p>
-<p>
-a full explanation is available <a href="/files/stocks.html">here</a>
-</p>
-<p>
-  <div id='reasons'>
-    buy when:
-    <br/>
-    <ul>
-      <li>30% price drop in 2 days</li>
-      <li>Trading volume > 10,000,000 trades/day</li>
-    </ul>
-
-    sell when:
-    <br/>
-    <ul>
-      <li>(fraction, not a percentage) ROI > -0.05 * trading_days_held + 4.6</li>
-    </ul>
-  </div>
-</p>
-<p>prices may be adjusted to reflect a split/reverse-split that occurred after that date</p>
-<p>drop occurs on one day, buy the next morning. prior 5 days is including the day of the drop</p>
-<p><span id='future'>blue</span> figures are taken from the latest closing prices, since the threshold to sell has not yet been reached</p>
 <br/>
+<div style='display: inline-block;'>
+  <table>
+    <tr>
+      <th>Year</th>
+      <th># of Buys</th>
+      <th>Mean ROI</th>
+      <th>SPY ROI</th>
+    </tr>
+    <tr>
+      <td><a href="/files/stocks_recs.2021.html">2021</a></td>
+      <td>24</td>
+      <td>-34.459%</td>
+      <td>3.651%</td>
+    </tr>
+    <tr>
+      <td><a href="/files/stocks_recs.2020.html">2020</a></td>
+      <td>99</td>
+      <td>81.908%</td>
+      <td>16.162%</td>
+    </tr>
+    <tr>
+      <td><a href="/files/stocks_recs.2019.html">2019</a></td>
+      <td>11</td>
+      <td>74.797%</td>
+      <td>28.785%</td>
+    </tr>
+    <tr>
+      <td><a href="/files/stocks_recs.2018.html">2018</a></td>
+      <td>5</td>
+      <td>48.628%</td>
+      <td>-7.013%</td>
+    </tr>
+    <tr>
+      <td><a href="/files/stocks_recs.2017.html">2017</a></td>
+      <td>1</td>
+      <td>-100.00%</td>
+      <td>19.384%</td>
+    </tr>
+    <tr>
+      <td><a href="/files/stocks_recs.2016.html">2016</a></td>
+      <td>9</td>
+      <td>16.663%</td>
+      <td>9.643</td>
+    </tr>
+    <tr>
+      <td><a href="/files/stocks_recs.2015.html">2015</a></td>
+      <td>6</td>
+      <td>12.530%</td>
+      <td>-0.812%</td>
+    </tr>
+    <tr>
+      <td><a href="/files/stocks_recs.2014.html">2014</a></td>
+      <td>3</td>
+      <td>10.495%</td>
+      <td>11.289%</td>
+    </tr>
+    <tr>
+      <td><a href="/files/stocks_recs.2013.html">2013</a></td>
+      <td>2</td>
+      <td>3.729%</td>
+      <td>29.689%</td>
+    </tr>
+    <tr>
+      <td><a href="/files/stocks_recs.2012.html">2012</a></td>
+      <td>5</td>
+      <td>61.324%</td>
+      <td>13.474%</td>
+    </tr>
+    <tr>
+      <td><a href="/files/stocks_recs.2011.html">2011</a></td>
+      <td>4</td>
+      <td>14.042%</td>
+      <td>-0.199%</td>
+    </tr>
+    <tr>
+      <td><a href="/files/stocks_recs.2010.html">2010</a></td>
+      <td>1</td>
+      <td>-100.000%</td>
+      <td>12.841%</td>
+    </tr>
+    <tr>
+      <td><a href="/files/stocks_recs.2009.html">2009</a></td>
+      <td>18</td>
+      <td>107.637%</td>
+      <td>23.493%</td>
+    </tr>
+    <tr>
+      <td><a href="/files/stocks_recs.2010.html">2010</a></td>
+      <td>49</td>
+      <td>43.304%</td>
+      <td>-37.735%</td>
+    </tr>
+  </table>
+</div>
+<div style='display: inline-block; vertical-align: top; padding-left: 20px;'>
+  <br/>
+  <br/>
+  <p>
+    a full explanation is available <b><a href="/files/stocks.html">here</a></b>
+  </p>
+  <br/>
+  <p>
+    <div id='reasons'>
+      buy when:
+      <br/>
+      <ul>
+        <li>30% price drop in 2 days</li>
+        <li>Trading volume > 10,000,000 trades/day</li>
+      </ul>
+  
+      sell when:
+      <br/>
+      <ul>
+        <li>(fraction, not a percentage) ROI > -0.05 * trading_days_held + 4.6</li>
+      </ul>
+    </div>
+  </p>
+  <p>prices may be adjusted to reflect a split/reverse-split that occurred after that date</p>
+  <p>drop occurs on one day, buy the next morning. prior 5 days is including the day of the drop</p>
+  <p><span id='future'>blue</span> figures are taken from the latest closing prices, since the threshold to sell has not yet been reached</p>
+</div>
+<br/>
+<center><h2>#{START.upcase} - #{FIN.upcase}</h2></center>
 <p>SPY ROI for #{START.upcase} - #{FIN.upcase}: #{uusi(perc(spy[Time.parse(START), Time.parse(FIN)]))}</p>
 <p>mean ROI for trades shown: #{uusi(mean_ROI)}</p>
 <p>mean ROI if you were to also sell everything you're still holding: #{uusi(liquidated_ROI)}</p>
