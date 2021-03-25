@@ -1,6 +1,8 @@
 @colorscheme sunburst.css
 @add_css style.css
 
-@s Author
-By [Ari Brown](http://aribrown.com) in February - March 2021.
+@s Results
+Made by [Ari Brown](http://aribrown.com) in February - March 2021. The results
+are visible [here](/files/stock_recs.2021.html), with links to other years as
+well.
 
