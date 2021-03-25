@@ -69,7 +69,7 @@ class Ticker < Sequel::Model
   # percentage drops will still be evident
   def normalize!
     return @normalized if @normalized
-    bars.each {|b| b.id = nil }
+    bars.each {|b| b.id = nil } unless splits.empty?
 
     splits.each do |split|
       unnormalized = bars.filter {|b| b.date <= split.date }

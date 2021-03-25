@@ -45,6 +45,7 @@ class Simulator
   def run
     @assessor.assess_buys @stocks, :after  => @after,
                                    :before => @before
+    puts "holdings determined"
     assess_sells
   end
 

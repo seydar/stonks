@@ -23,11 +23,23 @@ class Bar < Sequel::Model
     "#<Bar id => #{id}, sym => #{ticker.symbol}, date => #{date.strftime "%Y-%m-%d"}, o => #{open}, c => #{close}, h => #{high}, l => #{low}>"
   end
 
+  # GREAT trick here: the goal is to figure out how many records
+  # exist between `self` and `from`. Since a simple date calculation
+  # won't work, we just ask the DB to see what's in store for us.
+  #
+  # This originally loaded up `ticker.bars` and then got the indices
+  # for the two elements, but then that got turned into querying the DB
+  # directly and operating on that list, but then I realized it was the
+  # size of that array minus 1, and then I realized I could just get the
+  # count directly from the DB.
   def trading_days_from(from)
     raise unless from.ticker == ticker
 
-    bars = ticker.bars
-    (bars.index(self) - bars.index(from)).abs # this may bite me
+    dates = [date, from.date].sort
+
+    Bar.where(:ticker => ticker, :date => dates[0]..dates[-1])
+       .order(Sequel.asc(:date))
+       .count - 1
   end
 
   def before_split?(days: 90)
@@ -42,7 +54,8 @@ class Bar < Sequel::Model
   # How many trading days does it take to rise by `percent`?
   # Returns -1 if it never does.
   def time_to_rise(percent)
-    bars  = self.ticker.bars
+    #bars  = self.ticker.bars
+    bars  = Bar.where(:ticker => ticker) { date >= self.date }.all
     index = bars.index self
     #i = bars[index..-1].index
 
@@ -62,16 +75,18 @@ class Bar < Sequel::Model
   # What is the maximum percent rise when compared to `self` over the next
   # `days` trading days?
   def max_rise_over(days)
-    index = ticker.bars.index self
-    range = ticker.bars[index..(index + days)]
+    bars  = ticker.bars(:date => date..(date + (days * 1.4).ceil * 86_400))
+    index = bars.index self
+    range = bars[index..(index + days)]
     range.map {|b| [b, b.change_from(self)] }.max_by {|a| a[1] }
   end
 
   # When is the first two-day period that drops by `drop`, after this bar?
   def drop(drop)
-    i    = ticker.bars.index self
-    fin  = ticker.bars.size - 1
-    bars = ticker.bars[i..fin]
+    bars = ticker.bars { date >= self.date }
+    i    = bars.index self
+    fin  = bars.size - 1
+    bars = bars[i..fin]
 
     # oldest bar is first
     bars.each_cons(2).find do |span|
@@ -81,9 +96,10 @@ class Bar < Sequel::Model
 
   # When is the first two-day period that rises by `rise`, after this bar?
   def rise(rise)
-    i    = ticker.bars.index self
-    fin  = ticker.bars.size - 1
-    bars = ticker.bars[i..fin]
+    bars = ticker.bars { date >= self.date }
+    i    = bars.index self
+    fin  = bars.size - 1
+    bars = bars[i..fin]
 
     # oldest bar is first
     bars.each_cons(2).find do |span|

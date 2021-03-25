@@ -73,20 +73,25 @@ class Assessor
     # TODO include the notification system at this point.
     #
     # From here on out, we're dealing with *simulation*.
+    p "stocks identified"
     @holding = @holding.map do |stock|
-      index = stock.ticker.bars.index stock
-      stock.ticker.bars[index + 1] || stock
+      bars  = Bar.where(:ticker => stock.ticker,
+                        :date => stock.date..(stock.date + 7 * 86400))
+                 .all
+      index = bars.index stock
+      bars[index + 1] || stock
     end
+    p "ready to normalize"
     @holding.each {|stock| stock.ticker.normalize! }
+    p "refreshing"
     @holding = @holding.map {|stock| stock.refresh }
   end
 
   def assess_sells
     sales = @holding.map do |stock|
-      bars   = stock.ticker.bars
-      orig_i = bars.index stock
-
-      sell_bar = bars[orig_i..-1].find {|day| sell? stock, day }
+      bars     = Bar.where(:ticker => stock.ticker) { date >= stock.date }
+                    .all
+      sell_bar = bars.find {|day| sell? stock, day }
 
       {:buy  => stock,
        :sell => sell_bar,

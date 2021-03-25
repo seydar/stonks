@@ -1,17 +1,6 @@
 require 'pry'
 require './market.rb'
-
-class Array
-  def median
-    sort[size / 2]
-  end
-end
-
-def time
-  start  = Time.now
-  result = yield
-  [Time.now - start, result]
-end
+require './script/helpers.rb'
 
 nyse = Ticker.where(:exchange => 'NYSE').all
 spy_ticker = Ticker.where(:symbol => 'SPY').first

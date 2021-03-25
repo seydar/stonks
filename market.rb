@@ -10,8 +10,8 @@ require 'histogram/array'
 # Configure the Alpaca API
 Alpaca::Trade::Api.configure do |config|
   config.endpoint   = "https://api.alpaca.markets"
-  config.key_id     = "AKM406CX3NH9IO9PGC55"
-  config.key_secret = "6NC5iRohh75TkdC6NBvOy2pEKhvYbnBPGPGaRFnM"
+  config.key_id     = "AKYX3PV15W7C6IVMFV7L"
+  config.key_secret = "7lztPWuYcZFynkrun9RPhPcpmkC1iWztrGKZnIEW"
 end
 
 ALP_CLIENT = Alpaca::Trade::Api::Client.new

@@ -1,0 +1,6 @@
+website: https://www.alphavantage.co
+API key: GI387ZJ0874WXW5S
+
+require 'alphavantagerb'
+CLIENT = Alphavantage::Client.new :key => "GI387ZJ0874WXW5S"
+
