@@ -15,7 +15,7 @@ class Bar < Sequel::Model
     # in the `ticker` argument.
     symbols = tickers.map {|t| t.symbol }
     symbols.each_slice(50).map do |ticks|
-      CLIENT.bars span, ticks, opts
+      ALP_CLIENT.bars span, ticks, opts
     end.inject({}) {|h, v| h.merge v }
   end
 

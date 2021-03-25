@@ -93,5 +93,26 @@ class Ticker < Sequel::Model
     bars.map {|b| b.destroy }
     super
   end
+
+  def download!(since: '2008-01-01')
+    stock  = AV_CLIENT.stock :symbol => symbol
+    series = stock.timeseries :outputsize => 'full'
+
+    bars = series.output['Time Series (Daily)']
+    bars = bars.filter {|k, bar| k > since }
+
+    insertion = bars.map do |k, bar|
+      {:date   => Time.parse(k),
+       :open   => bar['1. open'].to_f,
+       :high   => bar['2. high'].to_f,
+       :low    => bar['3. low'].to_f,
+       :close  => bar['4. close'].to_f,
+       :volume => bar['5. volume'].to_i,
+       :span   => 'day',
+       :ticker_id => id
+      }
+    end
+    DB[:bars].multi_insert insertion
+  end
 end
 

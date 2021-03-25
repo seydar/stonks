@@ -1,5 +1,6 @@
 require 'open-uri'
 require 'alpaca/trade/api'
+require 'alphavantagerb'
 require './db.rb'
 require './assessor.rb'
 require './simulator.rb'
@@ -13,7 +14,8 @@ Alpaca::Trade::Api.configure do |config|
   config.key_secret = "6NC5iRohh75TkdC6NBvOy2pEKhvYbnBPGPGaRFnM"
 end
 
-CLIENT = Alpaca::Trade::Api::Client.new
+ALP_CLIENT = Alpaca::Trade::Api::Client.new
+AV_CLIENT  = Alphavantage::Client.new :key => "GI387ZJ0874WXW5S"
 
 class Alpaca::Trade::Api::Client
   # This takes care of the issue where I was not able to provide other options
