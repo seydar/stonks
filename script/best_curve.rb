@@ -8,12 +8,10 @@ end.flatten 1
 
 num = 127# files.size
 
-hash = {}
-data.each do |r|
-  key = [r[1], r[2]] # [m, b]
-  hash[key] ||= 0
-  hash[key] += r[-1].to_f * r[3].to_f
+h = data.inject(Hash.new {|h, k| h[k] = 0 }) do |hash, row|
+  hash[row[1..2]] += row[-1].to_f * row[3].to_f
+  hash
 end
-hash.each {|k, v| hash[k] = hash[k] / num.to_f }
+
 binding.pry
 

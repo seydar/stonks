@@ -110,14 +110,14 @@ Maybe ensure that a stock is in the top 30% or something? Or meets some minimum
 threshold that roughly represents that bracket?
 
 --- Price Theory Optimization
-vals = nyse.map do |t|
-  if t.bars.empty?
-    [t, nil]
-  else
-    [t, t.volumes(:prior => 10).mean / t.bars[-1].close]
+# Make a list of the N_{trades{ / P_{day - 1} values for each company *today*
+vals = nyse.inject({}) do |hash, ticker|
+  unless ticker.bars.empty?
+    hash[ticker] = ticker.volumes(:prior => 10).mean / ticker.bars[-1].close]
   end
-end.to_h
-vals.each {|k, v| vals.delete k if v.nil? }
+
+  hash
+end
 ---
 
 #### N<sub>trades</sub>

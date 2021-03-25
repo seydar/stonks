@@ -83,12 +83,48 @@ li.L1,li.L3,li.L5,li.L7,li.L9 { }
   pre .atv, code .atv { color: #060; }
 }
 body{min-width:200px;max-width:850px;margin:0 auto;padding:30px;}.chapter-nav{font-size: 10pt;}a:link,a:visited{color:#00f}.codeblock_name,code,pre.prettyprint{font-family:Monaco,"Lucida Console",monospace}body{font-size:14pt}.codeblock_name,.math,.seealso,code{font-size:10pt}.codeblock{page-break-inside:avoid;padding-bottom:15px}.math{text-indent:0}pre.prettyprint{font-size:10pt;padding:10px;border-radius:10px;border:none;white-space:pre-wrap}.codeblock_name{margin-top:1.25em;display:block}a:link{text-decoration:none}a:link:not(.lit):hover{color:#00f;text-decoration:underline}a:link:active{color:red}h4{padding-right:1.25em}h4.noheading{margin-bottom:0}h1{text-align:center}code{padding:2px}pre{-moz-tab-size:4;-o-tab-size:4;tab-size:4}p:not(.notp){margin:0;text-indent:2em}.two-col{list-style-type:none}.two-col li:before{content:'-';padding:5px;margin-right:5px;color:orange;background-color:#fff;display:inline-block}@media print{body{font-size:10pt}pre.prettyprint{font-size:8pt}.seealso{font-size:9pt}.codeblock_name,.math,code{font-size:8pt}.math{text-indent:0}}
+body {
+  /*background: #FAFAFA;*/
+  background: #1d1f21;
+  color: #c9cacc;
+  /*font-family: Georgia, Palatino, Times, "Times New Roman", sans-serif;*/
+  font-size: 17px;
+}
+
+a:link,
+a:visited {
+  color: #2bbc8a;
+}
+
+a:hover {
+  color: #2bddff;
+}
+
+h1, h2, h3, h4 {
+  font-family: Georgia, Palatino, Times, "Times New Roman", sans-serif;
+  color: yellow;
+}
+
+a h4 {
+  color: #2bddff;
+}
+
+p {
+  padding-bottom: 10px;
+  line-height: 18px;
+}
+
 </style>
 </head>
 <body onload="prettyPrint()">
 <section>
 <h1>Computer-aided Day Trading</h1>
-<a name="1:1"><div class="section"><h4>1. Computer-aided Day Trading</h4></a>
+<a name="1:1"><div class="section"><h4>1. Author</h4></a>
+<p>By <a href="http://aribrown.com">Ari Brown</a> in February - March 2021.
+</p>
+
+</div>
+<a name="1:2"><div class="section"><h4>2. Computer-aided Day Trading</h4></a>
 <p>The stock market generally overreacts. When good news is published, the price
 rises before subsequently falling some amount. When bad news is published, the
 price plummets before subsequently rising some amount. One method of automation
@@ -106,7 +142,7 @@ satisfied with a stock's performance?
 </p>
 
 </div>
-<a name="1:2"><div class="section"><h4>2. The Process</h4></a>
+<a name="1:3"><div class="section"><h4>3. The Process</h4></a>
 <p>The process starts simply: we answer the questions of "when do we buy" and "when
 do we sell".
 </p>
@@ -117,7 +153,7 @@ intermediate step, I've settled on the below figures.
 </p>
 
 </div>
-<a name="1:3"><div class="section"><h4>3. When Do We Buy?</h4></a>
+<a name="1:4"><div class="section"><h4>4. When Do We Buy?</h4></a>
 <p>What a great question.
 </p>
 <p>We buy when the price drops and we are confident that the price will go back up.
@@ -130,7 +166,7 @@ the close of the next):
 </p>
 
 <div class="codeblock">
-<span class="codeblock_name">{Price Change and Occurrences <a href="stocks.html#1:3">3</a>}</span>
+<span class="codeblock_name">{Price Change and Occurrences <a href="stocks.html#1:4">4</a>}</span>
 <pre class="prettyprint lang-rb">
 tids  = Ticker.where(:exchange =&gt; 'NYSE').all.map {|t| t.id }
 debut = Time.parse('1 jan 2019')
@@ -151,7 +187,7 @@ hist = changes.histogram [-0.35, -0.25, -0.15, -0.05, 0.05, 0.15, 0.25, 0.35]
 </div>
 
 <div class="codeblock">
-<span class="codeblock_name">{Price Change and Occurrences <a href="stocks.html#1:3">3</a>} :=</span>
+<span class="codeblock_name">{Price Change and Occurrences <a href="stocks.html#1:4">4</a>} :=</span>
 <pre class="prettyprint lang-rb">
 "Fractional 2-day Change" =&gt; "# of Occurrences"
                -100..-0.3 =&gt; 99
@@ -206,16 +242,16 @@ threshold that roughly represents that bracket?
 </p>
 
 <div class="codeblock">
-<span class="codeblock_name">{Price Theory Optimization <a href="stocks.html#1:3">3</a>}</span>
+<span class="codeblock_name">{Price Theory Optimization <a href="stocks.html#1:4">4</a>}</span>
 <pre class="prettyprint lang-rb">
-vals = nyse.map do |t|
-  if t.bars.empty?
-    [t, nil]
-  else
-    [t, t.volumes(:prior =&gt; 10).mean / t.bars[-1].close]
+# Make a list of the N_{trades{ / P_{day - 1} values for each company *today*
+vals = nyse.inject({}) do |hash, ticker|
+  unless ticker.bars.empty?
+    hash[ticker] = ticker.volumes(:prior =&gt; 10).mean / ticker.bars[-1].close]
   end
-end.to_h
-vals.each {|k, v| vals.delete k if v.nil? }
+
+  hash
+end
 </pre>
 
 
@@ -230,7 +266,7 @@ found that I could increase my average ROI by culling the herd.
 </p>
 
 <div class="codeblock">
-<span class="codeblock_name">{When Do We Buy? <a href="stocks.html#1:3">3</a>}</span>
+<span class="codeblock_name">{When Do We Buy? <a href="stocks.html#1:4">4</a>}</span>
 <pre class="prettyprint lang-rb">
     @assessor.buy_when :history =&gt; 5 do |history|
       today     = history[-1]
@@ -245,10 +281,10 @@ found that I could increase my average ROI by culling the herd.
 </pre>
 
 
-<p class="seealso">Used in section <a href="stocks.html#1:5">5</a></p>
+<p class="seealso">Used in section <a href="stocks.html#1:6">6</a></p>
 </div>
 </div>
-<a name="1:4"><div class="section"><h4>4. When Do We Sell?</h4></a>
+<a name="1:5"><div class="section"><h4>5. When Do We Sell?</h4></a>
 <p>As time goes on, more opportunities to invest will arise, and, being a man with
 limited impulse control, I am going to invest in them.
 </p>
@@ -280,7 +316,7 @@ It looked roughly like this:
 </p>
 
 <div class="codeblock">
-<span class="codeblock_name">{Line Fitting <a href="stocks.html#1:4">4</a>}</span>
+<span class="codeblock_name">{Line Fitting <a href="stocks.html#1:5">5</a>}</span>
 <pre class="prettyprint lang-rb">
 0.05.step(:to =&gt; 0.1, :by =&gt; 0.005) do |m|
   m = -m
@@ -310,7 +346,7 @@ during the year).
 </p>
 
 <div class="codeblock">
-<span class="codeblock_name">{Fit Results <a href="stocks.html#1:4">4</a>}</span>
+<span class="codeblock_name">{Fit Results <a href="stocks.html#1:5">5</a>}</span>
 <pre class="prettyprint lang-rb">
 hash = {}
 num = 127 # the number of buying opportunities in 2018-2020
@@ -341,7 +377,7 @@ judge how well the line is meeting the potential on that set of stocks.
 </p>
 
 <div class="codeblock">
-<span class="codeblock_name">{Max Buy-based Average <a href="stocks.html#1:4">4</a>}</span>
+<span class="codeblock_name">{Max Buy-based Average <a href="stocks.html#1:5">5</a>}</span>
 <pre class="prettyprint lang-rb">
 [m = -0.05, b = 4.6] =&gt; 0.7704006488746548
 
@@ -359,7 +395,7 @@ judge how well the line is meeting the potential on that set of stocks.
 </p>
 
 <div class="codeblock">
-<span class="codeblock_name">{When Do We Sell? <a href="stocks.html#1:4">4</a>}</span>
+<span class="codeblock_name">{When Do We Sell? <a href="stocks.html#1:5">5</a>}</span>
 <pre class="prettyprint lang-rb">
     # drop = -0.3, vol &gt; 10M, m = -0.05, b = 4.6
     @assessor.sell_when do |original, today|
@@ -374,17 +410,17 @@ judge how well the line is meeting the potential on that set of stocks.
 </pre>
 
 
-<p class="seealso">Used in section <a href="stocks.html#1:5">5</a></p>
+<p class="seealso">Used in section <a href="stocks.html#1:6">6</a></p>
 </div>
 </div>
-<a name="1:5"><div class="section"><h4>5. The Simulator</h4></a>
+<a name="1:6"><div class="section"><h4>6. The Simulator</h4></a>
 <p>While the assessor provides the framework for routinely and cleanly assessing
 the data, the contents of that framework, the actual algorithm, are contained in
 the simulator.
 </p>
 
 <div class="codeblock">
-<span class="codeblock_name">{<strong>simulator.rb</strong> <a href="stocks.html#1:5">5</a>}</span>
+<span class="codeblock_name">{<strong>simulator.rb</strong> <a href="stocks.html#1:6">6</a>}</span>
 <pre class="prettyprint lang-rb">
 class Simulator
   attr_accessor :results
@@ -400,9 +436,9 @@ class Simulator
 
     @assessor = Assessor.new
 
-<span class="nocode pln">    {When Do We Buy?, <a href="stocks.html#1:3">3</a>}</span>
+<span class="nocode pln">    {When Do We Buy?, <a href="stocks.html#1:4">4</a>}</span>
 
-<span class="nocode pln">    {When Do We Sell?, <a href="stocks.html#1:4">4</a>}</span>
+<span class="nocode pln">    {When Do We Sell?, <a href="stocks.html#1:5">5</a>}</span>
   end
 
   def run
@@ -418,10 +454,10 @@ end
 
 </div>
 </div>
-<a name="1:6"><div class="section"><h4>6. The Assessor</h4></a>
+<a name="1:7"><div class="section"><h4>7. The Assessor</h4></a>
 
 <div class="codeblock">
-<span class="codeblock_name">{<strong>assessor.rb</strong> <a href="stocks.html#1:6">6</a>}</span>
+<span class="codeblock_name">{<strong>assessor.rb</strong> <a href="stocks.html#1:7">7</a>}</span>
 <pre class="prettyprint lang-rb">
 class Assessor
   attr_accessor :buying_plan
@@ -532,14 +568,14 @@ end
 
 </div>
 </div>
-<a name="1:7"><div class="section"><h4>7. Accessing Market Data</h4></a>
+<a name="1:8"><div class="section"><h4>8. Accessing Market Data</h4></a>
 <p>I use Alpaca.Markets to access market data. At the moment, I only use daily
 data. Alpaca's data is unadjusted for splits, and I have found at least one
 unresolved issue with their data (January 2018 data for AFL).
 </p>
 
 <div class="codeblock">
-<span class="codeblock_name">{<strong>market.rb</strong> <a href="stocks.html#1:7">7</a>}</span>
+<span class="codeblock_name">{<strong>market.rb</strong> <a href="stocks.html#1:8">8</a>}</span>
 <pre class="prettyprint lang-rb">
 require 'open-uri'
 require 'alpaca/trade/api'
@@ -549,20 +585,20 @@ require './simulator.rb'
 require 'statistics'
 require 'histogram/array'
 
-<span class="nocode pln">{Configure the Alpaca API, <a href="stocks.html#1:8">8</a>}</span>
+<span class="nocode pln">{Configure the Alpaca API, <a href="stocks.html#1:9">9</a>}</span>
 </pre>
 
 
 
 </div>
 </div>
-<a name="1:8"><div class="section"><h4>8. Configure the Alpaca API</h4></a>
+<a name="1:9"><div class="section"><h4>9. Configure the Alpaca API</h4></a>
 <p>As a matter of boilerplate, I need to link up to the Alpaca API in order to
 trade.
 </p>
 
 <div class="codeblock">
-<span class="codeblock_name">{Configure the Alpaca API <a href="stocks.html#1:8">8</a>}</span>
+<span class="codeblock_name">{Configure the Alpaca API <a href="stocks.html#1:9">9</a>}</span>
 <pre class="prettyprint lang-rb">
 Alpaca::Trade::Api.configure do |config|
   config.endpoint   = "https://api.alpaca.markets"
@@ -572,21 +608,21 @@ end
 
 CLIENT = Alpaca::Trade::Api::Client.new
 
-<span class="nocode pln">{Enhance the Alpaca Ruby API, <a href="stocks.html#1:9">9</a>}</span>
+<span class="nocode pln">{Enhance the Alpaca Ruby API, <a href="stocks.html#1:10">10</a>}</span>
 </pre>
 
 
-<p class="seealso">Used in section <a href="stocks.html#1:7">7</a></p>
+<p class="seealso">Used in section <a href="stocks.html#1:8">8</a></p>
 </div>
 </div>
-<a name="1:9"><div class="section"><h4>9. Enhance the Alpaca Ruby API</h4></a>
+<a name="1:10"><div class="section"><h4>10. Enhance the Alpaca Ruby API</h4></a>
 <p>Minor issue with the Ruby API: it only allows you to specify the symbols and
 limit the number of results returned. The below change allows you to supply
 arbitrary options so that the usage of the <code>CLIENT.bars</code> can match the web API.
 </p>
 
 <div class="codeblock">
-<span class="codeblock_name">{Enhance the Alpaca Ruby API <a href="stocks.html#1:9">9</a>}</span>
+<span class="codeblock_name">{Enhance the Alpaca Ruby API <a href="stocks.html#1:10">10</a>}</span>
 <pre class="prettyprint lang-rb">
 class Alpaca::Trade::Api::Client
   # This takes care of the issue where I was not able to provide other options
@@ -606,7 +642,7 @@ end
 </pre>
 
 
-<p class="seealso">Used in section <a href="stocks.html#1:8">8</a></p>
+<p class="seealso">Used in section <a href="stocks.html#1:9">9</a></p>
 </div>
 
 </div>

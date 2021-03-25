@@ -1,2 +1,6 @@
 @colorscheme sunburst.css
+@add_css style.css
+
+@s Author
+By [Ari Brown](http://aribrown.com) in February - March 2021.
 

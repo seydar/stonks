@@ -1,0 +1,31 @@
+body {
+  /*background: #FAFAFA;*/
+  background: #1d1f21;
+  color: #c9cacc;
+  /*font-family: Georgia, Palatino, Times, "Times New Roman", sans-serif;*/
+  font-size: 17px;
+}
+
+a:link,
+a:visited {
+  color: #2bbc8a;
+}
+
+a:hover {
+  color: #2bddff;
+}
+
+h1, h2, h3, h4 {
+  font-family: Georgia, Palatino, Times, "Times New Roman", sans-serif;
+  color: yellow;
+}
+
+a h4 {
+  color: #2bddff;
+}
+
+p {
+  padding-bottom: 10px;
+  line-height: 18px;
+}
+
