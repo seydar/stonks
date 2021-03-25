@@ -4,11 +4,21 @@ class Simulator
   attr_accessor :stocks
   attr_accessor :after
   attr_accessor :before
+  attr_accessor :m
+  attr_accessor :b
 
-  def initialize(stocks: nil, drop: -0.3, vol: 10_000_000, after: nil, before: nil)
+  def initialize(stocks: nil,
+                 drop: -0.3,
+                 vol: 10_000_000,
+                 m: -0.05,
+                 b: 4.6,
+                 after: nil,
+                 before: nil)
     @stocks = stocks
     @after  = after
     @before = before
+    @m      = m
+    @b      = b
 
     @assessor = Assessor.new
     @assessor.buy_when :history => 5 do |history|
@@ -26,9 +36,7 @@ class Simulator
     @assessor.sell_when do |original, today|
       days_held = today.trading_days_from original
       
-      m = -0.05
-      b =  4.6
-      sell_point = [m * days_held + b, 0].max
+      sell_point = [@m * days_held + @b, 0].max
     
       today.change_from(original) >= sell_point
     end
@@ -37,6 +45,10 @@ class Simulator
   def run
     @assessor.assess_buys @stocks, :after  => @after,
                                    :before => @before
+    assess_sells
+  end
+
+  def assess_sells
     @results = @assessor.assess_sells
   end
 end
