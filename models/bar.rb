@@ -20,15 +20,7 @@ class Bar < Sequel::Model
   end
 
   def inspect
-    "#<Bar id => #{id}, sym => #{ticker.symbol}, time => #{time.strftime "%Y-%m-%d"}, o => #{open}, c => #{close}, h => #{high}, l => #{low}>"
-  end
-
-  def date
-    time.to_datetime
-  end
-
-  def date=(val)
-    self.time = Time.parse(val.to_s)
+    "#<Bar id => #{id}, sym => #{ticker.symbol}, date => #{date.strftime "%Y-%m-%d"}, o => #{open}, c => #{close}, h => #{high}, l => #{low}>"
   end
 
   def trading_days_from(from)
@@ -43,7 +35,7 @@ class Bar < Sequel::Model
   end
 
   def refresh
-    ticker.bars.filter {|b| b.time == time }[0]
+    ticker.bars.filter {|b| b.date == date }[0]
   end
 
   # the "rise" part of the name is baked into the `>=`

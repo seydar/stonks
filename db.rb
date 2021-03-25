@@ -1,22 +1,21 @@
 require 'sqlite3'
 require 'sequel'
 require 'alpaca/trade/api'
-require 'ruby_linear_regression'
-require 'linefit'
 
 DB = Sequel.connect "sqlite://data/tickers.db"
 
 DB.create_table? :bars do
   primary_key :id
   foreign_key :ticker_id, :tickers
-  index :ticker_id
   float :close
   float :high
   float :low
   float :open
-  datetime :time
+  datetime :datetime
   integer :volume
   string :span # day, 15 min, 5 min, 1 min
+
+  index :ticker_id
 end
 
 DB.create_table? :tickers do
@@ -28,12 +27,10 @@ end
 DB.create_table? :splits do
   primary_key :id
   foreign_key :ticker_id, :tickers
-  index :ticker_id
-
   string :ratio
-  datetime :announcement
-  datetime :record
-  datetime :ex
+  datetime :date
+
+  index :ticker_id
 end
 
 require './models/ticker.rb'
@@ -41,15 +38,23 @@ require './models/split.rb'
 require './models/bar.rb'
 
 class Alpaca::Trade::Api::Bar
+  def date; @time; end
+
   def save(symbol, period)
     ::Bar.create :span   => period,
                  :close  => @close,
                  :high   => @high,
                  :low    => @low,
                  :open   => @open,
-                 :time   => @time,
+                 :date   => @time,
                  :volume => @volume,
                  :ticker_id => ::Ticker.where(:symbol => symbol).first.id
+  end
+end
+
+class Numeric
+  def days
+    self * 86400.0
   end
 end
 

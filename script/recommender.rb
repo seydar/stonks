@@ -8,8 +8,8 @@ nyse = Ticker.where(:exchange => 'NYSE').all
 spy_ticker = Ticker.where(:symbol => 'SPY').first
 
 spy = proc do |debut, fin|
-  buy  = spy_ticker.bars.sort_by {|b| (debut - b.time).abs }.first
-  sell = spy_ticker.bars.sort_by {|b| (fin - b.time).abs }.first
+  buy  = spy_ticker.bars.sort_by {|b| (debut - b.date).abs }.first
+  sell = spy_ticker.bars.sort_by {|b| (fin - b.date).abs }.first
 
   (sell.close / buy.close) - 1
 end
@@ -30,11 +30,11 @@ def perc(num); "%0.3f%%" % (num * 100); end
 
 # download and save the latest information
 # i acknowledge that this assumes that all tickers are updated at the same time
-latest_bar = nyse[5].bars.last.time
-unless Time.parse((Date.today - 1).to_s) == latest_bar
+latest_bar = nyse[5].bars.last.date
+unless Time.parse((Date.today - 1).to_s) <= latest_bar
   puts "downloading data after #{latest_bar}..."
   updates = Bar.download nyse, :after => latest_bar
-  updates.merge! Bar.download([spy_ticker], :after => spy_ticker.bars.last.time)
+  updates.merge! Bar.download([spy_ticker], :after => spy_ticker.bars.last.date)
 
   puts "\tsaving data..."
   stocks_updated = 0
@@ -42,7 +42,7 @@ unless Time.parse((Date.today - 1).to_s) == latest_bar
     bz.each do |b|
       stocks_updated += 1
 
-      unless b.time == Time.parse(Date.today.to_s) && Time.now < Time.parse('17:00')
+      unless b.date == Time.parse(Date.today.to_s) && Time.now < Time.parse('17:00')
         b.save sym, 'day'
       end
     end
@@ -55,14 +55,14 @@ results = sim.run
 
 # how well would we have done if we had just invested in SPY?
 results.each do |h|
-  sell_date = h[:sell] ? h[:sell].time : h[:buy].ticker.bars.last.time
-  h[:spy] = spy[h[:buy].time, sell_date]
+  sell_date = h[:sell] ? h[:sell].date : h[:buy].ticker.bars.last.date
+  h[:spy] = spy[h[:buy].date, sell_date]
 end
 
 # could be the day after the deciding day, or it could be the deciding day (if
 # there's no new bar after it, aka it's bleeding edge)
-new_buys  = results.filter {|h| h[:buy].time >= latest_bar }
-new_sells = results.filter {|h| h[:sell] && h[:sell].time >= latest_bar }
+new_buys  = results.filter {|h| h[:buy].date >= latest_bar }
+new_sells = results.filter {|h| h[:sell] && h[:sell].date >= latest_bar }
 puts "buy:"
 puts "\t#{new_buys.map {|t| t[:buy].ticker.symbol }.join ", "}"
 puts "sell:"

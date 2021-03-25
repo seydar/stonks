@@ -30,8 +30,8 @@ class Assessor
     fin    = opts[:before] || Time.parse(Date.today.to_s)
     fin    = fin.is_a?(Time) ? fin : Time.parse(fin.to_s)
 
-    bars   = Bar.where(:time => debut..fin, :ticker_id => tids)
-                .order(:ticker_id, Sequel.asc(:time))
+    bars   = Bar.where(:date => debut..fin, :ticker_id => tids)
+                .order(:ticker_id, Sequel.asc(:date))
                 .all
     groups = bars.group_by {|b| b.ticker_id }
 
@@ -49,7 +49,7 @@ class Assessor
         # verify that the history is consecutive
         day_deltas = history.each_cons(2).map {|a, b| b.date - a.date }
 
-        if day_deltas.any? {|v| v > 4 }
+        if day_deltas.any? {|v| v > 4.days }
           false
         else
           buy? history

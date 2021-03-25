@@ -1,6 +1,6 @@
 class Ticker < Sequel::Model
-  one_to_many :bars, :order => :time
-  one_to_many :splits, :order => :ex
+  one_to_many :bars, :order => :date
+  one_to_many :splits, :order => :date
 
   # bar history based on a bar
   def history(around: nil, prior: 10, post: 5)
@@ -61,7 +61,7 @@ class Ticker < Sequel::Model
   def split_after?(bar, days: 64)
     sell = bars[bars.index(bar) + days] || bars.last
     splits.any? do |split|
-      split.ex <= sell.time and split.ex >= bar.time
+      split.date <= sell.date and split.date >= bar.date
     end
   end
 
@@ -72,7 +72,7 @@ class Ticker < Sequel::Model
     bars.each {|b| b.id = nil }
 
     splits.each do |split|
-      unnormalized = bars.filter {|b| b.time <= split.ex }
+      unnormalized = bars.filter {|b| b.date <= split.date }
       next unless unnormalized.size >= 2
       ratio = unnormalized[-1].open / unnormalized[-2].close
       unnormalized[0..-2].map do |b|
@@ -87,5 +87,11 @@ class Ticker < Sequel::Model
   end
 
   def normalized?; @normalized; end
+
+  def before_destroy
+    splits.map {|s| s.destroy }
+    bars.map {|b| b.destroy }
+    super
+  end
 end
 

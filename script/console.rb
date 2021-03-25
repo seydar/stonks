@@ -20,8 +20,8 @@ spy = proc do |debut, fin|
   debut = debut.is_a?(Time) ? debut : Time.parse(debut.to_s)
   fin   = fin.is_a?(Time) ? fin : Time.parse(fin.to_s)
 
-  buy  = spy_ticker.bars.sort_by {|b| (debut - b.time).abs }.first
-  sell = spy_ticker.bars.sort_by {|b| (fin - b.time).abs }.first
+  buy  = spy_ticker.bars.sort_by {|b| (debut - b.date).abs }.first
+  sell = spy_ticker.bars.sort_by {|b| (fin - b.date).abs }.first
 
   (sell.close / buy.close) - 1
 end
