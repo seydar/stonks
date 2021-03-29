@@ -1,6 +1,7 @@
 class Ticker < Sequel::Model
   one_to_many :bars, :order => :date
   one_to_many :splits, :order => :date
+  one_to_many :rankings, :order => :date
 
   # Return N_trade / P_day rankings
   #
@@ -10,31 +11,40 @@ class Ticker < Sequel::Model
     @@rankings ||= {}
     return @@rankings[[stocks, date, prior]] if @@rankings[[stocks, date, prior]]
 
-    volumes = stocks.map do |t|
-      DB[:bars].where(:ticker_id => t.id, :date => (date - prior.days)..date)
-               .avg(:volume)
+    tids = stocks.map {|t| t.id}
+
+    query = DB[:bars].where(:ticker_id => tids, :date => (date - prior.days)..date)
+                     .group(:ticker_id)
+                     .select_append(:ticker_id)
+                     .sql
+    query.gsub! "*", "AVG(`volume`)"
+    volumes = DB.fetch(query).all.inject({}) do |vols, hash|
+      vols[hash[:ticker_id]] = hash[:"AVG(`volume`)"]
+      vols
     end
 
-    closes = stocks.map do |t|
-      DB[:bars].where(:ticker_id => t.id, :date => date)
-               .select(:close)
-               .first
+    closes = DB[:bars].select(:close, :ticker_id)
+                      .where(:ticker_id => tids, :date => date)
+                      .all
+    closes = closes.inject({}) do |cls, hash|
+      cls[hash[:ticker_id]] = hash[:close]
+      cls
     end
 
     # {"SYM" => [Rank, Value]}
     ranks = {}
 
     values = {}
-    stocks.each.with_index do |stock, i|
-      if volumes[i] == nil || closes[i] == nil
+    stocks.each do |stock|
+      if volumes[stock.id] == nil || closes[stock.id] == nil
         values[stock] = 0
       else
-        values[stock] = volumes[i] / closes[i][:close]
+        values[stock] = volumes[stock.id] / closes[stock.id]
       end
     end
     sorted_values = values.values.sort.reverse
 
-    values.each {|tick, value| ranks[tick.symbol] = [sorted_values.index(value), value] }
+    values.each {|tick, value| ranks[tick.id] = [sorted_values.index(value), value] }
 
     @@rankings[[stocks, date, prior]] = ranks
   end
