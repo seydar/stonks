@@ -3,22 +3,33 @@ class Ticker < Sequel::Model
   one_to_many :splits, :order => :date
 
   # Return N_trade / P_day rankings
-  # Unsure if I want to memoize this to some extent
+  #
+  # This would be SO MUCH FASTER if I just wrote the SQL by hand (since Sequel
+  # doesn't allow me to do GROUP BY and AVG)
   def self.rankings(stocks: nil, date: Time.parse(Date.today.to_s), prior: 10)
+    @@rankings ||= {}
+    return @@rankings[[stocks, date, prior]] if @@rankings[[stocks, date, prior]]
+
     tids = stocks.map {|t| t.id }
     bars = Bar.where(:ticker_id => tids, :date => (date - prior.days)..date).all
 
     rev_map = stocks.inject({}) {|h, t| h[t.id] = t.symbol; h }
     groups  = bars.group_by {|b| b.ticker_id }
 
-    # {"SYM" => Rank}
+    # {"SYM" => [Rank, Value]}
     ranks = {}
-    groups.map do |tid, bz|
-      n_trade = bz.map {|b| b.volume }.mean
-      p_day   = bz.sort_by {|b| b.date }[-1].close
-      ranks[rev_map[tid]] = n_trade / p_day
+
+    values = groups.inject({}) do |vals, (tid, bz)|
+      n_trade   = bz.map {|b| b.volume }.median
+      p_day     = bz.max_by {|b| b.date }.close
+      vals[tid] = n_trade / p_day
+      vals
     end
-    ranks
+    sorted_values = values.values.sort.reverse
+
+    values.each {|tid, value| ranks[rev_map[tid]] = [sorted_values.index(value), value] }
+
+    @@rankings[[stocks, date, prior]] = ranks
   end
 
   # bar history based on a bar

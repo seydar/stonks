@@ -1,3 +1,4 @@
+require 'yaml'
 CONFIG = YAML.load File.read("config.yml")
 
 require 'open-uri'
@@ -12,12 +13,12 @@ require 'histogram/array'
 # Configure the Alpaca API
 Alpaca::Trade::Api.configure do |config|
   config.endpoint   = "https://api.alpaca.markets"
-  config.key_id     = CONFIG[:Alpaca_key_ID]
-  config.key_secret = CONFIG[:Alpaca_key_secret]
+  config.key_id     = CONFIG[:Alpaca][:ID]
+  config.key_secret = CONFIG[:Alpaca][:secret]
 end
 
 ALP_CLIENT = Alpaca::Trade::Api::Client.new
-AV_CLIENT  = Alphavantage::Client.new :key => CONFIG[:AV_key]
+AV_CLIENT  = Alphavantage::Client.new :key => CONFIG[:AV][:key]
 
 class Alpaca::Trade::Api::Client
   # This takes care of the issue where I was not able to provide other options
