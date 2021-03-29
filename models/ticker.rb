@@ -10,24 +10,31 @@ class Ticker < Sequel::Model
     @@rankings ||= {}
     return @@rankings[[stocks, date, prior]] if @@rankings[[stocks, date, prior]]
 
-    tids = stocks.map {|t| t.id }
-    bars = Bar.where(:ticker_id => tids, :date => (date - prior.days)..date).all
+    volumes = stocks.map do |t|
+      DB[:bars].where(:ticker_id => t.id, :date => (date - prior.days)..date)
+               .avg(:volume)
+    end
 
-    rev_map = stocks.inject({}) {|h, t| h[t.id] = t.symbol; h }
-    groups  = bars.group_by {|b| b.ticker_id }
+    closes = stocks.map do |t|
+      DB[:bars].where(:ticker_id => t.id, :date => date)
+               .select(:close)
+               .first
+    end
 
     # {"SYM" => [Rank, Value]}
     ranks = {}
 
-    values = groups.inject({}) do |vals, (tid, bz)|
-      n_trade   = bz.map {|b| b.volume }.median
-      p_day     = bz.max_by {|b| b.date }.close
-      vals[tid] = n_trade / p_day
-      vals
+    values = {}
+    stocks.each.with_index do |stock, i|
+      if volumes[i] == nil || closes[i] == nil
+        values[stock] = 0
+      else
+        values[stock] = volumes[i] / closes[i][:close]
+      end
     end
     sorted_values = values.values.sort.reverse
 
-    values.each {|tid, value| ranks[rev_map[tid]] = [sorted_values.index(value), value] }
+    values.each {|tick, value| ranks[tick.symbol] = [sorted_values.index(value), value] }
 
     @@rankings[[stocks, date, prior]] = ranks
   end
