@@ -89,7 +89,7 @@ class Ticker < Sequel::Model
   #
   # THIS SHOULD BE RARELY CALLED
   # THE DATA SHOULD BE STORED IN ITS NORMALIZED FORM
-  def normalize!
+  def normalize!(debug: false)
     # operating on hashes and optimized to minimize calls to the DB
     # and also minimizing the number of objects created
     ticker.splits.each do |split|
@@ -107,7 +107,7 @@ class Ticker < Sequel::Model
                           .all
       ratio = unnormal[-1][:open] / unnormal[-2][:close]
 
-      #puts "\tupdating #{unnorm_size} bars"
+      puts "\tupdating #{unnorm_size} bars" if debug
 
       DB[:bars].where(:ticker_id => id,
                       :date => Time.parse('1 jan 1900')..(split[:date] - 1.day))

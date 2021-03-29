@@ -1,2 +1,4 @@
-* add config file for DB location and API keys
+o   Add config file for DB location and API keys
+o   Plot [x: days held, y: ticker ranking]
+o   Filter buys according to ticker ranking
 

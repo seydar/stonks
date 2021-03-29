@@ -2,7 +2,7 @@ require 'sqlite3'
 require 'sequel'
 require 'alpaca/trade/api'
 
-DB = Sequel.connect "sqlite://data/tickers.db.bak"
+DB = Sequel.connect "sqlite://data/tickers.db"
 
 DB.create_table? :bars do
   primary_key :id
