@@ -9,9 +9,11 @@ end.flatten 1
 num = 127# files.size
 
 h = data.inject(Hash.new {|h, k| h[k] = 0 }) do |hash, row|
-  hash[row[1..2]] += row[-1].to_f * row[3].to_f
+  hash[row[1..2]] += (row[-1].to_f * row[3].to_f) / num
   hash
 end
+
+p h.max_by {|k, v| v }
 
 binding.pry
 

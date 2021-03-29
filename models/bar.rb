@@ -55,7 +55,9 @@ class Bar < Sequel::Model
   # Returns -1 if it never does.
   def time_to_rise(percent)
     #bars  = self.ticker.bars
-    bars  = Bar.where(:ticker => ticker) { date >= self.date }.all
+    bars  = Bar.where(:ticker => ticker) { date >= self.date }
+               .order(Sequel.asc(:date))
+               .all
     index = bars.index self
     #i = bars[index..-1].index
 
@@ -75,7 +77,13 @@ class Bar < Sequel::Model
   # What is the maximum percent rise when compared to `self` over the next
   # `days` trading days?
   def max_rise_over(days)
-    bars  = ticker.bars(:date => date..(date + (days * 1.4).ceil * 86_400))
+    # these will be unnormalized
+    # ugh i should really just make the normalization permanent
+    #bars  = Bar.where(:ticker => ticker,
+    #                  :date => date..(date + (days * 1.4).ceil * 86_400))
+    #           .order(Sequel.asc(:date))
+    #           .all
+    bars  = ticker.bars
     index = bars.index self
     range = bars[index..(index + days)]
     range.map {|b| [b, b.change_from(self)] }.max_by {|a| a[1] }
@@ -83,7 +91,9 @@ class Bar < Sequel::Model
 
   # When is the first two-day period that drops by `drop`, after this bar?
   def drop(drop)
-    bars = ticker.bars { date >= self.date }
+    bars  = Bar.where(:ticker => ticker) { date >= self.date }
+               .order(Sequel.asc(:date))
+               .all
     i    = bars.index self
     fin  = bars.size - 1
     bars = bars[i..fin]
@@ -96,7 +106,9 @@ class Bar < Sequel::Model
 
   # When is the first two-day period that rises by `rise`, after this bar?
   def rise(rise)
-    bars = ticker.bars { date >= self.date }
+    bars  = Bar.where(:ticker => ticker) { date >= self.date }
+               .order(Sequel.asc(:date))
+               .all
     i    = bars.index self
     fin  = bars.size - 1
     bars = bars[i..fin]

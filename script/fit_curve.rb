@@ -1,4 +1,5 @@
 require './market.rb'
+require 'pry'
 
 assessor = Assessor.new
 assessor.buy_when :history => 5 do |history|
@@ -16,10 +17,10 @@ assessor.assess_buys nyse, :after  => "1 jan #{ARGV[0]}",
                            :before => "31 dec #{ARGV[0]}"
 STDERR.puts "holding #{assessor.holding.size}"
 
-0.05.step(:to => 0.1, :by => 0.005) do |m|
+0.00.step(:to => 0.1, :by => 0.005) do |m|
   m = -m
 
-  1.step(:to => 10, :by => 0.1) do |b|
+  0.step(:to => 6, :by => 0.1) do |b|
     STDERR.puts "m = #{m}, b = #{b}"
 
     assessor.sell_when do |original, today|

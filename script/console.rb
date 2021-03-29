@@ -2,7 +2,6 @@ require 'pry'
 require './market.rb'
 require './script/helpers.rb'
 
-nyse = Ticker.where(:exchange => 'NYSE').all
 spy_ticker = Ticker.where(:symbol => 'SPY').first
 
 spy = proc do |debut, fin|

@@ -2,6 +2,25 @@ class Ticker < Sequel::Model
   one_to_many :bars, :order => :date
   one_to_many :splits, :order => :date
 
+  # Return N_trade / P_day rankings
+  # Unsure if I want to memoize this to some extent
+  def self.rankings(stocks: nil, date: Time.parse(Date.today.to_s), prior: 10)
+    tids = stocks.map {|t| t.id }
+    bars = Bar.where(:ticker_id => tids, :date => (date - prior.days)..date).all
+
+    rev_map = stocks.inject({}) {|h, t| h[t.id] = t.symbol; h }
+    groups  = bars.group_by {|b| b.ticker_id }
+
+    # {"SYM" => Rank}
+    ranks = {}
+    groups.map do |tid, bz|
+      n_trade = bz.map {|b| b.volume }.mean
+      p_day   = bz.sort_by {|b| b.date }[-1].close
+      ranks[rev_map[tid]] = n_trade / p_day
+    end
+    ranks
+  end
+
   # bar history based on a bar
   def history(around: nil, prior: 10, post: 5)
     idx  = around ? bars.index(around) : -1
@@ -67,26 +86,42 @@ class Ticker < Sequel::Model
 
   # normalize the prices to get rid of splits
   # percentage drops will still be evident
+  #
+  # THIS SHOULD BE RARELY CALLED
+  # THE DATA SHOULD BE STORED IN ITS NORMALIZED FORM
   def normalize!
-    return @normalized if @normalized
-    bars.each {|b| b.id = nil } unless splits.empty?
+    # operating on hashes and optimized to minimize calls to the DB
+    # and also minimizing the number of objects created
+    ticker.splits.each do |split|
+      next if split.applied
 
-    splits.each do |split|
-      unnormalized = bars.filter {|b| b.date <= split.date }
-      next unless unnormalized.size >= 2
-      ratio = unnormalized[-1].open / unnormalized[-2].close
-      unnormalized[0..-2].map do |b|
-        b.close *= ratio
-        b.open  *= ratio
-        b.high  *= ratio
-        b.low   *= ratio
-      end
+      unnorm_size = DB[:bars].where(:ticker_id => id,
+                                    :date => Time.parse('1 jan 1900')..split[:date])
+                             .count
+
+      next unless unnorm_size >= 2
+
+      unnormal = DB[:bars].where(:ticker_id => id,
+                                 :date => (split[:date] - 30 * 86400)..split[:date])
+                          .order(Sequel.asc(:date))
+                          .all
+      ratio = unnormal[-1][:open] / unnormal[-2][:close]
+
+      #puts "\tupdating #{unnorm_size} bars"
+
+      DB[:bars].where(:ticker_id => id,
+                      :date => Time.parse('1 jan 1900')..(split[:date] - 1.day))
+               .update(:close => Sequel[:close] * ratio,
+                       :open  => Sequel[:open]  * ratio,
+                       :high  => Sequel[:high]  * ratio,
+                       :low   => Sequel[:low]   * ratio)
+
+      split.applied = true
+      split.save
     end
-
-    @normalized = true
   end
 
-  def normalized?; @normalized; end
+  def normalized?; splits.all {|s| s.applied } ; end
 
   def before_destroy
     splits.map {|s| s.destroy }
