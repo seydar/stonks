@@ -13,6 +13,8 @@ def time
 end
 
 # specifically for results hash. takes bars and turns them into hashes
+# This prevents the ticker and ALL associated bars from being serialized
+# as well
 def dehydrate(hash)
   hash[:buy]    = hash[:buy].to_hash
   hash[:sell] &&= hash[:sell].to_hash
@@ -38,7 +40,7 @@ def cache(fname, &blk)
 end
 
 def simulate(year: nil, drop: nil, stocks: NYSE, m: -0.02, b: 5.2)
-  cache("data/sim/#{year}_#{drop.abs}.sim") do
+  cache("data/sim/#{year}_d#{drop}_m#{m}_b#{b}.sim") do
     sim = Simulator.new :stocks => stocks,
                         :drop   => drop,
                         :m      => m,

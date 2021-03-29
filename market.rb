@@ -1,3 +1,5 @@
+CONFIG = YAML.load File.read("config.yml")
+
 require 'open-uri'
 require 'alpaca/trade/api'
 require 'alphavantagerb'
