@@ -2,7 +2,7 @@ require 'sqlite3'
 require 'sequel'
 require 'alpaca/trade/api'
 
-DB = Sequel.connect "sqlite://data/tickers.db"
+DB = Sequel.connect "sqlite://#{CONFIG[:DB][:path]}"
 
 DB.create_table? :bars do
   primary_key :id
@@ -33,9 +33,20 @@ DB.create_table? :splits do
   index :ticker_id
 end
 
+DB.create_table? :rankings do
+  primary_key :id
+  foreign_key :ticker_id, :tickers
+  datetime :date
+  integer :rank
+  float :value
+
+  index :ticker_id
+end
+
 require './models/ticker.rb'
 require './models/split.rb'
 require './models/bar.rb'
+require './models/ranking.rb'
 
 class Alpaca::Trade::Api::Bar
   def date; @time; end
@@ -53,8 +64,10 @@ class Alpaca::Trade::Api::Bar
 end
 
 class Numeric
+  # useful for dealing with Time
   def days
     self * 86400.0
   end
+  alias_method :day, :days
 end
 

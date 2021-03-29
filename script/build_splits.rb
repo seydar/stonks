@@ -1,9 +1,9 @@
 require 'open-uri'
 require 'nokogiri'
 require './market.rb'
+require './script/helpers.rb'
 
 url = proc {|ticker| "http://stocksplithistory.com/?symbol=#{ticker}" }
-nyse = Ticker.where(:exchange => 'NYSE').all
 
 # DB.drop_table :splits
 # 
@@ -16,7 +16,7 @@ nyse = Ticker.where(:exchange => 'NYSE').all
 #   index :ticker_id
 # end
 
-nyse.each do |sym|
+NYSE.each do |sym|
   print "\nreviewing #{sym.symbol}: "
   doc = Nokogiri::HTML(URI.open(url[sym.symbol.downcase]))
   possibilities = doc.at 'td:contains("Split History Table")'
@@ -29,12 +29,21 @@ nyse.each do |sym|
 
     next if Split.where(:ticker_id => sym.id,
                         :ratio     => tds[-1],
-                        :ex        => date).count > 0
+                        :date      => date).count > 0
 
     Split.create :ticker_id => sym.id,
                  :ratio     => tds[-1],
-                 :ex        => date
+                 :date      => date
     print "."
   end
+end
+
+# reflect the splits in the data permanently. or rather... hide the splits in
+# the data, permanently
+NYSE.each do |ticker|
+  p ticker.symbol
+  puts "\t#{ticker.splits.size} splits"
+
+  ticker.normalize! :debug => true
 end
 

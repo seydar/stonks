@@ -177,14 +177,21 @@ The logic here is based on my theory of price change: the price of a stock
 changes when enough sales have occurred to raise the price (an unenlightening
 statement), with $\Delta P_{min}$ being the minimum increase in a stock's price:
 
+$$\Delta P_{day} = \Delta P_{min} * N_{buys} - \Delta P_{min} * N_{sells}$$
+
+Since I don't have access to the individual figures of $N_{buys}$ and
+$N_{sells}$, I am going to combine the terms and present an expression for the
+maximum potential for price movement ($N_{trades} = N_{buys} + N_{sells}$), in
+one direction of the other:
+
 $$\Delta P_{day} = \Delta P_{min} * N_{trades}$$
 
 With a larger minimum price increase, then fewer sales are required to raise the
 price to meet a certain threshold. Dividing both sides by $P_{day - 1}$, we get
 the fractional change in price:
 
-$$\frac{\Delta P_{day}}{P_{day - 1}} = \frac{\Delta P_{min}}{P_{day - 1}} *
-N_{trades}$$
+$$\frac{\Delta P_{day}}{P_{day - 1}} = \frac{\Delta P_{min} * N_{trades}}{P_{day
+- 1}}$$
 
 This now represents the fractional ROI. Assuming the $P_{min}$ is constant for
 all stocks, $\frac{\Delta P_{min}}{P_{day - 1}}$ will be greater when $P$ is

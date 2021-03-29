@@ -1,19 +1,12 @@
 require 'pry'
 require './market.rb'
+require './script/helpers.rb'
 
-START = "1 jan #{ARGV[0] || 2020}"
-FIN   = ARGV[0] ? "31 dec #{ARGV[0]}" : Date.today.strftime("%d %M %Y")
-
-nyse = Ticker.where(:exchange => 'NYSE').all
-if File.exists? "#{ARGV[0]}.sim"
-  res = open("data/#{ARGV[0]}.sim", "r") {|f| Marshal.load f.read }
-elsif ARGV[0] == "all"
-  res = (2018..2021).map {|y| open("data/#{y}.sim", "r") {|f| Marshal.load f.read } }
+if ARGV[0] == "all"
+  res = (2017..2020).map {|y| simulate :year => y, :drop => -0.3 }
                     .inject {|s, v| s + v }
 else
-  sim  = Simulator.new :stocks => nyse, :after => START, :before => FIN
-  res  = sim.run
-  open("#{ARGV[0]}.sim", "w") {|f| f.write Marshal.dump(res) }
+  res = simulate :year => ARGV[0], :drop => -0.3
 end
 
 timeline = res.map do |h|
@@ -32,21 +25,21 @@ end.flatten(1).sort_by {|r| r[:stock].date }
 # (the literal `1` below would be replaced by a growing figure)
 puts "NO REINVEST"
 
-cash       = 6.0
-investment = 0.8
-skip = []
-running_total = timeline.inject([cash]) do |tally, trade|
-  if trade[:action] == :sell && skip.include?(trade[:original])
+cash       = 15.0
+investment = 1.0
+skip_no_re = []
+history_no_re = timeline.inject([cash]) do |tally, trade|
+  if trade[:action] == :sell && skip_no_re.include?(trade[:original])
     # nothing
   elsif trade[:action] == :buy && tally.last - investment < 0
-    skip << trade[:stock]
+    skip_no_re << trade[:stock]
   else
 
     if trade[:action] == :buy
-      puts "buying #{trade[:stock].symbol} for #{investment}"
+      puts "buying #{trade[:stock].ticker.symbol} for #{investment}"
       tally << tally.last - investment
     else
-      puts "selling #{trade[:stock].symbol} at #{(trade[:ROI] * 100).round(3)}% ($#{investment.round 3} => $#{(investment * (1 + trade[:ROI])).round(3)})"
+      puts "selling #{trade[:stock].ticker.symbol} at #{(trade[:ROI] * 100).round(3)}% ($#{investment.round 3} => $#{(investment * (1 + trade[:ROI])).round(3)})"
       tally << tally.last + investment * (1 + trade[:ROI])
     end
     puts "\tcash: #{tally.last.round 3}"
@@ -54,10 +47,6 @@ running_total = timeline.inject([cash]) do |tally, trade|
 
   tally
 end
-
-money_required = running_total.min.abs
-efficacy = money_required / res.size.to_f
-max_gains = running_total.last / running_total.first
 
 ################
 # Reinvesting dividends
@@ -69,23 +58,23 @@ max_gains = running_total.last / running_total.first
 # a return, so now instead of $1K/stock, I can invest $1.2K/stock.
 puts "REINVEST"
 
-circulation = 4.0
-pieces      = 5.0
+circulation = 15.0
+pieces      = 10.0
 investment  = Hash.new {|h, k| h[k] = circulation / pieces }
-skip = []
+skip_re = []
 
-running_reinvest = timeline.inject([circulation]) do |tally, trade|
-  if trade[:action] == :sell && skip.include?(trade[:original])
+history_re = timeline.inject([circulation]) do |tally, trade|
+  if trade[:action] == :sell && skip_re.include?(trade[:original])
     # nothing
   elsif trade[:action] == :buy && tally.last - investment[trade[:stock]] < 0
-    skip << trade[:stock]
+    skip_re << trade[:stock]
   else
 
     if trade[:action] == :buy
-      puts "buying #{trade[:stock].symbol} for #{investment[trade[:stock]]}"
+      puts "buying #{trade[:stock].ticker.symbol} for #{investment[trade[:stock]]}"
       tally << tally.last - investment[trade[:stock]]
     else
-      puts "selling #{trade[:stock].symbol} at #{(trade[:ROI] * 100).round(3)}% ($#{investment[trade[:original]].round(3)} => $#{(investment[trade[:original]] * (1 + trade[:ROI])).round(3)})"
+      puts "selling #{trade[:stock].ticker.symbol} at #{(trade[:ROI] * 100).round(3)}% ($#{investment[trade[:original]].round(3)} => $#{(investment[trade[:original]] * (1 + trade[:ROI])).round(3)})"
       profit = investment[trade[:original]] * trade[:ROI]
       tally << tally.last + investment[trade[:original]] + profit
       circulation += profit

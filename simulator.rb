@@ -10,8 +10,8 @@ class Simulator
   def initialize(stocks: nil,
                  drop: -0.3,
                  vol: 10_000_000,
-                 m: -0.05,
-                 b: 4.6,
+                 m: -0.02,
+                 b:  5.2,
                  after: nil,
                  before: nil)
     @stocks = stocks
@@ -45,7 +45,6 @@ class Simulator
   def run
     @assessor.assess_buys @stocks, :after  => @after,
                                    :before => @before
-    puts "holdings determined"
     assess_sells
   end
 

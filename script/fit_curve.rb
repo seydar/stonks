@@ -1,36 +1,26 @@
 require './market.rb'
+require './script/helpers.rb'
+require 'pry'
 
-assessor = Assessor.new
-assessor.buy_when :history => 5 do |history|
-  today     = history[-1]
-  yesterday = history[-2]
+####################
+# Informational output is sent to STDERR because this program is meant
+# to be piped into a file for later processing.
+####################
 
-  [(today.change_from(yesterday) <= -0.3 or
-    today.change_from(today)     <= -0.3),
-   history.map {|b| b.volume }.mean >= 10_000_000
-  ].all?
-end
+sim = Simulator.new :stocks => NYSE,
+                    :drop   => -0.3,
+                    :after  => "1 jan #{ARGV[0]}",
+                    :before => "31 dec #{ARGV[0]}"
 
-nyse = Ticker.where(:exchange => 'NYSE').all
-assessor.assess_buys nyse, :after  => "1 jan #{ARGV[0]}",
-                           :before => "31 dec #{ARGV[0]}"
-STDERR.puts "holding #{assessor.holding.size}"
-
-0.05.step(:to => 0.1, :by => 0.005) do |m|
+0.00.step(:to => 0.1, :by => 0.005) do |m|
   m = -m
 
-  1.step(:to => 10, :by => 0.1) do |b|
+  0.step(:to => 6, :by => 0.1) do |b|
     STDERR.puts "m = #{m}, b = #{b}"
 
-    assessor.sell_when do |original, today|
-      days_held = today.trading_days_from original
-      
-      sell_point = [m * days_held + b, 0].max
-    
-      today.change_from(original) >= sell_point
-    end
-
-    sells = assessor.assess_sells
+    sim.m = m
+    sim.b = b
+    sells = sim.run
 
     sells.each do |h|
       h[:max] = if h[:hold]

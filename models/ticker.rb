@@ -1,6 +1,53 @@
 class Ticker < Sequel::Model
   one_to_many :bars, :order => :date
   one_to_many :splits, :order => :date
+  one_to_many :rankings, :order => :date
+
+  # Return N_trade / P_day rankings
+  #
+  # This would be SO MUCH FASTER if I just wrote the SQL by hand (since Sequel
+  # doesn't allow me to do GROUP BY and AVG)
+  def self.rankings(stocks: nil, date: Time.parse(Date.today.to_s), prior: 10)
+    @@rankings ||= {}
+    return @@rankings[[stocks, date, prior]] if @@rankings[[stocks, date, prior]]
+
+    tids = stocks.map {|t| t.id}
+
+    query = DB[:bars].where(:ticker_id => tids, :date => (date - prior.days)..date)
+                     .group(:ticker_id)
+                     .select_append(:ticker_id)
+                     .sql
+    query.gsub! "*", "AVG(`volume`)"
+    volumes = DB.fetch(query).all.inject({}) do |vols, hash|
+      vols[hash[:ticker_id]] = hash[:"AVG(`volume`)"]
+      vols
+    end
+
+    closes = DB[:bars].select(:close, :ticker_id)
+                      .where(:ticker_id => tids, :date => date)
+                      .all
+    closes = closes.inject({}) do |cls, hash|
+      cls[hash[:ticker_id]] = hash[:close]
+      cls
+    end
+
+    # {"SYM" => [Rank, Value]}
+    ranks = {}
+
+    values = {}
+    stocks.each do |stock|
+      if volumes[stock.id] == nil || closes[stock.id] == nil
+        values[stock] = 0
+      else
+        values[stock] = volumes[stock.id] / closes[stock.id]
+      end
+    end
+    sorted_values = values.values.sort.reverse
+
+    values.each {|tick, value| ranks[tick.id] = [sorted_values.index(value), value] }
+
+    @@rankings[[stocks, date, prior]] = ranks
+  end
 
   # bar history based on a bar
   def history(around: nil, prior: 10, post: 5)
@@ -67,26 +114,42 @@ class Ticker < Sequel::Model
 
   # normalize the prices to get rid of splits
   # percentage drops will still be evident
-  def normalize!
-    return @normalized if @normalized
-    bars.each {|b| b.id = nil } unless splits.empty?
+  #
+  # THIS SHOULD BE RARELY CALLED
+  # THE DATA SHOULD BE STORED IN ITS NORMALIZED FORM
+  def normalize!(debug: false)
+    # operating on hashes and optimized to minimize calls to the DB
+    # and also minimizing the number of objects created
+    ticker.splits.each do |split|
+      next if split.applied
 
-    splits.each do |split|
-      unnormalized = bars.filter {|b| b.date <= split.date }
-      next unless unnormalized.size >= 2
-      ratio = unnormalized[-1].open / unnormalized[-2].close
-      unnormalized[0..-2].map do |b|
-        b.close *= ratio
-        b.open  *= ratio
-        b.high  *= ratio
-        b.low   *= ratio
-      end
+      unnorm_size = DB[:bars].where(:ticker_id => id,
+                                    :date => Time.parse('1 jan 1900')..split[:date])
+                             .count
+
+      next unless unnorm_size >= 2
+
+      unnormal = DB[:bars].where(:ticker_id => id,
+                                 :date => (split[:date] - 30 * 86400)..split[:date])
+                          .order(Sequel.asc(:date))
+                          .all
+      ratio = unnormal[-1][:open] / unnormal[-2][:close]
+
+      puts "\tupdating #{unnorm_size} bars" if debug
+
+      DB[:bars].where(:ticker_id => id,
+                      :date => Time.parse('1 jan 1900')..(split[:date] - 1.day))
+               .update(:close => Sequel[:close] * ratio,
+                       :open  => Sequel[:open]  * ratio,
+                       :high  => Sequel[:high]  * ratio,
+                       :low   => Sequel[:low]   * ratio)
+
+      split.applied = true
+      split.save
     end
-
-    @normalized = true
   end
 
-  def normalized?; @normalized; end
+  def normalized?; splits.all {|s| s.applied } ; end
 
   def before_destroy
     splits.map {|s| s.destroy }
