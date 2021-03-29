@@ -77,13 +77,10 @@ class Bar < Sequel::Model
   # What is the maximum percent rise when compared to `self` over the next
   # `days` trading days?
   def max_rise_over(days)
-    # these will be unnormalized
-    # ugh i should really just make the normalization permanent
-    #bars  = Bar.where(:ticker => ticker,
-    #                  :date => date..(date + (days * 1.4).ceil * 86_400))
-    #           .order(Sequel.asc(:date))
-    #           .all
-    bars  = ticker.bars
+    bars  = Bar.where(:ticker => ticker,
+                      :date => date..(date + (days * 1.4).ceil * 86_400))
+               .order(Sequel.asc(:date))
+               .all
     index = bars.index self
     range = bars[index..(index + days)]
     range.map {|b| [b, b.change_from(self)] }.max_by {|a| a[1] }

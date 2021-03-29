@@ -19,13 +19,9 @@ def dehydrate(hash)
   hash
 end
 
-# can't use the ID, because if they've been normalized, then they won't
-# *have* an ID
 def hydrate(hash)
-  hash[:buy]    = Bar.where(:ticker_id => hash[:buy][:ticker_id],
-                            :date      => hash[:buy][:date]).first
-  hash[:sell] &&= Bar.where(:ticker_id => hash[:sell][:ticker_id],
-                            :date      => hash[:sell][:date]).first
+  hash[:buy]    = Bar[hash[:buy][:id]]
+  hash[:sell] &&= Bar[hash[:sell][:id]]
   hash
 end
 

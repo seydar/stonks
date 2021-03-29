@@ -81,8 +81,6 @@ class Assessor
       index = bars.index stock
       bars[index + 1] || stock
     end
-    @holding.each {|stock| stock.ticker.normalize! }
-    @holding = @holding.map {|stock| stock.refresh }
   end
 
   def assess_sells
