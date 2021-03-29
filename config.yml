@@ -1,5 +1,8 @@
 ---
-:Alpaca_key_ID: ''
-:Alpaca_key_secret: ''
-:DB_path: ''
-:AV_key: ''
+:Alpaca:
+  :ID: ''
+  :secret: ''
+:DB:
+  :path: ''
+:AV:
+  :key: ''

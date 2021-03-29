@@ -12,12 +12,12 @@ require 'histogram/array'
 # Configure the Alpaca API
 Alpaca::Trade::Api.configure do |config|
   config.endpoint   = "https://api.alpaca.markets"
-  config.key_id     = "AKYX3PV15W7C6IVMFV7L"
-  config.key_secret = "7lztPWuYcZFynkrun9RPhPcpmkC1iWztrGKZnIEW"
+  config.key_id     = CONFIG[:Alpaca_key_ID]
+  config.key_secret = CONFIG[:Alpaca_key_secret]
 end
 
 ALP_CLIENT = Alpaca::Trade::Api::Client.new
-AV_CLIENT  = Alphavantage::Client.new :key => "GI387ZJ0874WXW5S"
+AV_CLIENT  = Alphavantage::Client.new :key => CONFIG[:AV_key]
 
 class Alpaca::Trade::Api::Client
   # This takes care of the issue where I was not able to provide other options
