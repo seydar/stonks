@@ -4,4 +4,8 @@ o   Filter buys according to ticker ranking
     -> maybe change the drop so that there are more to choose from
     -> the power is in the number of high-confidence short-return investment
        opportunities
-
+o   mean returns / stddev of returns
+    -> Sharpe ratio
+    -> look at ROI/month
+o   Regularly pick a random set of bars (N = ~500) and check the mean ROI
+    given the standard sell signal (ROI >= m*x + b)

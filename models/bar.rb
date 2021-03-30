@@ -139,5 +139,13 @@ class Bar < Sequel::Model
   def regression(prior: 10)
     ticker.regression(:at => self, :prior => prior)
   end
+
+  def ranking
+    @ranking || ticker.rankings.find {|r| r.date == date }
+  end
+
+  def ranking=(val)
+    @ranking = val
+  end
 end
 

@@ -7,13 +7,13 @@ class Simulator
   attr_accessor :m
   attr_accessor :b
 
-  def initialize(stocks: nil,
-                 drop: -0.3,
-                 vol: 10_000_000,
-                 m: -0.02,
-                 b:  5.2,
-                 after: nil,
-                 before: nil)
+  def initialize(stocks:  nil,
+                 drop:   -0.3,
+                 vol:     10_000_000,
+                 m:      -0.02,
+                 b:       5.2,
+                 after:   nil,
+                 before:  nil)
     @stocks = stocks
     @after  = after
     @before = before
@@ -21,14 +21,15 @@ class Simulator
     @b      = b
 
     @assessor = Assessor.new
-    @assessor.buy_when :history => 5 do |history|
+    @assessor.buy_when :history => 2 do |history|
       today     = history[-1]
       yesterday = history[-2]
     
       [[today.change_from(yesterday) <= drop,
         today.change_from(today)     <= drop].any?,
 
-       history.map {|b| b.volume }.mean >= vol
+       # history.map {|b| b.volume }.mean >= vol
+       today.rank <= 60
       ].all?
     end
     
