@@ -181,26 +181,25 @@ $$\Delta P_{day} = \Delta P_{min} * N_{buys} - \Delta P_{min} * N_{sells}$$
 
 Since I don't have access to the individual figures of $N_{buys}$ and
 $N_{sells}$, I am going to combine the terms and present an expression for the
-maximum potential for price movement ($N_{trades} = N_{buys} + N_{sells}$), in
+maximum potential for price movement ($N_{shares} = N_{buys} + N_{sells}$), in
 one direction of the other:
 
-$$\Delta P_{day} = \Delta P_{min} * N_{trades}$$
+$$\Delta P_{day} = \Delta P_{min} * N_{shares}$$
 
 With a larger minimum price increase, then fewer sales are required to raise the
 price to meet a certain threshold. Dividing both sides by $P_{day - 1}$, we get
 the fractional change in price:
 
-$$\frac{\Delta P_{day}}{P_{day - 1}} = \frac{\Delta P_{min} * N_{trades}}{P_{day
-- 1}}$$
+$$\frac{\Delta P_{day}}{P_{day - 1}} = \frac{\Delta P_{min} * N_{shares}}{P_{day - 1}}$$
 
 This now represents the fractional ROI. Assuming the $P_{min}$ is constant for
 all stocks, $\frac{\Delta P_{min}}{P_{day - 1}}$ will be greater when $P$ is
-lower. We want to maximize $N_{trades}$ and minimize $P$, which is summarized in
-our maximization of $\frac{N_{trades}}{P_{day - 1}}$, visible in the following
+lower. We want to maximize $N_{shares}$ and minimize $P$, which is summarized in
+our maximization of $\frac{N_{shares}}{P_{day - 1}}$, visible in the following
 rephrasing:
 
 
-$$\frac{\Delta P_{day}}{P_{day - 1}} = \Delta P_{min} * \frac{N_{trades}}{P_{day - 1}}$$
+$$\frac{\Delta P_{day}}{P_{day - 1}} = \Delta P_{min} * \frac{N_{shares}}{P_{day - 1}}$$
 
 The change in price works in both directions, so maximizing the above monomial
 could also lead to a sever price drop. But since we're minimizing the $P_{day}$
@@ -213,7 +212,7 @@ Maybe ensure that a stock is in the top 30% or something? Or meets some minimum
 threshold that roughly represents that bracket?
 
 --- Price Theory Optimization
-# Make a list of the N_{trades{ / P_{day - 1} values for each company *today*
+# Make a list of the N_{shares} / P_{day - 1} values for each company *today*
 vals = nyse.inject({}) do |hash, ticker|
   unless ticker.bars.empty?
     hash[ticker] = ticker.volumes(:prior => 10).mean / ticker.bars[-1].close]
@@ -223,12 +222,12 @@ vals = nyse.inject({}) do |hash, ticker|
 end
 ---
 
-#### N<sub>trades</sub>
+#### N<sub>shares</sub>
 
 But because I'm an idiot and didn't do sufficient math as I was developing this
-program, I only check for $N_{trades}$ instead of $\frac{N_{trades}}{P_{day -
+program, I only check for $N_{shares}$ instead of $\frac{N_{shares}}{P_{day -
 1}}$. 10,000,000 was chosen because after looking at the trades that dropped,
-there were more losers than winners in the < 10,000,000 trades/day crowd. I
+there were more losers than winners in the < 10,000,000 shares/day crowd. I
 found that I could increase my average ROI by culling the herd.
 
 --- When Do We Buy?

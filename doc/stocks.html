@@ -339,29 +339,24 @@ statement), with <span class="math">\Delta P_{min}</span> being the minimum incr
 </p>
 <p>Since I don't have access to the individual figures of <span class="math">N_{buys}</span> and
 <span class="math">N_{sells}</span>, I am going to combine the terms and present an expression for the
-maximum potential for price movement (<span class="math">N_{trades} = N_{buys} + N_{sells}</span>), in
+maximum potential for price movement (<span class="math">N_{shares} = N_{buys} + N_{sells}</span>), in
 one direction of the other:
 </p>
-<p><div class="math">\Delta P_{day} = \Delta P_{min} * N_{trades}</div>
+<p><div class="math">\Delta P_{day} = \Delta P_{min} * N_{shares}</div>
 </p>
 <p>With a larger minimum price increase, then fewer sales are required to raise the
 price to meet a certain threshold. Dividing both sides by <span class="math">P_{day - 1}</span>, we get
 the fractional change in price:
 </p>
-<p><div class="math">\frac{\Delta P_{day}}{P_{day - 1}} = \frac{\Delta P_{min} * N_{trades}}{P_{day
+<p><div class="math">\frac{\Delta P_{day}}{P_{day - 1}} = \frac{\Delta P_{min} * N_{shares}}{P_{day - 1}}</div>
 </p>
-<ul>
-<li><p>1}}</div>
-</p>
-</li>
-</ul>
 <p>This now represents the fractional ROI. Assuming the <span class="math">P_{min}</span> is constant for
 all stocks, <span class="math">\frac{\Delta P_{min}}{P_{day - 1}}</span> will be greater when <span class="math">P</span> is
-lower. We want to maximize <span class="math">N_{trades}</span> and minimize <span class="math">P</span>, which is summarized in
-our maximization of <span class="math">\frac{N_{trades}}{P_{day - 1}}</span>, visible in the following
+lower. We want to maximize <span class="math">N_{shares}</span> and minimize <span class="math">P</span>, which is summarized in
+our maximization of <span class="math">\frac{N_{shares}}{P_{day - 1}}</span>, visible in the following
 rephrasing:
 </p>
-<p><div class="math">\frac{\Delta P_{day}}{P_{day - 1}} = \Delta P_{min} * \frac{N_{trades}}{P_{day - 1}}</div>
+<p><div class="math">\frac{\Delta P_{day}}{P_{day - 1}} = \Delta P_{min} * \frac{N_{shares}}{P_{day - 1}}</div>
 </p>
 <p>The change in price works in both directions, so maximizing the above monomial
 could also lead to a sever price drop. But since we're minimizing the <span class="math">P_{day}</span>
@@ -377,7 +372,7 @@ threshold that roughly represents that bracket?
 <div class="codeblock">
 <span class="codeblock_name">{Price Theory Optimization <a href="stocks.html#1:4">4</a>}</span>
 <pre class="prettyprint lang-rb">
-# Make a list of the N_{trades{ / P_{day - 1} values for each company *today*
+# Make a list of the N_{shares} / P_{day - 1} values for each company *today*
 vals = nyse.inject({}) do |hash, ticker|
   unless ticker.bars.empty?
     hash[ticker] = ticker.volumes(:prior =&gt; 10).mean / ticker.bars[-1].close]
@@ -390,11 +385,11 @@ end
 
 
 </div>
-<h4> N<sub>trades</sub></h4>
+<h4> N<sub>shares</sub></h4>
 <p>But because I'm an idiot and didn't do sufficient math as I was developing this
-program, I only check for <span class="math">N_{trades}</span> instead of <span class="math">\frac{N_{trades}}{P_{day -
+program, I only check for <span class="math">N_{shares}</span> instead of <span class="math">\frac{N_{shares}}{P_{day -
 1}}</span>. 10,000,000 was chosen because after looking at the trades that dropped,
-there were more losers than winners in the < 10,000,000 trades/day crowd. I
+there were more losers than winners in the < 10,000,000 shares/day crowd. I
 found that I could increase my average ROI by culling the herd.
 </p>
 
