@@ -9,7 +9,7 @@ class Simulator
 
   def initialize(stocks:  nil,
                  drop:   -0.3,
-                 vol:     10_000_000,
+                 rank:    60,
                  m:      -0.02,
                  b:       5.2,
                  after:   nil,
@@ -28,8 +28,7 @@ class Simulator
       [[today.change_from(yesterday) <= drop,
         today.change_from(today)     <= drop].any?,
 
-       # history.map {|b| b.volume }.mean >= vol
-       today.rank <= 60
+       today.rank <= rank
       ].all?
     end
     
