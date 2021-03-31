@@ -126,8 +126,8 @@ liquidated_ROI = perc(liquidated_ROI)
 
 out = ERB.new(File.read("views/table.erb")).result
 
-#fname = "/home/ari/servers/default/public/files/stock_recs.#{KIND}.html"
-fname = "views/stock_recs.#{KIND}.html"
+fname = "/home/ari/servers/default/public/files/stock_recs.#{KIND}.html"
+#fname = "views/stock_recs.#{KIND}.html"
 open(fname, "w") {|f| f.write out }
 puts "file made @ #{fname}"
 
