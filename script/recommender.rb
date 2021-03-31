@@ -93,7 +93,7 @@ rows = results.sort_by {|r| r[:buy].date }.reverse.map do |rec|
   buy_date   = buy.date == Date.today ? uusi(buy.date.strftime("%Y-%m-%d")) : buy.date.strftime("%Y-%m-%d")
   buy_price  = buy.date == Date.today ? uusi(money(buy.close)) : money(buy.open)
   days_held  = rec[:hold] ? rec[:hold] : buy.trading_days_from(latest)
-  roi_thresh = perc([-0.05 * days_held + 4.6, 0].max)
+  roi_thresh = perc([sim.m * days_held + sim.b, 0].max)
   days_held  = rec[:hold] ? days_held.to_i : uusi(days_held.to_i)
   roi_thresh = rec[:hold] ? roi_thresh : uusi(roi_thresh)
   sell_date  = rec[:sell] ? rec[:sell].date.strftime("%Y-%m-%d") : uusi("-")
