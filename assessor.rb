@@ -75,7 +75,7 @@ class Assessor
     # From here on out, we're dealing with *simulation*.
     @holding = @holding.map do |stock|
       bars  = Bar.where(:ticker => stock.ticker,
-                        :date => stock.date..(stock.date + 7 * 86400))
+                        :date => stock.date..(stock.date + 7.days))
                  .order(Sequel.asc(:date))
                  .all
       index = bars.index stock

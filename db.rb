@@ -14,6 +14,8 @@ DB.create_table? :bars do
   datetime :datetime
   integer :volume
   string :span # day, 15 min, 5 min, 1 min
+  integer :rank
+  float :value
 
   index :ticker_id
 end
@@ -33,20 +35,9 @@ DB.create_table? :splits do
   index :ticker_id
 end
 
-DB.create_table? :rankings do
-  primary_key :id
-  foreign_key :ticker_id, :tickers
-  datetime :date
-  integer :rank
-  float :value
-
-  index :ticker_id
-end
-
 require './models/ticker.rb'
 require './models/split.rb'
 require './models/bar.rb'
-require './models/ranking.rb'
 
 class Alpaca::Trade::Api::Bar
   def date; @time; end
