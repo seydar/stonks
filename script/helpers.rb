@@ -39,10 +39,17 @@ def cache(fname, &blk)
   end
 end
 
-def simulate(year: nil, drop: nil, stocks: NYSE, m: -0.02, b: 5.2)
-  cache("data/sim/#{year}_d#{drop}_m#{m}_b#{b}.sim") do
+def simulate(year: nil,
+             drop: nil,
+             rank: 60,
+             stocks: NYSE,
+             m: -0.02,
+             b: 5.2,
+             folder: "sim")
+  cache("data/#{folder}/#{year}_d#{drop}_m#{m}_b#{b}.sim") do
     sim = Simulator.new :stocks => stocks,
                         :drop   => drop,
+                        :rank   => rank,
                         :m      => m,
                         :b      => b,
                         :after  => "1 jan #{year}",
