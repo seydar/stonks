@@ -1,0 +1,26 @@
+<table>
+  <tr>
+    <th>Year</th>
+    <th># of Buys</th>
+    <th>Median ROI</th>
+    <th>STDDEV ROI</th>
+    <th>Sharpe Ratio</th>
+    <th>Mean ROI</th>
+    <th>SPY ROI</th>
+  </tr>
+  <% years.keys.sort.reverse.each do |year| %>
+    <% data = years[year] %>
+    <tr>
+      <td>
+        <a href="/files/stocks_recs.<%= data[:year] %>.html"><%= data[:year] %></a>
+      </td>
+      <td><%= data[:num] %></td>
+      <td><%= (data[:median] * 100).round 3 %>%</td>
+      <td><%= (data[:stddev] * 100).round 3 %>%</td>
+      <td><%= data[:sharpe].round 3 %></td>
+      <td><%= (data[:mean] * 100).round 3 %>%</td>
+      <td><%= (data[:spy] * 100).round 3 %>%</td>
+    </tr>
+  <% end %>
+</table>
+

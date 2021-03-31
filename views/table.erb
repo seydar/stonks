@@ -1,0 +1,91 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>stonk ideas</title>
+    <link rel="stylesheet" type="text/css" href="/style.css" media="screen">
+  </head>
+  <body>
+    <p id='intro'>
+      <b><a href="/">aribrown.com</a></b> |
+      generated (<b><span id='future'>
+          <%= Date.today.strftime "%Y-%m-%d" %>
+      </b></future>)
+      by a program
+    </p>
+    <hr/>
+    <br/>
+    <div style='display: inline-block;'>
+      <%= File.read "views/summary.html" %>
+    </div>
+    <div style='display: inline-block; vertical-align: top; padding-left: 20px;'>
+      <br/>
+      <br/>
+      <p>
+        a full explanation is available <b><a href="/files/stocks.html">here</a></b>
+      </p>
+      <br/>
+      <p>
+        <div id='reasons'>
+          buy when:
+          <br/>
+          <ul>
+            <li>30% price drop in 2 days</li>
+            <li>
+              stock is in the top 61 of the market movement potential
+              (explained <b><a href="/files/stocks.html#1:4">here</a></b>)
+            </li>
+          </ul>
+      
+          sell when:
+          <br/>
+          <ul>
+            <li>
+              (fraction, not a percentage)
+              ROI > -0.02 * trading_days_held + 5.2
+            </li>
+          </ul>
+        </div>
+      </p>
+      <br/>
+      <p>
+        prices may be adjusted to reflect a split/reverse-split that occurred
+        after that date
+      </p>
+      <p>
+        drop occurs on one day, buy the next morning. prior 5 days is including
+        the day of the drop
+      </p>
+      <p>
+        <span id='future'>blue</span> figures are taken from the latest
+        closing prices, since the threshold to sell has not yet been reached
+      </p>
+    </div>
+    <br/>
+    <center><h2><%= START.upcase %> - <%= FIN.upcase %></h2></center>
+    <p>SPY ROI for <%= START.upcase %> - <%= FIN.upcase %>: <%= uusi(perc(spy[Time.parse(START), Time.parse(FIN)])) %></p>
+    <p>mean ROI for trades shown: <%= uusi(mean_ROI) %></p>
+    <p>mean ROI if you were to also sell everything you're still holding: <%= uusi(liquidated_ROI) %></p>
+    <table>
+      <tr>
+        <th><b>Symbol</b></th>
+        <th><b>10-Day Trade Volume</b></th>
+        <th><b>Buy Date</b></th>
+        <th><b>Buy Price</b></th>
+        <th><b>Days Held</b></th>
+        <th><b>ROI Threshold</b></th>
+        <th><b>Sell Date</b></th>
+        <th><b>Sell Price</b></th>
+        <th><b>Sell ROI</b></th>
+        <th><b>SPY ROI</b></th>
+      </tr>
+      <% rows.each do |row| %>
+        <tr>
+          <% row.each do |col| %>
+            <td><%= col %></td>
+          <% end %>
+        </tr>
+      <% end %>
+    </table>
+  </body>
+</html>

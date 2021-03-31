@@ -6,11 +6,13 @@ require 'pry'
 # Informational output is sent to STDERR because this program is meant
 # to be piped into a file for later processing.
 ####################
+data = (2018..2020).map do |year|
+  simulate :year => year, :folder => 'rank_sim', :drop => -0.3
+end
+data = data.map {|res| res.map {|r| r[:buy] } }.flatten
 
-sim = Simulator.new :stocks => NYSE,
-                    :drop   => -0.3,
-                    :after  => "1 jan #{ARGV[0]}",
-                    :before => "31 dec #{ARGV[0]}"
+ass = Assessor.new
+ass.holding = data
 
 0.00.step(:to => 0.1, :by => 0.005) do |m|
   m = -m
@@ -18,9 +20,14 @@ sim = Simulator.new :stocks => NYSE,
   0.step(:to => 6, :by => 0.1) do |b|
     STDERR.puts "m = #{m}, b = #{b}"
 
-    sim.m = m
-    sim.b = b
-    sells = sim.run
+    ass.sell_when do |original, today|
+      days_held = today.trading_days_from original
+      
+      sell_point = [m * days_held + b, 0].max
+    
+      today.change_from(original) >= sell_point
+    end
+    sells = ass.assess_sells
 
     sells.each do |h|
       h[:max] = if h[:hold]

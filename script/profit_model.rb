@@ -3,10 +3,10 @@ require './market.rb'
 require './script/helpers.rb'
 
 if ARGV[0] == "all"
-  res = (2017..2020).map {|y| simulate :year => y, :drop => -0.3 }
+  res = (2017..2020).map {|y| simulate :year => y, :folder => "#{ARGV[1]}_sim", :drop => -0.3 }
                     .inject {|s, v| s + v }
 else
-  res = simulate :year => ARGV[0], :drop => -0.3
+  res = simulate :year => ARGV[0], :folder => "#{ARGV[1]}_sim", :drop => -0.3
 end
 
 timeline = res.map do |h|
