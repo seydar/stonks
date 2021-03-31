@@ -12,7 +12,7 @@ spy = proc do |debut, fin|
 end
 
 years = {}
-(2008..2020).each do |year|
+(2008..2021).each do |year|
   years[year] = simulate :year => year, :drop => -0.3, :folder => 'rank_sim'
   years[year].each do |h|
     sell_date = h[:sell] ? h[:sell].date : h[:buy].ticker.bars.last.date
