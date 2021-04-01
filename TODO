@@ -1,11 +1,19 @@
-x   Add config file for DB location and API keys
+TODO
+-----------------------------------
 o   Plot [x: days held, y: ticker ranking]
-o   Filter buys according to ticker ranking
+o   Regularly pick a random set of bars (N = ~500) and check the mean ROI
+    given the standard sell signal (ROI >= m*x + b)
+o   Integrate with Quantopian's zipline
+    -> https://www.zipline.io
+o   Make `simulate` take a range of years and combine results
+
+DONE
+-----------------------------------
+x   Add config file for DB location and API keys
+x   Filter buys according to ticker ranking
     -> maybe change the drop so that there are more to choose from
     -> the power is in the number of high-confidence short-return investment
        opportunities
-o   mean returns / stddev of returns
+x   mean returns / stddev of returns
     -> Sharpe ratio
     -> look at ROI/month
-o   Regularly pick a random set of bars (N = ~500) and check the mean ROI
-    given the standard sell signal (ROI >= m*x + b)

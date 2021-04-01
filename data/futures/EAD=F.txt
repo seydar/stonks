@@ -1,0 +1,2 @@
+Date,Open,High,Low,Close,Adj Close,Volume
+2021-04-01,1.546500,1.556000,1.546500,1.546700,1.546700,55

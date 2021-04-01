@@ -7,7 +7,7 @@ require 'pry'
 # to be piped into a file for later processing.
 ####################
 data = (2018..2020).map do |year|
-  simulate :year => year, :folder => 'rank_sim', :drop => -0.3
+  simulate :year => year, :folder => 'rank', :drop => -0.2
 end
 data = data.map {|res| res.map {|r| r[:buy] } }.flatten
 
@@ -46,7 +46,8 @@ ass.holding = data
     max_roi  &&= max_roi.mean
     mean_roi   = sells.map {|h| h[:ROI] }
     mean_roi &&= mean_roi.mean
+    prof       = profit sells, :pieces => 30, :reinvest => true
     
-    puts [ARGV[0].to_i, m, b, size, max_roi, mean_roi].join(",")
+    puts [ARGV[0].to_i, m, b, size, max_roi, mean_roi, prof[:cash]].join(",")
   end
 end

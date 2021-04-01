@@ -11,7 +11,7 @@ class Simulator
                  drop:   -0.3,
                  rank:    60,
                  m:      -0.02,
-                 b:       5.2,
+                 b:       5.0,
                  after:   nil,
                  before:  nil)
     @stocks = stocks
@@ -32,7 +32,8 @@ class Simulator
       ].all?
     end
     
-    # drop = -0.3, vol > 10M, m = -0.05, b = 4.6
+    # for ROI: m = -0.02, b = 5.0
+    # for $$$: m = -0.035, b = 3.6
     @assessor.sell_when do |original, today|
       days_held = today.trading_days_from original
       
