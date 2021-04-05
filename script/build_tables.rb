@@ -26,7 +26,8 @@ years.each do |year, data|
          :mean   => data.map {|r| r[:ROI] }.mean,
          :median => data.map {|r| r[:ROI] }.median,
          :stddev => data.map {|r| r[:ROI] }.standard_deviation,
-         :spy    => data.map {|r| r[:spy] }.mean
+         :spy    => data.map {|r| r[:spy] }.mean,
+         :sp500  => spy[Time.parse("1 jan #{year}"), Time.parse("31 dec #{year}")]
         }
   out[:sharpe] = out[:mean] / out[:stddev]
 
