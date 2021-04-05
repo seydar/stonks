@@ -439,7 +439,8 @@ horizon).
 What I have found is that maximizing the ROI while minimizing the hold time
 leads me to high-frequency trading (HFT), which presupposes an infinite supply
 of trading opportunities. When that supply is limited (e.g., due to trading
-fees, commission, etc.), then we end up raising our hold times.
+fees, commission, etc.), then we end up raising our hold times. I do not yet
+have a formula for representing this trade-off.
 
 I've found that with a 20% drop, the defaults of $m = -0.02$ and $b = 5.2$ are
 suitable for getting reasonable returns.

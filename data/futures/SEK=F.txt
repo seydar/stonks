@@ -1,2 +1,0 @@
-Date,Open,High,Low,Close,Adj Close,Volume
-2021-04-01,0.114630,0.114780,0.114300,0.114760,0.114760,75
