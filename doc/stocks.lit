@@ -226,7 +226,6 @@ this document, which have lent themselves to the below results:
     </tr>
   
 </table>
-
 </center>
 
 @s When Do We Buy?
@@ -295,7 +294,7 @@ Looking at the results for 2015, we get:
 ---
 
 I therefore decided that -0.2 would be sufficient to start with: we can cull
-the herd of options from there.
+the herd of opportunities from there.
 
 #### Price Movement
 
@@ -360,6 +359,21 @@ rankings[ticker.symbol] #=> [Rank, Value]
 
 @s When Do We Sell?
 
+The goal is not to get the most ROI over an arbitrary amount of time. The goal
+is to get the most ROI over a finite period of time, the smaller the better.
+
+This is a work-in-progress: I am balancing individual ROI, because that affects
+the hold-time for each stock, because that affects when I have access to the
+earnings, because that affects my ability to reinvest that money into this
+trading plan.
+
+## Individual ROI
+
+I want to maximize the ROI from each stock that I invest in. This is balanced
+with my risk-tolerance.
+
+#### Risk-Tolerance Reduces Over Time
+
 As time goes on, more opportunities to invest will arise, and, being a man with
 limited impulse control, I am going to invest in them.
 
@@ -381,11 +395,6 @@ so I'm just looking to manage my risk appropriately.
 
 <br/>
 
-**TODO**: Appropriate risk management could very well involve trying many
-different polynomials of many different degrees.
-
-<br/>
-
 Anyways, I figured a linear drop ($y = m * x + b$) would be good enough, so I
 ran 1,200 tests on the data to find which curve would give me the best results.
 It looked roughly like this:
@@ -403,19 +412,26 @@ It looked roughly like this:
 end
 ---
 
-The results were then saved to textfiles and then processed to see which line
-would give the best results, measuring the **mean ROI** and the **results of
-paper trading those stocks**, thinking I am going to invest the same amount per
-investment opportunity (instead of investing the same amount per year, splitting
-that amount evenly across an estimated value of opportunities that will occur
-during the year).
+The output gave the **results of paper trading those stocks**, based on the idea
+that I am going to invest the same amount per investment opportunity (instead of
+investing the same amount per year, splitting that amount evenly across an
+unknown number of opportunities that will occur during the year).
 
 This raises an interesting point: I am not looking to simply maximize the ROI
 over an arbitrary time horizon. Rather, I am trying to maximize my earnings,
 which depend on my ability to reinvest my earnings from individual stocks, which
-means I want to maximize my ROI but to minimize my hold time.
+means I want to maximize my ROI but to minimize my hold time, all depending upon
+how many buying opportunities present themselves.
 
-<br/>
+## Hold Time
+
+Minimizing the hold time while maximizing the ROI (maximizing $ROI / t_{hold}$)
+is tempting, but misleading: the result is that you won't have enough
+opportunities to grow your investment, since you end up selling at 10% growth as
+soon as you can. It turns out, this is a good strategy, if you have the
+opportunities for it.
+
+## Reinvesting Earnings
 
 Each row in the data represents one trial: a given year, $m$, and $b$.
 
@@ -426,18 +442,18 @@ judge how well the line is meeting the potential on that set of stocks.
 The mean ROI is the mean ROI of each individual stock.
 
 The "reinvested profits" figure comes from investing \$15K into the market that
-year. When a buy signal comes along, you invest the value in circulation
-(initially \$15K) divided by 30 into the stock (initially \$15K / 30 = \$500).
-When a sell signal comes along, you sell. You then take the profits and put them
-back into circulation (e.g., if you made \$600 by selling a stock, your
-circulation is now \$15.6K, which means you would now be investing \$520 per
-stock). The figure shown is the amount of cash you have leftover after all of
-the buy signals and all of their sell signals; if a sell signal for a given
-stock never occurs, then that investment is still in circulation, but you don't
-have access to it.
+year. When a buy signal comes along, you invest the value in circulation divided
+by 30 into the stock (initially \$15K / 30 = \$500).  When a sell signal comes
+along, you sell. You then take the profits and put them back into circulation
+(e.g., if you made \$600 profit by selling a stock, your circulation is now
+\$15.6K, which means you would now be investing \$520 per stock). The "cash"
+figure is the amount of cash you have leftover after all of the buy signals and
+all of their sell signals; if a sell signal for a given stock never occurs, then
+that investment is still in circulation, but you don't have access to it, which
+is reflected in your "cash" value.
 
-Here is the explicit breakdown of 2018 (note that some sell signals will occur
-beyond 2018):
+Here is the explicit breakdown of the buy signals of 2015 (note that some sell
+signals will occur beyond 2015):
 
 <span onclick="togglediv('togglable')">
   <a>
@@ -447,198 +463,299 @@ beyond 2018):
 </span>
 <div id="togglable" style="display: none;">
 <pre>
-loaded 31 trxs
-  stats: {:m=>0, :b=>0.6}
-	med. hold:   454
-	med. ROI:    0.6272577996715928
-	avg. ROI:    0.22908638730856232
-buying KODK for 0.5
+loaded 40 transactions
+stats: {:m=>-0.02, :b=>5.2}
+	med. hold:   225 days
+	med. ROI:    0.8086680761099364
+	avg. ROI:    2.165151496553147
+	ROI / hold:  0.009622895540236208
+buying KBH for 0.5
 	cash: 14.5
 	circulation: 15.0
-buying PVG for 0.5
+buying NETI for 0.5
 	cash: 14.0
 	circulation: 15.0
-buying GEN for 0.5
+buying FRO for 0.5
 	cash: 13.5
 	circulation: 15.0
-buying GEN for 0.5
+buying AMPY for 0.5
 	cash: 13.0
 	circulation: 15.0
-buying CLNY for 0.5
+buying AMPY for 0.5
 	cash: 12.5
 	circulation: 15.0
-buying VHC for 0.5
+buying AMPY for 0.5
 	cash: 12.0
 	circulation: 15.0
-buying FTK for 0.5
+buying MTL for 0.5
 	cash: 11.5
 	circulation: 15.0
-buying SNAP for 0.5
+buying AMPY for 0.5
 	cash: 11.0
 	circulation: 15.0
-buying ETM for 0.5
+buying MTL for 0.5
 	cash: 10.5
 	circulation: 15.0
-buying VIPS for 0.5
+buying BBD for 0.5
 	cash: 10.0
 	circulation: 15.0
-selling GEN at 63.115% ($0.5 => $0.816)
-	cash: 10.816
-	circulation: 15.316
-selling GEN at 64.122% ($0.5 => $0.821)
-	cash: 11.636
-	circulation: 15.636
-buying RENN for 0.5212061485838234
-	cash: 11.115
-	circulation: 15.636
-buying GEN for 0.5212061485838234
-	cash: 10.594
-	circulation: 15.636
-buying TWTR for 0.5212061485838234
-	cash: 10.073
-	circulation: 15.636
-buying CSLT for 0.5212061485838234
-	cash: 9.551
-	circulation: 15.636
-buying EGY for 0.5212061485838234
-	cash: 9.03
-	circulation: 15.636
-buying DBD for 0.5212061485838234
-	cash: 8.509
-	circulation: 15.636
-buying DBD for 0.5212061485838234
-	cash: 7.988
-	circulation: 15.636
-buying LCI for 0.5212061485838234
-	cash: 7.467
-	circulation: 15.636
-buying SUPV for 0.5212061485838234
-	cash: 6.945
-	circulation: 15.636
-buying NIO for 0.5212061485838234
-	cash: 6.424
-	circulation: 15.636
-buying NIO for 0.5212061485838234
-	cash: 5.903
-	circulation: 15.636
-buying NIO for 0.5212061485838234
-	cash: 5.382
-	circulation: 15.636
-buying LCI for 0.5212061485838234
-	cash: 4.861
-	circulation: 15.636
-buying LCI for 0.5212061485838234
-	cash: 4.339
-	circulation: 15.636
-buying EGO for 0.5212061485838234
-	cash: 3.818
-	circulation: 15.636
-buying COTY for 0.5212061485838234
-	cash: 3.297
-	circulation: 15.636
-buying HZN for 0.5212061485838234
-	cash: 2.776
-	circulation: 15.636
-buying PCG for 0.5212061485838234
-	cash: 2.254
-	circulation: 15.636
-selling LCI at 60.916% ($0.521 => $0.839)
-	cash: 3.093
-	circulation: 15.954
-buying PCG for 0.5317894899656693
-	cash: 2.561
-	circulation: 15.954
-selling LCI at 65.067% ($0.521 => $0.86)
-	cash: 3.422
-	circulation: 16.293
-buying FUBO for 0.5430938722105095
-	cash: 2.879
-	circulation: 16.293
-buying CHS for 0.5430938722105095
-	cash: 2.336
-	circulation: 16.293
-selling VHC at 88.955% ($0.5 => $0.945)
-	cash: 3.28
-	circulation: 16.738
-selling FUBO at 122.5% ($0.543 => $1.208)
-	cash: 4.489
-	circulation: 17.403
-selling SUPV at 60.229% ($0.521 => $0.835)
-	cash: 5.324
-	circulation: 17.717
-selling LCI at 64.22% ($0.521 => $0.856)
-	cash: 6.18
-	circulation: 18.052
-selling DBD at 61.087% ($0.521 => $0.84)
-	cash: 7.019
-	circulation: 18.37
-selling DBD at 72.688% ($0.521 => $0.9)
-	cash: 7.919
-	circulation: 18.749
-selling HZN at 66.055% ($0.521 => $0.865)
-	cash: 8.785
-	circulation: 19.093
-selling EGO at 62.424% ($0.521 => $0.847)
-	cash: 9.631
-	circulation: 19.418
-selling SNAP at 60.954% ($0.5 => $0.805)
-	cash: 10.436
-	circulation: 19.723
-selling PVG at 67.611% ($0.5 => $0.838)
-	cash: 11.274
-	circulation: 20.061
-selling VIPS at 62.726% ($0.5 => $0.814)
-	cash: 12.088
-	circulation: 20.375
-selling NIO at 67.766% ($0.521 => $0.874)
-	cash: 12.962
-	circulation: 20.728
-selling NIO at 66.896% ($0.521 => $0.87)
-	cash: 13.832
-	circulation: 21.077
-selling KODK at 292.899% ($0.5 => $1.964)
-	cash: 15.797
-	circulation: 22.541
-selling NIO at 85.64% ($0.521 => $0.968)
-	cash: 16.764
-	circulation: 22.988
-selling TWTR at 63.506% ($0.521 => $0.852)
-	cash: 17.616
-	circulation: 23.319
-selling RENN at 90.791% ($0.521 => $0.994)
-	cash: 18.611
-	circulation: 23.792
+buying EGY for 0.5
+	cash: 9.5
+	circulation: 15.0
+buying TWTR for 0.5
+	cash: 9.0
+	circulation: 15.0
+buying NETI for 0.5
+	cash: 8.5
+	circulation: 15.0
+buying BTU for 0.5
+	cash: 8.0
+	circulation: 15.0
+buying MBI for 0.5
+	cash: 7.5
+	circulation: 15.0
+buying FBP for 0.5
+	cash: 7.0
+	circulation: 15.0
+buying AMPY for 0.5
+	cash: 6.5
+	circulation: 15.0
+buying BTU for 0.5
+	cash: 6.0
+	circulation: 15.0
+buying AMPY for 0.5
+	cash: 5.5
+	circulation: 15.0
+buying AMPY for 0.5
+	cash: 5.0
+	circulation: 15.0
+buying AMPY for 0.5
+	cash: 4.5
+	circulation: 15.0
+buying CRK for 0.5
+	cash: 4.0
+	circulation: 15.0
+selling AMPY at 337.647% (\$0.5 => \$2.188)
+	cash: 6.188
+	circulation: 16.688
+selling AMPY at 588.889% (\$0.5 => \$3.444)
+	cash: 9.633
+	circulation: 19.633
+selling AMPY at 490.476% (\$0.5 => \$2.952)
+	cash: 12.585
+	circulation: 22.085
+selling AMPY at 365.0% (\$0.5 => \$2.325)
+	cash: 14.91
+	circulation: 23.91
+selling AMPY at 348.193% (\$0.5 => \$2.241)
+	cash: 17.151
+	circulation: 25.651
+buying RYAM for 0.8550341515454909
+	cash: 16.296
+	circulation: 25.651
+selling AMPY at 280.909% (\$0.5 => \$1.905)
+	cash: 18.201
+	circulation: 27.056
+selling AMPY at 510.843% (\$0.5 => \$3.054)
+	cash: 21.255
+	circulation: 29.61
+buying BTU for 0.9869928956126688
+	cash: 20.268
+	circulation: 29.61
+buying HMY for 0.9869928956126688
+	cash: 19.281
+	circulation: 29.61
+buying HMY for 0.9869928956126688
+	cash: 18.294
+	circulation: 29.61
+buying SID for 0.9869928956126688
+	cash: 17.307
+	circulation: 29.61
+buying HUN for 0.9869928956126688
+	cash: 16.32
+	circulation: 29.61
+buying HUN for 0.9869928956126688
+	cash: 15.333
+	circulation: 29.61
+buying CNX for 0.9869928956126688
+	cash: 14.346
+	circulation: 29.61
+buying IO for 0.9869928956126688
+	cash: 13.359
+	circulation: 29.61
+buying FTK for 0.9869928956126688
+	cash: 12.372
+	circulation: 29.61
+buying FTK for 0.9869928956126688
+	cash: 11.385
+	circulation: 29.61
+buying VIPS for 0.9869928956126688
+	cash: 10.398
+	circulation: 29.61
+buying NETI for 0.9869928956126688
+	cash: 9.411
+	circulation: 29.61
+buying NETI for 0.9869928956126688
+	cash: 8.424
+	circulation: 29.61
+buying CNX for 0.9869928956126688
+	cash: 7.437
+	circulation: 29.61
+buying CLF for 0.9869928956126688
+	cash: 6.45
+	circulation: 29.61
+buying TK for 0.9869928956126688
+	cash: 5.463
+	circulation: 29.61
+buying TK for 0.9869928956126688
+	cash: 4.476
+	circulation: 29.61
+selling NETI at 538.065% (\$0.5 => \$3.19)
+	cash: 7.666
+	circulation: 32.3
+selling NETI at 1023.864% (\$0.987 => \$11.092)
+	cash: 18.759
+	circulation: 42.406
+selling NETI at 643.609% (\$0.5 => \$3.718)
+	cash: 22.477
+	circulation: 45.624
+selling NETI at 1028.867% (\$0.987 => \$11.142)
+	cash: 33.619
+	circulation: 55.778
+selling HMY at 334.971% (\$0.987 => \$4.293)
+	cash: 37.912
+	circulation: 59.085
+selling HMY at 326.285% (\$0.987 => \$4.207)
+	cash: 42.119
+	circulation: 62.305
+selling KBH at 1.105% (\$0.5 => \$0.506)
+	cash: 42.625
+	circulation: 62.311
+selling SID at 291.579% (\$0.987 => \$3.865)
+	cash: 46.489
+	circulation: 65.188
+selling BBD at 0.899% (\$0.5 => \$0.504)
+	cash: 46.994
+	circulation: 65.193
+selling RYAM at 103.846% (\$0.855 => \$1.743)
+	cash: 48.737
+	circulation: 66.081
+selling CLF at 254.375% (\$0.987 => \$3.498)
+	cash: 52.235
+	circulation: 68.591
+selling MBI at 8.254% (\$0.5 => \$0.541)
+	cash: 52.776
+	circulation: 68.633
+selling CNX at 158.451% (\$0.987 => \$2.551)
+	cash: 55.327
+	circulation: 70.197
+selling CNX at 201.415% (\$0.987 => \$2.975)
+	cash: 58.302
+	circulation: 72.185
+selling HUN at 80.867% (\$0.987 => \$1.785)
+	cash: 60.087
+	circulation: 72.983
+selling CRK at 28.801% (\$0.5 => \$0.644)
+	cash: 60.731
+	circulation: 73.127
+selling HUN at 70.16% (\$0.987 => \$1.679)
+	cash: 62.41
+	circulation: 73.819
+selling FBP at 1.633% (\$0.5 => \$0.508)
+	cash: 62.918
+	circulation: 73.827
+selling MTL at 5.642% (\$0.5 => \$0.528)
+	cash: 63.447
+	circulation: 73.856
+selling MTL at 6.634% (\$0.5 => \$0.533)
+	cash: 63.98
+	circulation: 73.889
+selling FTK at 74.076% (\$0.987 => \$1.718)
+	cash: 65.698
+	circulation: 74.62
+selling FTK at 72.313% (\$0.987 => \$1.701)
+	cash: 67.399
+	circulation: 75.334
+selling AMPY at 432.941% (\$0.5 => \$2.665)
+	cash: 70.063
+	circulation: 77.498
+selling IO at 22.119% (\$0.987 => \$1.205)
+	cash: 71.269
+	circulation: 77.717
+selling TK at 8.466% (\$0.987 => \$1.071)
+	cash: 72.339
+	circulation: 77.8
+selling TK at 0.0% (\$0.987 => \$0.987)
+	cash: 73.326
+	circulation: 77.8
+selling VIPS at 0.073% (\$0.987 => \$0.988)
+	cash: 74.314
+	circulation: 77.801
+selling BTU at 0.963% (\$0.5 => \$0.505)
+	cash: 74.819
+	circulation: 77.806
+selling BTU at 12.168% (\$0.987 => \$1.107)
+	cash: 75.926
+	circulation: 77.926
+selling BTU at 0.662% (\$0.5 => \$0.503)
+	cash: 76.429
+	circulation: 77.929
+selling TWTR at 1.324% (\$0.5 => \$0.507)
+	cash: 76.936
+	circulation: 77.936
+selling EGY at 1.224% (\$0.5 => \$0.506)
+	cash: 77.442
+	circulation: 77.942
+selling FRO at 2.999% (\$0.5 => \$0.515)
+	cash: 77.957
+	circulation: 77.957
 	skips:       0
-	profits:     15.0 -> 18.61087407776206
-	circulation: 23.791788182857353
+
+	profits:     \$15.0 -> \$77.95687276829435
+	circulation: \$77.95687276829433
 </pre>
 </div>
 
+<br/>
+
+Below, we have rough summaries for the performance of various sell lines (as
+termed by their $m$ and $b$ components) after a 20% drop and a rank of the top
+61:
+
 --- Max Buy-based Average
-"In the 2018-2020 continuous time period"
-[m = -0.03, b = 3.0] => ROI: 0.756441361197537, Profits: 83.15873237234362
+"In the cumulative timespan of 2018-2020"
+
+[drop = 20%, m = -0.02, b = 5.2] => ROI: 1.4985018195914688,
+                                    Profits: 130.09068571040072,
+                                    Hold: 211 days
 
 "Yearly Breakdown"
-| Timeframe |   m   |  b  | Buys |   Max ROI  |  Mean ROI  | Reinvested Profits|
-|-----------|-------|-----|------|------------|------------|-------------------|
-|   2018    | -0.03 | 3.0 |   31 | 0.469707429| -0.09172960| 19.95330851268649 |
-|   2019    | -0.03 | 3.0 |   53 | 1.898085494| 0.883476782| 62.20032826590945 |
-|   2020    | -0.03 | 3.0 |  348 | 3.103998120| 2.048722389| 16.56131166505285 |
+| Timeframe |   m   |  b  | Buys | Hold | Skips |  Mean ROI  | Reinvested Profits|
+|-----------|-------|-----|------|------|-------|------------|-------------------|
+|   2018    | -0.02 | 5.2 |  320 | 320  |   1   | 1.985966993|  46.2824884012912 |
+|   2019    | -0.02 | 5.2 |  247 | 247  |  22   | 0.794949965|  30.4867642574489 |
+|   2020    | -0.02 | 5.2 |  348 | 197  | 293   | 1.562228336|  45.1841573684472 |
+---
 
-"In the 2018-2020 continuous time period"
-[m =  0.00, b = 0.6] => ROI: 0.5250149741492969, Profits: 42.920837845011285
+And if we change the initial price drop from 20% to 30%:
+
+--- Max Buy-basedd Average
+[drop = 30%, m = -0.02, b = 5.2] => ROI: 1.7578832597251424,
+                                    Profits: 28.76512973580418,
+                                    Hold: 211 days
 
 "Yearly Breakdown"
-| Timeframe |   m   |  b  | Buys |   Max ROI  |  Mean ROI  | Reinvested Profits|
-|-----------|-------|-----|------|------------|------------|-------------------|
-|   2018    |  0.00 | 0.6 |   31 | 0.41858629 | 0.229086387| 18.61087407776206 |
-|   2019    |  0.00 | 0.6 |   53 | 0.93849151 | 0.520530492| 32.78889724498351 |
-|   2020    |  0.00 | 0.6 |  348 | 1.25641997 | 0.552059410| 25.61447225819548 |
+| Timeframe |   m   |  b  | Buys | Median Hold | Skips |  Mean ROI  | Reinvested Profits|
+|-----------|-------|-----|------|----------|-------|------------|-------------------|
+| 2018 | -0.02 | 5.2 | 8 | (unsold) | 0 | -0.09172960753873127 | 14.633081569845075 |
+| 2019 | -0.02  | 5.2  | 19  | 246 | 0 | 0.8834767826743782 | 23.39302943540659 |
+| 2020 | -0.02  | 5.2  | 108  | 197 | 59 | 2.0487223893739896 | 66.04386747735361 |
 ---
 
 At this point, it's just a matter of setting up the line:
 
 --- When Do We Sell?
+    # m = -0.02, b = 5.2
     @assessor.sell_when do |original, today|
       days_held = today.trading_days_from original
       
@@ -667,8 +784,8 @@ class Simulator
   def initialize(stocks:  nil,
                  drop:   -0.3,
                  rank:    60,
-                 m:      -0.00,
-                 b:       0.6,
+                 m:      -0.02,
+                 b:       5.2,
                  after:   nil,
                  before:  nil)
     @stocks = stocks
@@ -806,7 +923,6 @@ class Assessor
     assess_sells
   end
 end
-
 ---
 
 @s Accessing Market Data

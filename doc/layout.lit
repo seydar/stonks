@@ -6,6 +6,8 @@ Made by [Ari Brown](http://aribrown.com) in February - March 2021. The results
 are visible [here](/files/stock_recs.2021.html), with links to other years as
 well.
 
+This is not financial advice -- I am not a financial advisor.
+
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript">
   function togglediv(tag) {
