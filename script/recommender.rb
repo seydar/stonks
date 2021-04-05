@@ -41,9 +41,8 @@ unless Time.parse((Date.today - 1).to_s) <= latest_bar
   stocks_updated = 0
   updates.each do |sym, bz|
     bz.each do |b|
-      stocks_updated += 1
-
       unless b.date == Time.parse(Date.today.to_s) && Time.now < Time.parse('17:00')
+        stocks_updated += 1
         b.save sym, 'day'
       end
     end
