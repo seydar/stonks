@@ -10,8 +10,8 @@ class Simulator
   def initialize(stocks:  nil,
                  drop:   -0.3,
                  rank:    60,
-                 m:      -0.02,
-                 b:       5.0,
+                 m:      -0.00,
+                 b:       0.6,
                  after:   nil,
                  before:  nil)
     @stocks = stocks
@@ -33,7 +33,8 @@ class Simulator
     end
     
     # for ROI: m = -0.02, b = 5.0
-    # for $$$: m = -0.035, b = 3.6
+    # for $$$: m = -0.03, b = 3.0
+    #      or: m = -0.00, b = 0.6
     @assessor.sell_when do |original, today|
       days_held = today.trading_days_from original
       

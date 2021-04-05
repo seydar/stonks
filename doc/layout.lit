@@ -1,8 +1,21 @@
-@colorscheme sunburst.css
-@add_css style.css
+@colorscheme doc/sunburst.css
+@add_css doc/style.css
 
 @s Results
 Made by [Ari Brown](http://aribrown.com) in February - March 2021. The results
 are visible [here](/files/stock_recs.2021.html), with links to other years as
 well.
+
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript">
+  function togglediv(tag) {
+  \$('#' + tag).toggle(200);
+  \$('#' + tag + '_plus').text('[-]');
+  \$('#' + tag + '_minus').text('[+]');
+  \$('#' + tag + '_plus').attr('id', tag + '_min');
+  \$('#' + tag + '_minus').attr('id', tag + '_plu');
+  \$('#' + tag + '_plu').attr('id', tag + '_plus');
+  \$('#' + tag + '_min').attr('id', tag + '_minus');
+  }
+</script>
 

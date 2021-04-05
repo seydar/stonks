@@ -80,7 +80,7 @@ def profit(results, circulation: 15.0, pieces: 10, reinvest: false, debug: false
   end.flatten(1).sort_by {|r| r[:stock].date }
 
   skips = []
-  investment = Hash.new {|h, k| h[k] = circulation / pieces }
+  investment = Hash.new {|h, k| h[k] = circulation.to_f / pieces }
 
   history = timeline.inject([circulation]) do |tally, trade|
     if trade[:action] == :sell && skips.include?(trade[:original])
@@ -90,10 +90,11 @@ def profit(results, circulation: 15.0, pieces: 10, reinvest: false, debug: false
     else
   
       if trade[:action] == :buy
+        tally << tally.last - investment[trade[:stock]]
+
         puts "buying #{trade[:stock].ticker.symbol} for " +
              "#{investment[trade[:stock]]}"         if debug
 
-        tally << tally.last - investment[trade[:stock]]
       else # we're selling something we've successfully bought
         puts "selling #{trade[:stock].ticker.symbol} at " +
              "#{(trade[:ROI] * 100).round(3)}% " +

@@ -1,6 +1,6 @@
 @code_type ruby .rb
 @comment_type # %s
-@include layout.lit
+@include doc/layout.lit
 @title Database and Models
 
 @s Database Schema

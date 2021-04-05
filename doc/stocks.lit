@@ -1,6 +1,6 @@
-@code_type ruby .rb
+@code_type ruby .
 @comment_type # %s
-@include layout.lit
+@include doc/layout.lit
 @title Computer-aided Day Trading
 
 @s Computer-aided Day Trading
@@ -10,13 +10,13 @@ rises before subsequently falling some amount. When bad news is published, the
 price plummets before subsequently rising some amount. One method of automation
 would be scanning the news for headlines, measuring the sentiment, and then
 investing when the price drops -- the news tells you where to look. Another
-option is to scan the entire market and look for drops.
+option is to scan the entire market and look for drops that likely result from
+such news.
 
 My method is to do exactly that: scan the entire market for a precipitous drop
-in price over two days (opening of the first to closing of the second), and
-then invest. These stocks tend to rise, collectively, over 100%. How can I
-take advantage of that? How do I know when to sell? When should I be
-satisfied with a stock's performance?
+in price over two days (opening of the first to closing of the second), and then
+invest. How can I take advantage of that? How do I know when to sell? When
+should I be satisfied with a stock's performance?
 
 The database is discussed [here](/files/db.html).
 
@@ -25,105 +25,208 @@ The database is discussed [here](/files/db.html).
 The process starts simply: we answer the questions of "when do we buy" and "when
 do we sell".
 
-A stock price will drop and then it will go back up. We are measuring several
-different dimensions for the best outcome, which make this a difficult
-(annoying?) problem to solve without the help of more computing power. As an
-intermediate step, I've settled on the below figures, which have lent themselves
-to the below results:
+A stock price will drop and then it will likely go back up, due to **mean
+reversion**. We are measuring several different dimensions for the best outcome,
+which make this a difficult (annoying?) problem to solve without the help of
+more computing power. As an intermediate step, I've settled on the figures in
+this document, which have lent themselves to the below results:
 
 <center>
-  <table>
+<table>
+  <tr>
+    <th>Year</th>
+    <th># of Buys</th>
+    <th>S&P 500</th>
+    <th>Mean ROI</th>
+    <th>Median</th>
+    <th>STDDEV</th>
+    <th>Sharpe</th>
+  </tr>
+  
+    
     <tr>
-      <th>Year</th>
-      <th># of Buys</th>
-      <th>Mean ROI</th>
-      <th>SPY ROI</th>
-    </tr>
-    <tr>
-      <td><a href="/files/stock_recs.2021.html">2021</a></td>
+      <td>
+        <a href="/files/stock_recs.2021.html">2021</a>
+      </td>
       <td>24</td>
-      <td>-34.459%</td>
-      <td>3.651%</td>
+      <td>2.546%</td>
+      <td>-73.759%</td>
+      <td>-100%</td>
+      <td>128.555%</td>
+      <td>-0.574</td>
     </tr>
+  
+    
     <tr>
-      <td><a href="/files/stock_recs.2020.html">2020</a></td>
-      <td>99</td>
-      <td>81.908%</td>
-      <td>16.162%</td>
+      <td>
+        <a href="/files/stock_recs.2020.html">2020</a>
+      </td>
+      <td>108</td>
+      <td>32.39%</td>
+      <td>204.872%</td>
+      <td>136.923%</td>
+      <td>505.917%</td>
+      <td>0.405</td>
     </tr>
+  
+    
     <tr>
-      <td><a href="/files/stock_recs.2019.html">2019</a></td>
-      <td>11</td>
-      <td>74.797%</td>
-      <td>28.785%</td>
+      <td>
+        <a href="/files/stock_recs.2019.html">2019</a>
+      </td>
+      <td>19</td>
+      <td>14.505%</td>
+      <td>88.348%</td>
+      <td>37.5%</td>
+      <td>164.128%</td>
+      <td>0.538</td>
     </tr>
+  
+    
     <tr>
-      <td><a href="/files/stock_recs.2018.html">2018</a></td>
+      <td>
+        <a href="/files/stock_recs.2018.html">2018</a>
+      </td>
+      <td>8</td>
+      <td>28.728%</td>
+      <td>-9.173%</td>
+      <td>2.051%</td>
+      <td>134.038%</td>
+      <td>-0.068</td>
+    </tr>
+  
+    
+    <tr>
+      <td>
+        <a href="/files/stock_recs.2017.html">2017</a>
+      </td>
       <td>5</td>
-      <td>48.628%</td>
-      <td>-7.013%</td>
+      <td>24.075%</td>
+      <td>23.391%</td>
+      <td>1.254%</td>
+      <td>87.793%</td>
+      <td>0.266</td>
     </tr>
+  
+    
     <tr>
-      <td><a href="/files/stock_recs.2017.html">2017</a></td>
-      <td>1</td>
-      <td>-100.00%</td>
-      <td>19.384%</td>
+      <td>
+        <a href="/files/stock_recs.2016.html">2016</a>
+      </td>
+      <td>16</td>
+      <td>24.611%</td>
+      <td>285.415%</td>
+      <td>166.667%</td>
+      <td>401.708%</td>
+      <td>0.711</td>
     </tr>
+  
+    
     <tr>
-      <td><a href="/files/stock_recs.2016.html">2016</a></td>
-      <td>9</td>
-      <td>16.663%</td>
-      <td>9.643</td>
-    </tr>
-    <tr>
-      <td><a href="/files/stock_recs.2015.html">2015</a></td>
+      <td>
+        <a href="/files/stock_recs.2015.html">2015</a>
+      </td>
       <td>6</td>
-      <td>12.530%</td>
-      <td>-0.812%</td>
+      <td>6.404%</td>
+      <td>124.589%</td>
+      <td>74.076%</td>
+      <td>206.5%</td>
+      <td>0.603</td>
     </tr>
+  
+    
     <tr>
-      <td><a href="/files/stock_recs.2014.html">2014</a></td>
+      <td>
+        <a href="/files/stock_recs.2014.html">2014</a>
+      </td>
+      <td>10</td>
+      <td>20.424%</td>
+      <td>1.35%</td>
+      <td>3.367%</td>
+      <td>64.099%</td>
+      <td>0.021</td>
+    </tr>
+  
+    
+    <tr>
+      <td>
+        <a href="/files/stock_recs.2013.html">2013</a>
+      </td>
       <td>3</td>
-      <td>10.495%</td>
-      <td>11.289%</td>
+      <td>17.832%</td>
+      <td>104.197%</td>
+      <td>135.395%</td>
+      <td>81.446%</td>
+      <td>1.279</td>
     </tr>
+  
+    
     <tr>
-      <td><a href="/files/stock_recs.2013.html">2013</a></td>
+      <td>
+        <a href="/files/stock_recs.2012.html">2012</a>
+      </td>
+      <td>6</td>
+      <td>15.123%</td>
+      <td>142.51%</td>
+      <td>123.627%</td>
+      <td>112.88%</td>
+      <td>1.262</td>
+    </tr>
+  
+    
+    <tr>
+      <td>
+        <a href="/files/stock_recs.2011.html">2011</a>
+      </td>
+      <td>3</td>
+      <td>14.414%</td>
+      <td>26.922%</td>
+      <td>36.765%</td>
+      <td>19.117%</td>
+      <td>1.408</td>
+    </tr>
+  
+    
+    <tr>
+      <td>
+        <a href="/files/stock_recs.2010.html">2010</a>
+      </td>
       <td>2</td>
-      <td>3.729%</td>
-      <td>29.689%</td>
+      <td>9.02%</td>
+      <td>174.397%</td>
+      <td>309.877%</td>
+      <td>191.597%</td>
+      <td>0.91</td>
     </tr>
+  
+    
     <tr>
-      <td><a href="/files/stock_recs.2012.html">2012</a></td>
-      <td>5</td>
-      <td>61.324%</td>
-      <td>13.474%</td>
+      <td>
+        <a href="/files/stock_recs.2009.html">2009</a>
+      </td>
+      <td>48</td>
+      <td>28.657%</td>
+      <td>319.619%</td>
+      <td>324.138%</td>
+      <td>167.498%</td>
+      <td>1.908</td>
     </tr>
+  
+    
     <tr>
-      <td><a href="/files/stock_recs.2011.html">2011</a></td>
-      <td>4</td>
-      <td>14.042%</td>
-      <td>-0.199%</td>
+      <td>
+        <a href="/files/stock_recs.2008.html">2008</a>
+      </td>
+      <td>125</td>
+      <td>10.708%</td>
+      <td>224.648%</td>
+      <td>147.407%</td>
+      <td>412.673%</td>
+      <td>0.544</td>
     </tr>
-    <tr>
-      <td><a href="/files/stock_recs.2010.html">2010</a></td>
-      <td>1</td>
-      <td>-100.000%</td>
-      <td>12.841%</td>
-    </tr>
-    <tr>
-      <td><a href="/files/stock_recs.2009.html">2009</a></td>
-      <td>18</td>
-      <td>107.637%</td>
-      <td>23.493%</td>
-    </tr>
-    <tr>
-      <td><a href="/files/stock_recs.2008.html">2008</a></td>
-      <td>49</td>
-      <td>43.304%</td>
-      <td>-37.735%</td>
-    </tr>
-  </table>
+  
+</table>
+
 </center>
 
 @s When Do We Buy?
@@ -131,6 +234,14 @@ to the below results:
 What a great question.
 
 We buy when the price drops and we are confident that the price will go back up.
+
+The strategy is to invest a little bit into a lot of stocks, betting that this
+"sector" of the market will go up, without placing that guarantee on any
+individual stock. As a result, we need to ensure that we have enough
+opportunities to invest (since we will likely be investing evenly into each
+stock -- I can't predict the future of how many buy signals we'll see over the
+course of the year), and we have to balance that with how long we hold each
+stock and how much the average ROI is.
 
 #### Price Drop
 
@@ -144,17 +255,19 @@ tids  = Ticker.where(:exchange => 'NYSE').all.map {|t| t.id }
 debut = Time.parse('1 jan 2019')
 fin   = Time.parse('31 dec 2019')
 bars  = Bar.where(:time => debut..fin, :ticker_id => tids)
-           .order(:ticker_id, Sequel.asc(:time))
+           .order(:ticker_id, Sequel.asc(:date))
            .all
 groups  = bars.group_by {|b| b.ticker_id }
 changes = groups.map do |ticker_id, bars|
   bars.each_cons(2).map {|a, b| b.change_from a }
 end.flatten
 
+# This will sort the changes into the bucket that are closest in value
 hist = changes.histogram [-0.35, -0.25, -0.15, -0.05, 0.05, 0.15, 0.25, 0.35]
 ---
 
 --- Price Change and Occurrences :=
+2019
 "Fractional 2-day Change" => "# of Occurrences"
                -100..-0.3 => 99
                -0.3..-0.2 => 243
@@ -166,10 +279,23 @@ hist = changes.histogram [-0.35, -0.25, -0.15, -0.05, 0.05, 0.15, 0.25, 0.35]
                 0.3.. 100 => 151
 ---
 
-I therefore decided that the 99 occurrences/year would be sufficient for my
-tastes; the odds that a >30% drop is an overreaction due to bad news to some
-degree is likely high. Thus: we're set the default value in the simulator as
-`-0.3`.
+Looking at the results for 2015, we get:
+
+--- Price Change and Occurrences :=
+2015
+"Fractional 2-day Change" => "# of Occurrences"
+               -100..-0.3 => 36
+               -0.3..-0.2 => 192
+               -0.2..-0.1 => 2171
+               -0.1.. 0   => 237530
+                0  .. 0.1 => 243177
+                0.1.. 0.2 => 2490
+                0.2.. 0.3 => 238
+                0.3.. 100 => 78
+---
+
+I therefore decided that -0.2 would be sufficient to start with: we can cull
+the herd of options from there.
 
 #### Price Movement
 
@@ -177,14 +303,18 @@ The logic here is based on my theory of price change: the price of a stock
 changes when enough sales have occurred to raise the price (an unenlightening
 statement), with $\Delta P_{min}$ being the minimum increase in a stock's price:
 
-$$\Delta P_{day} = \Delta P_{min} * N_{buys} - \Delta P_{min} * N_{sells}$$
-
-Since I don't have access to the individual figures of $N_{buys}$ and
-$N_{sells}$, I am going to combine the terms and present an expression for the
-maximum potential for price movement ($N_{shares} = N_{buys} + N_{sells}$), in
-one direction of the other:
-
 $$\Delta P_{day} = \Delta P_{min} * N_{shares}$$
+
+Each share that is traded involves a buyer and a seller. The question is whether
+the change in price is positive or negative. This is marked by the minimum
+change in price.
+
+The minimum increase in a stock's price comes from the idea that you can always
+produce a number that is between two others based, so in theory, you could
+always undercut someone else's bid that is still higher than the original price.
+Since you likely cannot pursue the depths of the Rationals when buying stock,
+there is some minimum price ($\Delta P_{min}$) that defines the minimum a stock
+price must increase.
 
 With a larger minimum price increase, then fewer sales are required to raise the
 price to meet a certain threshold. Dividing both sides by $P_{day - 1}$, we get
@@ -198,49 +328,34 @@ lower. We want to maximize $N_{shares}$ and minimize $P$, which is summarized in
 our maximization of $\frac{N_{shares}}{P_{day - 1}}$, visible in the following
 rephrasing:
 
-
 $$\frac{\Delta P_{day}}{P_{day - 1}} = \Delta P_{min} * \frac{N_{shares}}{P_{day - 1}}$$
 
-The change in price works in both directions, so maximizing the above monomial
-could also lead to a sever price drop. But since we're minimizing the $P_{day}$
-involved, we're limiting how much the price can drop.
-
-<br/>
-
-**TODO**: This would be a really good thing to check instead of simply volume.
-Maybe ensure that a stock is in the top 30% or something? Or meets some minimum
-threshold that roughly represents that bracket?
-
---- Price Theory Optimization
-# Make a list of the N_{shares} / P_{day - 1} values for each company *today*
-vals = nyse.inject({}) do |hash, ticker|
-  unless ticker.bars.empty?
-    hash[ticker] = ticker.volumes(:prior => 10).mean / ticker.bars[-1].close]
-  end
-
-  hash
-end
----
-
-#### N<sub>shares</sub>
-
-But because I'm an idiot and didn't do sufficient math as I was developing this
-program, I only check for $N_{shares}$ instead of $\frac{N_{shares}}{P_{day -
-1}}$. 10,000,000 was chosen because after looking at the trades that dropped,
-there were more losers than winners in the < 10,000,000 shares/day crowd. I
-found that I could increase my average ROI by culling the herd.
+The change in price works in both directions, so maximizing the above term
+could also lead to a sever price drop. But since we're looking at stocks after
+they have already dropped considerably, we're relying on **mean reversion** to
+push the price up.
 
 --- When Do We Buy?
-    @assessor.buy_when :history => 5 do |history|
+    @assessor.buy_when :history => 2 do |history|
       today     = history[-1]
       yesterday = history[-2]
     
       [[today.change_from(yesterday) <= drop,
         today.change_from(today)     <= drop].any?,
 
-       history.map {|b| b.volume }.mean >= vol
+       today.rank <= rank
       ].all?
     end
+---
+
+`today.rank` here is the rank of that ticker at the end of that day. It is
+computed through the following lines, and each ticker's daily rank and rank
+value are stored in the database within the bar:
+
+--- Computing Rank
+# {"SYM" => [Rank, Value]}
+rankings = Ticker.rankings NYSE, :date => date
+rankings[ticker.symbol] #=> [Rank, Value]
 ---
 
 @s When Do We Sell?
@@ -272,17 +387,16 @@ different polynomials of many different degrees.
 <br/>
 
 Anyways, I figured a linear drop ($y = m * x + b$) would be good enough, so I
-ran 1,000 tests on the data to find which curve would give me the best results.
+ran 1,200 tests on the data to find which curve would give me the best results.
 It looked roughly like this:
 
 --- Line Fitting
-0.05.step(:to => 0.1, :by => 0.005) do |m|
+0.00.step(:to => 0.1, :by => 0.005) do |m|
   m = -m
-  1.step(:to => 10, :by => 0.1) do |b|
-    assessor.sell_when do |original, today|
-      # ...
-    end
-    sells = assessor.assess_sells
+  0.step(:to => 6, :by => 0.1) do |b|
+    sim.m = m
+    sim.b = b
+    sells = sim.assess_sells
 
     # ...
   end
@@ -290,60 +404,245 @@ end
 ---
 
 The results were then saved to textfiles and then processed to see which line
-would give the best results, thinking I am going to invest the same amount per
+would give the best results, measuring the **mean ROI** and the **results of
+paper trading those stocks**, thinking I am going to invest the same amount per
 investment opportunity (instead of investing the same amount per year, splitting
 that amount evenly across an estimated value of opportunities that will occur
 during the year).
+
+This raises an interesting point: I am not looking to simply maximize the ROI
+over an arbitrary time horizon. Rather, I am trying to maximize my earnings,
+which depend on my ability to reinvest my earnings from individual stocks, which
+means I want to maximize my ROI but to minimize my hold time.
 
 <br/>
 
 Each row in the data represents one trial: a given year, $m$, and $b$.
 
---- Fit Results
-hash = {}
-num = 127 # the number of buying opportunities in 2018-2020
-
-files = Dir['data/roi_*.txt']
-data  = files.map do |f|
-  txt = File.read f
-  txt.split("\n").map {|l| l.split "," }
-end.flatten 1
-
-# Conduct a weighted mean
-data.each do |r|
-  # r = [Timeframe, m, b, Buys, Max ROI, Mean ROI]
-  key = [r[1], r[2]] # [m, b]
-  hash[key] ||= 0
-  hash[key] += r[-1].to_f * r[3].to_f
-end
-hash.each {|k, v| hash[k] = hash[k] / num.to_f }
-hash.max_by {|k, v| v }
----
-
 The maximum ROI seen on that stock is taken from the time that the stock is to
 be held (according to the $m$ and $b$ combination) plus 30 days. It allows me to
 judge how well the line is meeting the potential on that set of stocks.
 
---- Max Buy-based Average
-[m = -0.05, b = 4.6] => 0.7704006488746548
+The mean ROI is the mean ROI of each individual stock.
 
-| Timeframe |   m   |  b  | Buys |   Max ROI   |  Mean ROI  |
-|-----------|-------|-----|------|-------------|------------|
-|   2018    | -0.05 | 4.6 |   7  | 0.745668795 | 0.669367097|
-|   2019    | -0.05 | 4.6 |   8  | 1.311737151 | 0.780366784|
-|   2020    | -0.05 | 4.6 |  112 | 1.375183827 | 0.776003379|
+The "reinvested profits" figure comes from investing \$15K into the market that
+year. When a buy signal comes along, you invest the value in circulation
+(initially \$15K) divided by 30 into the stock (initially \$15K / 30 = \$500).
+When a sell signal comes along, you sell. You then take the profits and put them
+back into circulation (e.g., if you made \$600 by selling a stock, your
+circulation is now \$15.6K, which means you would now be investing \$520 per
+stock). The figure shown is the amount of cash you have leftover after all of
+the buy signals and all of their sell signals; if a sell signal for a given
+stock never occurs, then that investment is still in circulation, but you don't
+have access to it.
+
+Here is the explicit breakdown of 2018 (note that some sell signals will occur
+beyond 2018):
+
+<span onclick="togglediv('togglable')">
+  <a>
+    Breakdown
+    <span id="togglable_plus">[+]</span>
+  </a>
+</span>
+<div id="togglable" style="display: none;">
+<pre>
+loaded 31 trxs
+  stats: {:m=>0, :b=>0.6}
+	med. hold:   454
+	med. ROI:    0.6272577996715928
+	avg. ROI:    0.22908638730856232
+buying KODK for 0.5
+	cash: 14.5
+	circulation: 15.0
+buying PVG for 0.5
+	cash: 14.0
+	circulation: 15.0
+buying GEN for 0.5
+	cash: 13.5
+	circulation: 15.0
+buying GEN for 0.5
+	cash: 13.0
+	circulation: 15.0
+buying CLNY for 0.5
+	cash: 12.5
+	circulation: 15.0
+buying VHC for 0.5
+	cash: 12.0
+	circulation: 15.0
+buying FTK for 0.5
+	cash: 11.5
+	circulation: 15.0
+buying SNAP for 0.5
+	cash: 11.0
+	circulation: 15.0
+buying ETM for 0.5
+	cash: 10.5
+	circulation: 15.0
+buying VIPS for 0.5
+	cash: 10.0
+	circulation: 15.0
+selling GEN at 63.115% ($0.5 => $0.816)
+	cash: 10.816
+	circulation: 15.316
+selling GEN at 64.122% ($0.5 => $0.821)
+	cash: 11.636
+	circulation: 15.636
+buying RENN for 0.5212061485838234
+	cash: 11.115
+	circulation: 15.636
+buying GEN for 0.5212061485838234
+	cash: 10.594
+	circulation: 15.636
+buying TWTR for 0.5212061485838234
+	cash: 10.073
+	circulation: 15.636
+buying CSLT for 0.5212061485838234
+	cash: 9.551
+	circulation: 15.636
+buying EGY for 0.5212061485838234
+	cash: 9.03
+	circulation: 15.636
+buying DBD for 0.5212061485838234
+	cash: 8.509
+	circulation: 15.636
+buying DBD for 0.5212061485838234
+	cash: 7.988
+	circulation: 15.636
+buying LCI for 0.5212061485838234
+	cash: 7.467
+	circulation: 15.636
+buying SUPV for 0.5212061485838234
+	cash: 6.945
+	circulation: 15.636
+buying NIO for 0.5212061485838234
+	cash: 6.424
+	circulation: 15.636
+buying NIO for 0.5212061485838234
+	cash: 5.903
+	circulation: 15.636
+buying NIO for 0.5212061485838234
+	cash: 5.382
+	circulation: 15.636
+buying LCI for 0.5212061485838234
+	cash: 4.861
+	circulation: 15.636
+buying LCI for 0.5212061485838234
+	cash: 4.339
+	circulation: 15.636
+buying EGO for 0.5212061485838234
+	cash: 3.818
+	circulation: 15.636
+buying COTY for 0.5212061485838234
+	cash: 3.297
+	circulation: 15.636
+buying HZN for 0.5212061485838234
+	cash: 2.776
+	circulation: 15.636
+buying PCG for 0.5212061485838234
+	cash: 2.254
+	circulation: 15.636
+selling LCI at 60.916% ($0.521 => $0.839)
+	cash: 3.093
+	circulation: 15.954
+buying PCG for 0.5317894899656693
+	cash: 2.561
+	circulation: 15.954
+selling LCI at 65.067% ($0.521 => $0.86)
+	cash: 3.422
+	circulation: 16.293
+buying FUBO for 0.5430938722105095
+	cash: 2.879
+	circulation: 16.293
+buying CHS for 0.5430938722105095
+	cash: 2.336
+	circulation: 16.293
+selling VHC at 88.955% ($0.5 => $0.945)
+	cash: 3.28
+	circulation: 16.738
+selling FUBO at 122.5% ($0.543 => $1.208)
+	cash: 4.489
+	circulation: 17.403
+selling SUPV at 60.229% ($0.521 => $0.835)
+	cash: 5.324
+	circulation: 17.717
+selling LCI at 64.22% ($0.521 => $0.856)
+	cash: 6.18
+	circulation: 18.052
+selling DBD at 61.087% ($0.521 => $0.84)
+	cash: 7.019
+	circulation: 18.37
+selling DBD at 72.688% ($0.521 => $0.9)
+	cash: 7.919
+	circulation: 18.749
+selling HZN at 66.055% ($0.521 => $0.865)
+	cash: 8.785
+	circulation: 19.093
+selling EGO at 62.424% ($0.521 => $0.847)
+	cash: 9.631
+	circulation: 19.418
+selling SNAP at 60.954% ($0.5 => $0.805)
+	cash: 10.436
+	circulation: 19.723
+selling PVG at 67.611% ($0.5 => $0.838)
+	cash: 11.274
+	circulation: 20.061
+selling VIPS at 62.726% ($0.5 => $0.814)
+	cash: 12.088
+	circulation: 20.375
+selling NIO at 67.766% ($0.521 => $0.874)
+	cash: 12.962
+	circulation: 20.728
+selling NIO at 66.896% ($0.521 => $0.87)
+	cash: 13.832
+	circulation: 21.077
+selling KODK at 292.899% ($0.5 => $1.964)
+	cash: 15.797
+	circulation: 22.541
+selling NIO at 85.64% ($0.521 => $0.968)
+	cash: 16.764
+	circulation: 22.988
+selling TWTR at 63.506% ($0.521 => $0.852)
+	cash: 17.616
+	circulation: 23.319
+selling RENN at 90.791% ($0.521 => $0.994)
+	cash: 18.611
+	circulation: 23.792
+	skips:       0
+	profits:     15.0 -> 18.61087407776206
+	circulation: 23.791788182857353
+</pre>
+</div>
+
+--- Max Buy-based Average
+"In the 2018-2020 continuous time period"
+[m = -0.03, b = 3.0] => ROI: 0.756441361197537, Profits: 83.15873237234362
+
+"Yearly Breakdown"
+| Timeframe |   m   |  b  | Buys |   Max ROI  |  Mean ROI  | Reinvested Profits|
+|-----------|-------|-----|------|------------|------------|-------------------|
+|   2018    | -0.03 | 3.0 |   31 | 0.469707429| -0.09172960| 19.95330851268649 |
+|   2019    | -0.03 | 3.0 |   53 | 1.898085494| 0.883476782| 62.20032826590945 |
+|   2020    | -0.03 | 3.0 |  348 | 3.103998120| 2.048722389| 16.56131166505285 |
+
+"In the 2018-2020 continuous time period"
+[m =  0.00, b = 0.6] => ROI: 0.5250149741492969, Profits: 42.920837845011285
+
+"Yearly Breakdown"
+| Timeframe |   m   |  b  | Buys |   Max ROI  |  Mean ROI  | Reinvested Profits|
+|-----------|-------|-----|------|------------|------------|-------------------|
+|   2018    |  0.00 | 0.6 |   31 | 0.41858629 | 0.229086387| 18.61087407776206 |
+|   2019    |  0.00 | 0.6 |   53 | 0.93849151 | 0.520530492| 32.78889724498351 |
+|   2020    |  0.00 | 0.6 |  348 | 1.25641997 | 0.552059410| 25.61447225819548 |
 ---
 
 At this point, it's just a matter of setting up the line:
 
 --- When Do We Sell?
-    # drop = -0.3, vol > 10M, m = -0.05, b = 4.6
     @assessor.sell_when do |original, today|
       days_held = today.trading_days_from original
       
-      m = -0.05
-      b =  4.6
-      sell_point = [m * days_held + b, 0].max
+      sell_point = [@m * days_held + @b, 0].max
     
       today.change_from(original) >= sell_point
     end

@@ -2,10 +2,14 @@ require 'pry'
 require './market.rb'
 require './script/helpers.rb'
 
-schemes = [{:m => 0, :b => 0.6},
-           {:m => -0.02, :b => 5.0}]
+schemes = [{:m => -0.03, :b => 3.0},
+           {:m =>  0.00, :b => 0.6}]
 
-sim = simulator :year => 2008, :drop => -0.2
+sim = Simulator.new
+sim.assessor.holding = (ARGV[0]..(ARGV[1] || ARGV[0])).inject([]) do |sum, year|
+  sum + holdings(:year => year, :drop => -0.2)
+end
+
 puts "loaded #{sim.assessor.holding.size} trxs"
 
 comparison = schemes.map do |scheme|
@@ -19,7 +23,7 @@ comparison = schemes.map do |scheme|
   puts "\tmed. ROI:    #{sells.map {|h| h[:ROI] }.median}"
   puts "\tavg. ROI:    #{sells.map {|h| h[:ROI] }.mean}"
 
-  prof = profit sells, :pieces => 30, :reinvest => true
+  prof = profit sells, :circulation => 15.0, :pieces => 30.0, :reinvest => true
   puts "\tskips:       #{prof[:skips].size}"
   puts "\tprofits:     15.0 -> #{prof[:cash]}"
   puts "\tcirculation: #{prof[:circulation]}"
