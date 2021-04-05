@@ -452,8 +452,10 @@ all of their sell signals; if a sell signal for a given stock never occurs, then
 that investment is still in circulation, but you don't have access to it, which
 is reflected in your "cash" value.
 
-Here is the explicit breakdown of the buy signals of 2015 (note that some sell
-signals will occur beyond 2015):
+Here is the explicit breakdown of the buy and sell signals of 2015, with the
+requisite drop being 20% instead (note that some sell signals will occur beyond 2015):
+
+(A 30% drop yields only 4 buy signals, with final cash balance of \$18.737 from an initial investment of \$15. I'm still deciding on whether to use 20% or 30% as the initial drop).
 
 <span onclick="togglediv('togglable')">
   <a>

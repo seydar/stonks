@@ -6,7 +6,7 @@ schemes = [{:m => -0.02,  :b => 5.2}]
 
 sim = Simulator.new
 sim.assessor.holding = (ARGV[0]..(ARGV[1] || ARGV[0])).inject([]) do |sum, year|
-  sum + holdings(:year => year, :drop => -0.3)
+  sum + holdings(:year => year, :drop => -0.2)
 end
 
 puts "loaded #{sim.assessor.holding.size} trxs"
@@ -28,13 +28,13 @@ comparison = schemes.map do |scheme|
   puts "\tprofits:     15.0 -> #{prof[:cash]}"
   puts "\tcirculation: #{prof[:circulation]}"
 
-  puts "| #{sim.m}  | " +
-       "#{sim.b}  | " +
-       "#{sells.size}  | " +
-       "#{sells.map {|h| h[:hold] || 1000 }.median} | " +
-       "#{prof[:skips].size} | " +
-       "#{sells.map {|h| h[:ROI] }.mean} | " +
-       "#{prof[:cash]} |"
+  #puts "| #{sim.m}  | " +
+  #     "#{sim.b}  | " +
+  #     "#{sells.size}  | " +
+  #     "#{sells.map {|h| h[:hold] || 1000 }.median} | " +
+  #     "#{prof[:skips].size} | " +
+  #     "#{sells.map {|h| h[:ROI] }.mean} | " +
+  #     "#{prof[:cash]} |"
 
   prof
 end
