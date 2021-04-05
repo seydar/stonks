@@ -658,8 +658,8 @@ all of their sell signals; if a sell signal for a given stock never occurs, then
 that investment is still in circulation, but you don't have access to it, which
 is reflected in your "cash" value.
 </p>
-<p>Here is the explicit breakdown of the buy signals of 2015 (note that some sell
-signals will occur beyond 2015):
+<p>Here is the explicit breakdown of the buy and sell signals of 2015, with the
+requisite drop being 20% instead (note that some sell signals will occur beyond 2015):
 </p>
 <p><span onclick="togglediv('togglable')">
   <a>
@@ -938,12 +938,13 @@ termed by their <span class="math">m</span> and <span class="math">b</span> comp
                                     Profits: 130.09068571040072,
                                     Hold: 211 days
 
-"Yearly Breakdown"
-| Timeframe |   m   |  b  | Buys | Hold | Skips |  Mean ROI  | Reinvested Profits|
-|-----------|-------|-----|------|------|-------|------------|-------------------|
-|   2018    | -0.02 | 5.2 |  320 | 320  |   1   | 1.985966993|  46.2824884012912 |
-|   2019    | -0.02 | 5.2 |  247 | 247  |  22   | 0.794949965|  30.4867642574489 |
-|   2020    | -0.02 | 5.2 |  348 | 197  | 293   | 1.562228336|  45.1841573684472 |
+Yearly Breakdown
+
+| Timeframe |    m  |  b  | Buys | Median Hold | Skips |  Mean ROI  | Reinvested Profits|
+|-----------|-------|-----|------|-------------|-------|------------|-------------------|
+|   2018    | -0.02 | 5.2 |   31 |        320  |   1   | 1.985966993|  46.2824884012912 |
+|   2019    | -0.02 | 5.2 |   53 |        247  |  22   | 0.794949965|  30.4867642574489 |
+|   2020    | -0.02 | 5.2 |  348 |        197  | 293   | 1.562228336|  45.1841573684472 |
 </pre>
 
 
@@ -953,18 +954,18 @@ termed by their <span class="math">m</span> and <span class="math">b</span> comp
 </p>
 
 <div class="codeblock">
-<span class="codeblock_name">{Max Buy-basedd Average <a href="stocks.html#1:5">5</a>}</span>
+<span class="codeblock_name">{Max Buy-based Average <a href="stocks.html#1:5">5</a>} :=</span>
 <pre class="prettyprint lang-">
 [drop = 30%, m = -0.02, b = 5.2] =&gt; ROI: 1.7578832597251424,
                                     Profits: 28.76512973580418,
                                     Hold: 211 days
 
-"Yearly Breakdown"
-| Timeframe |   m   |  b  | Buys | Median Hold | Skips |  Mean ROI  | Reinvested Profits|
-|-----------|-------|-----|------|----------|-------|------------|-------------------|
-| 2018 | -0.02 | 5.2 | 8 | (unsold) | 0 | -0.09172960753873127 | 14.633081569845075 |
-| 2019 | -0.02  | 5.2  | 19  | 246 | 0 | 0.8834767826743782 | 23.39302943540659 |
-| 2020 | -0.02  | 5.2  | 108  | 197 | 59 | 2.0487223893739896 | 66.04386747735361 |
+Yearly Breakdown
+| Timeframe |    m  |  b  | Buys | Median Hold | Skips |       Mean ROI     | Reinvested Profits|
+|-----------|-------|-----|------|-------------|-------|--------------------|-------------------|
+|    2018   | -0.02 | 5.2 |   8  |   (unsold)  |   0   | -0.091729607538731 | 14.63308156984507 |
+|    2019   | -0.02 | 5.2 |  19  |      246    |   0   | 0.8834767826743782 | 23.39302943540659 |
+|    2020   | -0.02 | 5.2 | 108  |      197    |  59   | 2.0487223893739896 | 66.04386747735361 |
 </pre>
 
 

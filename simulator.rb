@@ -8,10 +8,10 @@ class Simulator
   attr_accessor :b
 
   def initialize(stocks:  nil,
-                 drop:   -0.3,
+                 drop:   -0.2,
                  rank:    60,
-                 m:      -0.00,
-                 b:       0.6,
+                 m:      -0.02,
+                 b:       5.2,
                  after:   nil,
                  before:  nil)
     @stocks = stocks

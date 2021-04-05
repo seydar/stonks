@@ -455,8 +455,6 @@ is reflected in your "cash" value.
 Here is the explicit breakdown of the buy and sell signals of 2015, with the
 requisite drop being 20% instead (note that some sell signals will occur beyond 2015):
 
-(A 30% drop yields only 4 buy signals, with final cash balance of \$18.737 from an initial investment of \$15. I'm still deciding on whether to use 20% or 30% as the initial drop).
-
 <span onclick="togglediv('togglable')">
   <a>
     Breakdown
@@ -731,27 +729,28 @@ termed by their $m$ and $b$ components) after a 20% drop and a rank of the top
                                     Profits: 130.09068571040072,
                                     Hold: 211 days
 
-"Yearly Breakdown"
-| Timeframe |   m   |  b  | Buys | Hold | Skips |  Mean ROI  | Reinvested Profits|
-|-----------|-------|-----|------|------|-------|------------|-------------------|
-|   2018    | -0.02 | 5.2 |  320 | 320  |   1   | 1.985966993|  46.2824884012912 |
-|   2019    | -0.02 | 5.2 |  247 | 247  |  22   | 0.794949965|  30.4867642574489 |
-|   2020    | -0.02 | 5.2 |  348 | 197  | 293   | 1.562228336|  45.1841573684472 |
+Yearly Breakdown
+
+| Timeframe |    m  |  b  | Buys | Median Hold | Skips |  Mean ROI  | Reinvested Profits|
+|-----------|-------|-----|------|-------------|-------|------------|-------------------|
+|   2018    | -0.02 | 5.2 |   31 |        320  |   1   | 1.985966993|  46.2824884012912 |
+|   2019    | -0.02 | 5.2 |   53 |        247  |  22   | 0.794949965|  30.4867642574489 |
+|   2020    | -0.02 | 5.2 |  348 |        197  | 293   | 1.562228336|  45.1841573684472 |
 ---
 
 And if we change the initial price drop from 20% to 30%:
 
---- Max Buy-basedd Average
+--- Max Buy-based Average :=
 [drop = 30%, m = -0.02, b = 5.2] => ROI: 1.7578832597251424,
                                     Profits: 28.76512973580418,
                                     Hold: 211 days
 
-"Yearly Breakdown"
-| Timeframe |   m   |  b  | Buys | Median Hold | Skips |  Mean ROI  | Reinvested Profits|
-|-----------|-------|-----|------|----------|-------|------------|-------------------|
-| 2018 | -0.02 | 5.2 | 8 | (unsold) | 0 | -0.09172960753873127 | 14.633081569845075 |
-| 2019 | -0.02  | 5.2  | 19  | 246 | 0 | 0.8834767826743782 | 23.39302943540659 |
-| 2020 | -0.02  | 5.2  | 108  | 197 | 59 | 2.0487223893739896 | 66.04386747735361 |
+Yearly Breakdown
+| Timeframe |    m  |  b  | Buys | Median Hold | Skips |       Mean ROI     | Reinvested Profits|
+|-----------|-------|-----|------|-------------|-------|--------------------|-------------------|
+|    2018   | -0.02 | 5.2 |   8  |   (unsold)  |   0   | -0.091729607538731 | 14.63308156984507 |
+|    2019   | -0.02 | 5.2 |  19  |      246    |   0   | 0.8834767826743782 | 23.39302943540659 |
+|    2020   | -0.02 | 5.2 | 108  |      197    |  59   | 2.0487223893739896 | 66.04386747735361 |
 ---
 
 At this point, it's just a matter of setting up the line:
@@ -784,7 +783,7 @@ class Simulator
   attr_accessor :b
 
   def initialize(stocks:  nil,
-                 drop:   -0.3,
+                 drop:   -0.2,
                  rank:    60,
                  m:      -0.02,
                  b:       5.2,

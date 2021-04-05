@@ -23,7 +23,7 @@ comparison = schemes.map do |scheme|
   puts "\tavg. ROI:    #{sells.map {|h| h[:ROI] }.mean}"
   puts "\tROI / hold:  #{sells.map {|h| h[:ROI] }.mean / sells.map {|h| h[:hold] || 1000 }.median}"
 
-  prof = profit sells, :circulation => 15.0, :pieces => 30.0, :reinvest => true, :debug => true
+  prof = profit sells, :circulation => 15.0, :pieces => 30.0, :reinvest => true
   puts "\tskips:       #{prof[:skips].size}"
   puts "\tprofits:     15.0 -> #{prof[:cash]}"
   puts "\tcirculation: #{prof[:circulation]}"
