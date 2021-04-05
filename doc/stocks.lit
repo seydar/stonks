@@ -42,189 +42,189 @@ this document, which have lent themselves to the below results:
     <th>STDDEV</th>
     <th>Sharpe</th>
   </tr>
-  
-    
+
+
     <tr>
       <td>
         <a href="/files/stock_recs.2021.html">2021</a>
       </td>
-      <td>24</td>
-      <td>2.546%</td>
-      <td>-73.759%</td>
+      <td>68</td>
+      <td>4.007%</td>
+      <td>-90.738%</td>
       <td>-100%</td>
-      <td>128.555%</td>
-      <td>-0.574</td>
+      <td>76.373%</td>
+      <td>-1.188</td>
     </tr>
-  
-    
+
+
     <tr>
       <td>
         <a href="/files/stock_recs.2020.html">2020</a>
       </td>
-      <td>108</td>
-      <td>32.39%</td>
-      <td>204.872%</td>
-      <td>136.923%</td>
-      <td>505.917%</td>
-      <td>0.405</td>
+      <td>348</td>
+      <td>33.315%</td>
+      <td>156.223%</td>
+      <td>137.963%</td>
+      <td>388.322%</td>
+      <td>0.402</td>
     </tr>
-  
-    
+
+
     <tr>
       <td>
         <a href="/files/stock_recs.2019.html">2019</a>
       </td>
-      <td>19</td>
-      <td>14.505%</td>
-      <td>88.348%</td>
-      <td>37.5%</td>
-      <td>164.128%</td>
-      <td>0.538</td>
+      <td>53</td>
+      <td>15.011%</td>
+      <td>79.495%</td>
+      <td>33.156%</td>
+      <td>169.753%</td>
+      <td>0.468</td>
     </tr>
-  
-    
+
+
     <tr>
       <td>
         <a href="/files/stock_recs.2018.html">2018</a>
       </td>
-      <td>8</td>
-      <td>28.728%</td>
-      <td>-9.173%</td>
-      <td>2.051%</td>
-      <td>134.038%</td>
-      <td>-0.068</td>
+      <td>31</td>
+      <td>15.933%</td>
+      <td>198.597%</td>
+      <td>7.446%</td>
+      <td>997.574%</td>
+      <td>0.199</td>
     </tr>
-  
-    
+
+
     <tr>
       <td>
         <a href="/files/stock_recs.2017.html">2017</a>
       </td>
-      <td>5</td>
-      <td>24.075%</td>
-      <td>23.391%</td>
-      <td>1.254%</td>
-      <td>87.793%</td>
-      <td>0.266</td>
+      <td>32</td>
+      <td>23.224%</td>
+      <td>207.064%</td>
+      <td>6.502%</td>
+      <td>618.783%</td>
+      <td>0.335</td>
     </tr>
-  
-    
+
+
     <tr>
       <td>
         <a href="/files/stock_recs.2016.html">2016</a>
       </td>
-      <td>16</td>
-      <td>24.611%</td>
-      <td>285.415%</td>
-      <td>166.667%</td>
-      <td>401.708%</td>
-      <td>0.711</td>
+      <td>50</td>
+      <td>21.222%</td>
+      <td>167.163%</td>
+      <td>121.088%</td>
+      <td>255.225%</td>
+      <td>0.655</td>
     </tr>
-  
-    
+
+
     <tr>
       <td>
         <a href="/files/stock_recs.2015.html">2015</a>
       </td>
-      <td>6</td>
-      <td>6.404%</td>
-      <td>124.589%</td>
-      <td>74.076%</td>
-      <td>206.5%</td>
-      <td>0.603</td>
+      <td>40</td>
+      <td>7.913%</td>
+      <td>216.515%</td>
+      <td>80.867%</td>
+      <td>272.092%</td>
+      <td>0.796</td>
     </tr>
-  
-    
+
+
     <tr>
       <td>
         <a href="/files/stock_recs.2014.html">2014</a>
       </td>
-      <td>10</td>
-      <td>20.424%</td>
-      <td>1.35%</td>
-      <td>3.367%</td>
-      <td>64.099%</td>
-      <td>0.021</td>
+      <td>24</td>
+      <td>10.392%</td>
+      <td>47.703%</td>
+      <td>18.585%</td>
+      <td>88.281%</td>
+      <td>0.54</td>
     </tr>
-  
-    
+
+
     <tr>
       <td>
         <a href="/files/stock_recs.2013.html">2013</a>
       </td>
-      <td>3</td>
-      <td>17.832%</td>
-      <td>104.197%</td>
-      <td>135.395%</td>
-      <td>81.446%</td>
-      <td>1.279</td>
+      <td>9</td>
+      <td>39.903%</td>
+      <td>41.125%</td>
+      <td>11.765%</td>
+      <td>62.839%</td>
+      <td>0.654</td>
     </tr>
-  
-    
+
+
     <tr>
       <td>
         <a href="/files/stock_recs.2012.html">2012</a>
       </td>
-      <td>6</td>
-      <td>15.123%</td>
-      <td>142.51%</td>
-      <td>123.627%</td>
-      <td>112.88%</td>
-      <td>1.262</td>
+      <td>23</td>
+      <td>19.091%</td>
+      <td>94.904%</td>
+      <td>74.043%</td>
+      <td>81.324%</td>
+      <td>1.167</td>
     </tr>
-  
-    
+
+
     <tr>
       <td>
         <a href="/files/stock_recs.2011.html">2011</a>
       </td>
-      <td>3</td>
-      <td>14.414%</td>
-      <td>26.922%</td>
-      <td>36.765%</td>
-      <td>19.117%</td>
-      <td>1.408</td>
+      <td>18</td>
+      <td>40.783%</td>
+      <td>26.39%</td>
+      <td>15.335%</td>
+      <td>52.428%</td>
+      <td>0.503</td>
     </tr>
-  
-    
+
+
     <tr>
       <td>
         <a href="/files/stock_recs.2010.html">2010</a>
       </td>
-      <td>2</td>
-      <td>9.02%</td>
-      <td>174.397%</td>
-      <td>309.877%</td>
-      <td>191.597%</td>
-      <td>0.91</td>
+      <td>9</td>
+      <td>21.148%</td>
+      <td>116.993%</td>
+      <td>44.486%</td>
+      <td>122.933%</td>
+      <td>0.952</td>
     </tr>
-  
-    
+
+
     <tr>
       <td>
         <a href="/files/stock_recs.2009.html">2009</a>
       </td>
-      <td>48</td>
-      <td>28.657%</td>
-      <td>319.619%</td>
-      <td>324.138%</td>
-      <td>167.498%</td>
-      <td>1.908</td>
+      <td>245</td>
+      <td>30.06%</td>
+      <td>268.279%</td>
+      <td>261.333%</td>
+      <td>263.722%</td>
+      <td>1.017</td>
     </tr>
-  
-    
+
+
     <tr>
       <td>
         <a href="/files/stock_recs.2008.html">2008</a>
       </td>
-      <td>125</td>
-      <td>10.708%</td>
-      <td>224.648%</td>
-      <td>147.407%</td>
-      <td>412.673%</td>
-      <td>0.544</td>
+      <td>351</td>
+      <td>11.892%</td>
+      <td>153.032%</td>
+      <td>101.984%</td>
+      <td>311.537%</td>
+      <td>0.491</td>
     </tr>
-  
+
 </table>
 </center>
 
@@ -433,13 +433,35 @@ opportunities for it.
 
 ## Reinvesting Earnings
 
-Each row in the data represents one trial: a given year, $m$, and $b$.
+Reinvesting earnings requires a short hold time (compared to your ultimate time
+horizon).
 
-The maximum ROI seen on that stock is taken from the time that the stock is to
-be held (according to the $m$ and $b$ combination) plus 30 days. It allows me to
-judge how well the line is meeting the potential on that set of stocks.
+What I have found is that maximizing the ROI while minimizing the hold time
+leads me to high-frequency trading (HFT), which presupposes an infinite supply
+of trading opportunities. When that supply is limited (e.g., due to trading
+fees, commission, etc.), then we end up raising our hold times.
 
-The mean ROI is the mean ROI of each individual stock.
+I've found that with a 20% drop, the defaults of $m = -0.02$ and $b = 5.2$ are
+suitable for getting reasonable returns.
+
+--- When Do We Sell?
+    # m = -0.02, b = 5.2
+    @assessor.sell_when do |original, today|
+      days_held = today.trading_days_from original
+      
+      sell_point = [@m * days_held + @b, 0].max
+    
+      today.change_from(original) >= sell_point
+    end
+---
+
+@s Metrics of Success
+
+The only real metric of succes is how much "money I've made", but even that is
+suspect: is that in reference to the liquid cash I have available at any given
+moment, or the total amount of my investments? Can I refine my coefficients ($m$
+and $b$) based on only 2018-2020, or as far back as I can? Should I be concerned
+that 2013 and 2010 had so few buy signals?
 
 The "reinvested profits" figure comes from investing \$15K into the market that
 year. When a buy signal comes along, you invest the value in circulation divided
@@ -722,7 +744,7 @@ Below, we have rough summaries for the performance of various sell lines (as
 termed by their $m$ and $b$ components) after a 20% drop and a rank of the top
 61:
 
---- Max Buy-based Average
+--- Metrics for 2018-2020
 "In the cumulative timespan of 2018-2020"
 
 [drop = 20%, m = -0.02, b = 5.2] => ROI: 1.4985018195914688,
@@ -740,7 +762,7 @@ Yearly Breakdown
 
 And if we change the initial price drop from 20% to 30%:
 
---- Max Buy-based Average :=
+--- Metrics for 2018-2020 :=
 [drop = 30%, m = -0.02, b = 5.2] => ROI: 1.7578832597251424,
                                     Profits: 28.76512973580418,
                                     Hold: 211 days
@@ -751,19 +773,6 @@ Yearly Breakdown
 |    2018   | -0.02 | 5.2 |   8  |   (unsold)  |   0   | -0.091729607538731 | 14.63308156984507 |
 |    2019   | -0.02 | 5.2 |  19  |      246    |   0   | 0.8834767826743782 | 23.39302943540659 |
 |    2020   | -0.02 | 5.2 | 108  |      197    |  59   | 2.0487223893739896 | 66.04386747735361 |
----
-
-At this point, it's just a matter of setting up the line:
-
---- When Do We Sell?
-    # m = -0.02, b = 5.2
-    @assessor.sell_when do |original, today|
-      days_held = today.trading_days_from original
-      
-      sell_point = [@m * days_held + @b, 0].max
-    
-      today.change_from(original) >= sell_point
-    end
 ---
 
 @s The Simulator

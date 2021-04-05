@@ -1,4 +1,8 @@
 NYSE = Ticker.where(:exchange => 'NYSE').all
+Commodities = Ticker.where(:exchange => ['NYBOT',
+                                         'CBOT'])
+                    .all
+Currencies = Ticker.where(:exchange => 'FOREX').all
 
 class Array
   def median
