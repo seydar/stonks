@@ -137,6 +137,19 @@ td {
   text-align: right;
 }
 
+pre {
+  margin-left: 15px;
+  margin-right: 5px;
+
+  padding-left: 10px;
+  padding-bottom: 5px;
+
+  border-radius: 10px;
+
+  background: black;
+  font-size: 15px;
+}
+
 </style>
 </head>
 <body onload="prettyPrint()">
@@ -146,6 +159,19 @@ td {
 <p>Made by <a href="http://aribrown.com">Ari Brown</a> in February - March 2021. The results
 are visible <a href="/files/stock_recs.2021.html">here</a>, with links to other years as
 well.
+</p>
+<p><script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript">
+  function togglediv(tag) {
+  $('#' + tag).toggle(200);
+  $('#' + tag + '_plus').text('[-]');
+  $('#' + tag + '_minus').text('[+]');
+  $('#' + tag + '_plus').attr('id', tag + '_min');
+  $('#' + tag + '_minus').attr('id', tag + '_plu');
+  $('#' + tag + '_plu').attr('id', tag + '_plus');
+  $('#' + tag + '_min').attr('id', tag + '_minus');
+  }
+</script>
 </p>
 
 </div>
@@ -162,23 +188,21 @@ pleasures.
 require 'sqlite3'
 require 'sequel'
 require 'alpaca/trade/api'
-require 'ruby_linear_regression'
-require 'linefit'
 
-DB = Sequel.connect "sqlite://data/tickers.db"
+DB = Sequel.connect "sqlite://#{CONFIG[:DB][:path]}"
 
 <span class="nocode pln">{Bar table, <a href="db.html#1:3">3</a>}</span>
 
 <span class="nocode pln">{Ticker table, <a href="db.html#1:8">8</a>}</span>
 
-<span class="nocode pln">{Split table, <a href="db.html#1:13">13</a>}</span>
+<span class="nocode pln">{Split table, <a href="db.html#1:15">15</a>}</span>
 
 # Load the models for handling the data
 require './models/ticker.rb'
 require './models/split.rb'
 require './models/bar.rb'
 
-<span class="nocode pln">{Alpaca Ruby API integration, <a href="db.html#1:15">15</a>}</span>
+<span class="nocode pln">{Alpaca Ruby API integration, <a href="db.html#1:17">17</a>}</span>
 </pre>
 
 
@@ -197,14 +221,17 @@ as well.
 DB.create_table? :bars do
   primary_key :id
   foreign_key :ticker_id, :tickers
-  index :ticker_id
   float :close
   float :high
   float :low
   float :open
-  datetime :time
+  datetime :datetime
   integer :volume
   string :span # day, 15 min, 5 min, 1 min
+  integer :rank
+  float :value
+
+  index :ticker_id
 end
 </pre>
 
@@ -220,28 +247,30 @@ end
 class Bar &lt; Sequel::Model
   many_to_one :ticker
 
-<span class="nocode pln">  {Alpaca Bar Integration, <a href="db.html#1:16">16</a>}</span>
+<span class="nocode pln">  {Alpaca Bar Integration, <a href="db.html#1:18">18</a>}</span>
 
   def inspect
-    "#&lt;Bar id =&gt; #{id}, sym =&gt; #{ticker.symbol}, time =&gt; #{time.strftime "%Y-%m-%d"}, o =&gt; #{open}, c =&gt; #{close}, h =&gt; #{high}, l =&gt; #{low}&gt;"
+    "#&lt;Bar id =&gt; #{id}, sym =&gt; #{ticker.symbol}, date =&gt; #{date.strftime "%Y-%m-%d"}, o =&gt; #{open}, c =&gt; #{close}, h =&gt; #{high}, l =&gt; #{low}&gt;"
   end
 
-  def date
-    time.to_datetime
-  end
-
-  def date=(val)
-    self.time = Time.parse(val.to_s)
-  end
-
+  # GREAT trick here: the goal is to figure out how many records
+  # exist between `self` and `from`. Since a simple date calculation
+  # won't work, we just ask the DB to see what's in store for us.
+  #
+  # This originally loaded up `ticker.bars` and then got the indices
+  # for the two elements, but then that got turned into querying the DB
+  # directly and operating on that list, but then I realized it was the
+  # size of that array minus 1, and then I realized I could just get the
+  # count directly from the DB.
   def trading_days_from(from)
     raise unless from.ticker == ticker
 
-    bars = ticker.bars
-    (bars.index(self) - bars.index(from)).abs # this may bite me
-  end
+    dates = [date, from.date].sort
 
-<span class="nocode pln">  {Bar Normalization, <a href="db.html#1:5">5</a>}</span>
+    Bar.where(:ticker =&gt; ticker, :date =&gt; dates[0]..dates[-1])
+       .order(Sequel.asc(:date))
+       .count - 1
+  end
 
 <span class="nocode pln">  {Measurements of Future Bar Change, <a href="db.html#1:6">6</a>}</span>
 
@@ -256,32 +285,10 @@ end
 <a name="1:5"><div class="section"><h4>5. Bar normalization</h4></a>
 <p>Because Alpaca data is unadjusted for splits/reverse splits, I have to do that
 adjustment ourselves. This involves aggregating split data and then normalizing
-the stock data from before the splits accordingly.
-</p>
-<p>Since it is inefficient to take every ticker, normalize the entire history of
-data, and /then/ perform our analyses, I conduct the analyses on the unadjusted
-data first and normalize afterwards in order to find the proper sell date.
-</p>
-<p>Refreshing allows us to retrieve the normalized version of a bar, from the
-perspective of the bar.
-</p>
-<p><br/>
-</p>
-<p><strong>TODO</strong>: While rare, this introduces a bug where a standard stock split (1 share
-becomes 2) is incorrectly identified as a drop in price.
+the stock data from before the splits accordingly. The adjusted prices are made
+permanent in the database.
 </p>
 
-<div class="codeblock">
-<span class="codeblock_name">{Bar Normalization <a href="db.html#1:5">5</a>}</span>
-<pre class="prettyprint lang-rb">
-  def refresh
-    ticker.bars.filter {|b| b.time == time }[0]
-  end
-</pre>
-
-
-<p class="seealso">Used in section <a href="db.html#1:4">4</a></p>
-</div>
 </div>
 <a name="1:6"><div class="section"><h4>6. Measurements of Future Bar Change</h4></a>
 <p>Useful methods for determining how the stock does in the future from this bar.
@@ -301,7 +308,10 @@ Bar#future.
   # How many trading days does it take to rise by `percent`?
   # Returns -1 if it never does.
   def time_to_rise(percent)
-    bars  = self.ticker.bars
+    #bars  = self.ticker.bars
+    bars  = Bar.where(:ticker =&gt; ticker) { date &gt;= self.date }
+               .order(Sequel.asc(:date))
+               .all
     index = bars.index self
     #i = bars[index..-1].index
 
@@ -321,16 +331,23 @@ Bar#future.
   # What is the maximum percent rise when compared to `self` over the next
   # `days` trading days?
   def max_rise_over(days)
-    index = ticker.bars.index self
-    range = ticker.bars[index..(index + days)]
+    bars  = Bar.where(:ticker =&gt; ticker,
+                      :date =&gt; date..(date + (days * 1.4).ceil * 86_400))
+               .order(Sequel.asc(:date))
+               .all
+    index = bars.index self
+    range = bars[index..(index + days)]
     range.map {|b| [b, b.change_from(self)] }.max_by {|a| a[1] }
   end
 
   # When is the first two-day period that drops by `drop`, after this bar?
   def drop(drop)
-    i    = ticker.bars.index self
-    fin  = ticker.bars.size - 1
-    bars = ticker.bars[i..fin]
+    bars  = Bar.where(:ticker =&gt; ticker) { date &gt;= self.date }
+               .order(Sequel.asc(:date))
+               .all
+    i    = bars.index self
+    fin  = bars.size - 1
+    bars = bars[i..fin]
 
     # oldest bar is first
     bars.each_cons(2).find do |span|
@@ -340,9 +357,12 @@ Bar#future.
 
   # When is the first two-day period that rises by `rise`, after this bar?
   def rise(rise)
-    i    = ticker.bars.index self
-    fin  = ticker.bars.size - 1
-    bars = ticker.bars[i..fin]
+    bars  = Bar.where(:ticker =&gt; ticker) { date &gt;= self.date }
+               .order(Sequel.asc(:date))
+               .all
+    i    = bars.index self
+    fin  = bars.size - 1
+    bars = bars[i..fin]
 
     # oldest bar is first
     bars.each_cons(2).find do |span|
@@ -356,8 +376,10 @@ Bar#future.
 </div>
 </div>
 <a name="1:7"><div class="section"><h4>7. Measurements of Past Bar Performance</h4></a>
-<p>Tools for evaluating a stock's previous performance. The algorithm has at times
-used the <span class="math">r^2</span> value, the MSE from the <span class="math">r^2</span>, and the average volume.
+<p>Tools for evaluating a stock's previous performance. The main algorithm has at
+times used the <span class="math">r^2</span> value, the MSE from the <span class="math">r^2</span>, and the average volume. Now,
+my algorithm uses the <code>rank</code> attribute of each bar, whose formula is detailed
+<a href="/files/stocks.html">on the main stocks page</a>.
 </p>
 
 <div class="codeblock">
@@ -422,14 +444,25 @@ done, and the bars of data I have for it.
 <span class="codeblock_name">{<strong>models/ticker.rb</strong> <a href="db.html#1:9">9</a>}</span>
 <pre class="prettyprint lang-rb">
 class Ticker &lt; Sequel::Model
-  one_to_many :bars, :order =&gt; :time
-  one_to_many :splits, :order =&gt; :ex
+  one_to_many :bars, :order =&gt; :date
+  one_to_many :splits, :order =&gt; :date
 
-<span class="nocode pln">  {Measurements of Past Ticker Performance, <a href="db.html#1:10">10</a>}</span>
+<span class="nocode pln">  {Measurement of Ticker Ranking, <a href="db.html#1:10">10</a>}</span>
 
-<span class="nocode pln">  {Measurements of Future Ticker Change, <a href="db.html#1:11">11</a>}</span>
+<span class="nocode pln">  {Measurements of Past Ticker Performance, <a href="db.html#1:11">11</a>}</span>
 
-<span class="nocode pln">  {Split Handling, <a href="db.html#1:12">12</a>}</span>
+<span class="nocode pln">  {Measurements of Future Ticker Change, <a href="db.html#1:12">12</a>}</span>
+
+<span class="nocode pln">  {Split Handling, <a href="db.html#1:13">13</a>}</span>
+
+<span class="nocode pln">  {AlphaVantage Integration, <a href="db.html#1:14">14</a>}</span>
+
+  # hook to ensure no orphans
+  def before_destroy
+    splits.map {|s| s.destroy }
+    bars.map {|b| b.destroy }
+    super
+  end
 end
 </pre>
 
@@ -437,10 +470,66 @@ end
 
 </div>
 </div>
-<a name="1:10"><div class="section"><h4>10. Measurements of Past Ticker Performance</h4></a>
+<a name="1:10"><div class="section"><h4>10. Measurement of Ticker Ranking</h4></a>
 
 <div class="codeblock">
-<span class="codeblock_name">{Measurements of Past Ticker Performance <a href="db.html#1:10">10</a>}</span>
+<span class="codeblock_name">{Measurement of Ticker Ranking <a href="db.html#1:10">10</a>}</span>
+<pre class="prettyprint lang-rb">
+  # Return N_trade / P_day rankings
+  #
+  # This would be SO MUCH FASTER if I just wrote the SQL by hand (since Sequel
+  # doesn't allow me to do GROUP BY and AVG)
+  def self.rankings(stocks: nil, date: Time.parse(Date.today.to_s), prior: 10)
+    @@rankings ||= {}
+    return @@rankings[[stocks, date, prior]] if @@rankings[[stocks, date, prior]]
+
+    tids = stocks.map {|t| t.id}
+
+    query = DB[:bars].where(:ticker_id =&gt; tids, :date =&gt; (date - prior.days)..date)
+                     .group(:ticker_id)
+                     .select_append(:ticker_id)
+                     .sql
+    query.gsub! "*", "AVG(`volume`)"
+    volumes = DB.fetch(query).all.inject({}) do |vols, hash|
+      vols[hash[:ticker_id]] = hash[:"AVG(`volume`)"]
+      vols
+    end
+
+    closes = DB[:bars].select(:close, :ticker_id)
+                      .where(:ticker_id =&gt; tids, :date =&gt; date)
+                      .all
+    closes = closes.inject({}) do |cls, hash|
+      cls[hash[:ticker_id]] = hash[:close]
+      cls
+    end
+
+    # {"SYM" =&gt; [Rank, Value]}
+    ranks = {}
+
+    values = {}
+    stocks.each do |stock|
+      if volumes[stock.id] == nil || closes[stock.id] == nil
+        values[stock] = 0
+      else
+        values[stock] = volumes[stock.id] / closes[stock.id]
+      end
+    end
+    sorted_values = values.values.sort.reverse
+
+    values.each {|tick, value| ranks[tick.id] = [sorted_values.index(value), value] }
+
+    @@rankings[[stocks, date, prior]] = ranks
+  end
+</pre>
+
+
+<p class="seealso">Used in section <a href="db.html#1:9">9</a></p>
+</div>
+</div>
+<a name="1:11"><div class="section"><h4>11. Measurements of Past Ticker Performance</h4></a>
+
+<div class="codeblock">
+<span class="codeblock_name">{Measurements of Past Ticker Performance <a href="db.html#1:11">11</a>}</span>
 <pre class="prettyprint lang-rb">
   # bar history based on a bar
   def history(around: nil, prior: 10, post: 5)
@@ -448,7 +537,7 @@ end
     bars[[idx - prior + 1, 0].max..(idx + post)]
   end
 
-  def volume(at: nil, prior: 10, post: 0)
+  def volumes(at: nil, prior: 10, post: 0)
     history(:around =&gt; at, :prior =&gt; prior, :post =&gt; post).map {|b| b.volume }
   end
 
@@ -483,10 +572,10 @@ end
 <p class="seealso">Used in section <a href="db.html#1:9">9</a></p>
 </div>
 </div>
-<a name="1:11"><div class="section"><h4>11. Measurements of Future Ticker Change</h4></a>
+<a name="1:12"><div class="section"><h4>12. Measurements of Future Ticker Change</h4></a>
 
 <div class="codeblock">
-<span class="codeblock_name">{Measurements of Future Ticker Change <a href="db.html#1:11">11</a>}</span>
+<span class="codeblock_name">{Measurements of Future Ticker Change <a href="db.html#1:12">12</a>}</span>
 <pre class="prettyprint lang-rb">
   # Find all 2-day drops of at least `drop`
   def drops(drop)
@@ -509,54 +598,99 @@ end
 <p class="seealso">Used in section <a href="db.html#1:9">9</a></p>
 </div>
 </div>
-<a name="1:12"><div class="section"><h4>12. Split Handling</h4></a>
-<p>A common bug here and everywhere is whether I'm measuring trading days or
-calendar days. I should always be counting trading days.
+<a name="1:13"><div class="section"><h4>13. Split Handling</h4></a>
+<p>A common bug when writing split-handling code is that I will accidentally count
+calendar days, when I should be counting trading days.
+</p>
+<p>Splits are recorded in the database and track whether they've been applied to
+the data. The adjusted prices are thus also permanently recorded. The original
+price is theoretically available because of the ratios are stored as strings ("1
+for 20") in each split record, but I have not verified that they are accurate.
 </p>
 
 <div class="codeblock">
-<span class="codeblock_name">{Split Handling <a href="db.html#1:12">12</a>}</span>
+<span class="codeblock_name">{Split Handling <a href="db.html#1:13">13</a>}</span>
 <pre class="prettyprint lang-rb">
-  # measure trading days, not calendar days, because
-  # we need to be consistent. the only way to look at trading
-  # days is to look at what we have the data for (otherwise we
-  # need some *serious* calendar skillz)
-  def split_after?(bar, days: 64)
-    sell = bars[bars.index(bar) + days] || bars.last
-    splits.any? do |split|
-      split.ex &lt;= sell.time and split.ex &gt;= bar.time
-    end
-  end
-
   # normalize the prices to get rid of splits
   # percentage drops will still be evident
-  def normalize!
-    return @normalized if @normalized
-    bars.each {|b| b.id = nil }
+  #
+  # THIS SHOULD BE RARELY CALLED
+  # THE DATA SHOULD BE STORED IN ITS NORMALIZED FORM
+  def normalize!(debug: false)
+    # operating on hashes and optimized to minimize calls to the DB
+    # and also minimizing the number of objects created
+    ticker.splits.each do |split|
+      next if split.applied
 
-    splits.each do |split|
-      unnormalized = bars.filter {|b| b.time &lt;= split.ex }
-      next unless unnormalized.size &gt;= 2
-      ratio = unnormalized[-1].open / unnormalized[-2].close
-      unnormalized[0..-2].map do |b|
-        b.close *= ratio
-        b.open  *= ratio
-        b.high  *= ratio
-        b.low   *= ratio
-      end
+      unnorm_size = DB[:bars].where(:ticker_id =&gt; id,
+                                    :date =&gt; Time.parse('1 jan 1900')..split[:date])
+                             .count
+
+      next unless unnorm_size &gt;= 2
+
+      unnormal = DB[:bars].where(:ticker_id =&gt; id,
+                                 :date =&gt; (split[:date] - 30 * 86400)..split[:date])
+                          .order(Sequel.asc(:date))
+                          .all
+      ratio = unnormal[-1][:open] / unnormal[-2][:close]
+
+      puts "\tupdating #{unnorm_size} bars" if debug
+
+      DB[:bars].where(:ticker_id =&gt; id,
+                      :date =&gt; Time.parse('1 jan 1900')..(split[:date] - 1.day))
+               .update(:close =&gt; Sequel[:close] * ratio,
+                       :open  =&gt; Sequel[:open]  * ratio,
+                       :high  =&gt; Sequel[:high]  * ratio,
+                       :low   =&gt; Sequel[:low]   * ratio)
+
+      split.applied = true
+      split.save
     end
-
-    @normalized = true
   end
 
-  def normalized?; @normalized; end
+  def normalized?; splits.all {|s| s.applied } ; end
 </pre>
 
 
 <p class="seealso">Used in section <a href="db.html#1:9">9</a></p>
 </div>
 </div>
-<a name="1:13"><div class="section"><h4>13. Split Table</h4></a>
+<a name="1:14"><div class="section"><h4>14. AlphaVantage Integration</h4></a>
+<p>AlphaVantage is a site that provides more accurate historical stock data than
+Alpaca, at the expense of being limited to 5 API calls/minute and 500 calls/day.
+In addition, I can only query one stock per call.
+</p>
+
+<div class="codeblock">
+<span class="codeblock_name">{AlphaVantage Integration <a href="db.html#1:14">14</a>}</span>
+<pre class="prettyprint lang-rb">
+  def download!(since: '2008-01-01')
+    stock  = AV_CLIENT.stock :symbol =&gt; symbol
+    series = stock.timeseries :outputsize =&gt; 'full'
+
+    bars = series.output['Time Series (Daily)']
+    bars = bars.filter {|k, bar| k &gt; since }
+
+    insertion = bars.map do |k, bar|
+      {:date   =&gt; Time.parse(k),
+       :open   =&gt; bar['1. open'].to_f,
+       :high   =&gt; bar['2. high'].to_f,
+       :low    =&gt; bar['3. low'].to_f,
+       :close  =&gt; bar['4. close'].to_f,
+       :volume =&gt; bar['5. volume'].to_i,
+       :span   =&gt; 'day',
+       :ticker_id =&gt; id
+      }
+    end
+    DB[:bars].multi_insert insertion
+  end
+</pre>
+
+
+<p class="seealso">Used in section <a href="db.html#1:9">9</a></p>
+</div>
+</div>
+<a name="1:15"><div class="section"><h4>15. Split Table</h4></a>
 <p>Split information is important to correct for quantum price shifts. The data
 from Alpaca (and Yahoo! Finance) is uncorrected, which means if a split occurs,
 the price will appear to have jumped (e.g.) 450% from before to after.
@@ -568,15 +702,15 @@ a column name: it means "execution date".
 </p>
 
 <div class="codeblock">
-<span class="codeblock_name">{Split table <a href="db.html#1:13">13</a>}</span>
+<span class="codeblock_name">{Split table <a href="db.html#1:15">15</a>}</span>
 <pre class="prettyprint lang-rb">
 DB.create_table? :splits do
   primary_key :id
   foreign_key :ticker_id, :tickers
-  index :ticker_id
-
   string :ratio
-  datetime :ex
+  datetime :date
+
+  index :ticker_id
 end
 </pre>
 
@@ -584,10 +718,10 @@ end
 <p class="seealso">Used in section <a href="db.html#1:2">2</a></p>
 </div>
 </div>
-<a name="1:14"><div class="section"><h4>14. Split Model</h4></a>
+<a name="1:16"><div class="section"><h4>16. Split Model</h4></a>
 
 <div class="codeblock">
-<span class="codeblock_name">{<strong>models/split.rb</strong> <a href="db.html#1:14">14</a>}</span>
+<span class="codeblock_name">{<strong>models/split.rb</strong> <a href="db.html#1:16">16</a>}</span>
 <pre class="prettyprint lang-rb">
 class Split &lt; Sequel::Model
   many_to_one :ticker
@@ -598,24 +732,34 @@ end
 
 </div>
 </div>
-<a name="1:15"><div class="section"><h4>15. Alpaca Ruby API Integration</h4></a>
+<a name="1:17"><div class="section"><h4>17. Alpaca Ruby API Integration</h4></a>
 <p>Just a helper method for quickly saving the results from a web query.
 </p>
 
 <div class="codeblock">
-<span class="codeblock_name">{Alpaca Ruby API integration <a href="db.html#1:15">15</a>}</span>
+<span class="codeblock_name">{Alpaca Ruby API integration <a href="db.html#1:17">17</a>}</span>
 <pre class="prettyprint lang-rb">
 class Alpaca::Trade::Api::Bar
+  def date; @time; end
+
   def save(symbol, period)
     ::Bar.create :span   =&gt; period,
                  :close  =&gt; @close,
                  :high   =&gt; @high,
                  :low    =&gt; @low,
                  :open   =&gt; @open,
-                 :time   =&gt; @time,
+                 :date   =&gt; @time,
                  :volume =&gt; @volume,
                  :ticker_id =&gt; ::Ticker.where(:symbol =&gt; symbol).first.id
   end
+end
+
+class Numeric
+  # useful for dealing with Time
+  def days
+    self * 86400.0
+  end
+  alias_method :day, :days
 end
 </pre>
 
@@ -623,7 +767,7 @@ end
 <p class="seealso">Used in section <a href="db.html#1:2">2</a></p>
 </div>
 </div>
-<a name="1:16"><div class="section"><h4>16. Alpaca Integration</h4></a>
+<a name="1:18"><div class="section"><h4>18. Alpaca Integration</h4></a>
 <p>Easy way to download data within the Bar class. The time component is a String
 from the CLI, a Time object from SQLite3, and the Alpaca web API wants a String
 that is conveniently formatted from a DateTime object.
@@ -632,7 +776,7 @@ that is conveniently formatted from a DateTime object.
 </p>
 
 <div class="codeblock">
-<span class="codeblock_name">{Alpaca Bar Integration <a href="db.html#1:16">16</a>}</span>
+<span class="codeblock_name">{Alpaca Bar Integration <a href="db.html#1:18">18</a>}</span>
 <pre class="prettyprint lang-rb">
   def self.download(tickers, opts={})
     span = opts.delete(:span) || 'day'

@@ -52,3 +52,16 @@ td {
   text-align: right;
 }
 
+pre {
+  margin-left: 15px;
+  margin-right: 5px;
+
+  padding-left: 10px;
+  padding-bottom: 5px;
+
+  border-radius: 10px;
+
+  background: black;
+  font-size: 15px;
+}
+

@@ -14,10 +14,8 @@ The rest of the program is discussed [here](/files/stocks.html).
 require 'sqlite3'
 require 'sequel'
 require 'alpaca/trade/api'
-require 'ruby_linear_regression'
-require 'linefit'
 
-DB = Sequel.connect "sqlite://data/tickers.db"
+DB = Sequel.connect "sqlite://#{CONFIG[:DB][:path]}"
 
 @{Bar table}
 
@@ -43,14 +41,17 @@ as well.
 DB.create_table? :bars do
   primary_key :id
   foreign_key :ticker_id, :tickers
-  index :ticker_id
   float :close
   float :high
   float :low
   float :open
-  datetime :time
+  datetime :datetime
   integer :volume
   string :span # day, 15 min, 5 min, 1 min
+  integer :rank
+  float :value
+
+  index :ticker_id
 end
 ---
 
@@ -63,25 +64,27 @@ class Bar < Sequel::Model
   @{Alpaca Bar Integration}
 
   def inspect
-    "#<Bar id => #{id}, sym => #{ticker.symbol}, time => #{time.strftime "%Y-%m-%d"}, o => #{open}, c => #{close}, h => #{high}, l => #{low}>"
+    "#<Bar id => #{id}, sym => #{ticker.symbol}, date => #{date.strftime "%Y-%m-%d"}, o => #{open}, c => #{close}, h => #{high}, l => #{low}>"
   end
 
-  def date
-    time.to_datetime
-  end
-
-  def date=(val)
-    self.time = Time.parse(val.to_s)
-  end
-
+  # GREAT trick here: the goal is to figure out how many records
+  # exist between `self` and `from`. Since a simple date calculation
+  # won't work, we just ask the DB to see what's in store for us.
+  #
+  # This originally loaded up `ticker.bars` and then got the indices
+  # for the two elements, but then that got turned into querying the DB
+  # directly and operating on that list, but then I realized it was the
+  # size of that array minus 1, and then I realized I could just get the
+  # count directly from the DB.
   def trading_days_from(from)
     raise unless from.ticker == ticker
 
-    bars = ticker.bars
-    (bars.index(self) - bars.index(from)).abs # this may bite me
-  end
+    dates = [date, from.date].sort
 
-  @{Bar Normalization}
+    Bar.where(:ticker => ticker, :date => dates[0]..dates[-1])
+       .order(Sequel.asc(:date))
+       .count - 1
+  end
 
   @{Measurements of Future Bar Change}
 
@@ -93,25 +96,8 @@ end
 
 Because Alpaca data is unadjusted for splits/reverse splits, I have to do that
 adjustment ourselves. This involves aggregating split data and then normalizing
-the stock data from before the splits accordingly.
-
-Since it is inefficient to take every ticker, normalize the entire history of
-data, and /then/ perform our analyses, I conduct the analyses on the unadjusted
-data first and normalize afterwards in order to find the proper sell date.
-
-Refreshing allows us to retrieve the normalized version of a bar, from the
-perspective of the bar.
-
-<br/>
-
-**TODO**: While rare, this introduces a bug where a standard stock split (1 share
-becomes 2) is incorrectly identified as a drop in price.
-
---- Bar Normalization
-  def refresh
-    ticker.bars.filter {|b| b.time == time }[0]
-  end
----
+the stock data from before the splits accordingly. The adjusted prices are made
+permanent in the database.
 
 @s Measurements of Future Bar Change
 
@@ -129,7 +115,10 @@ Bar#future.
   # How many trading days does it take to rise by `percent`?
   # Returns -1 if it never does.
   def time_to_rise(percent)
-    bars  = self.ticker.bars
+    #bars  = self.ticker.bars
+    bars  = Bar.where(:ticker => ticker) { date >= self.date }
+               .order(Sequel.asc(:date))
+               .all
     index = bars.index self
     #i = bars[index..-1].index
 
@@ -149,16 +138,23 @@ Bar#future.
   # What is the maximum percent rise when compared to `self` over the next
   # `days` trading days?
   def max_rise_over(days)
-    index = ticker.bars.index self
-    range = ticker.bars[index..(index + days)]
+    bars  = Bar.where(:ticker => ticker,
+                      :date => date..(date + (days * 1.4).ceil * 86_400))
+               .order(Sequel.asc(:date))
+               .all
+    index = bars.index self
+    range = bars[index..(index + days)]
     range.map {|b| [b, b.change_from(self)] }.max_by {|a| a[1] }
   end
 
   # When is the first two-day period that drops by `drop`, after this bar?
   def drop(drop)
-    i    = ticker.bars.index self
-    fin  = ticker.bars.size - 1
-    bars = ticker.bars[i..fin]
+    bars  = Bar.where(:ticker => ticker) { date >= self.date }
+               .order(Sequel.asc(:date))
+               .all
+    i    = bars.index self
+    fin  = bars.size - 1
+    bars = bars[i..fin]
 
     # oldest bar is first
     bars.each_cons(2).find do |span|
@@ -168,9 +164,12 @@ Bar#future.
 
   # When is the first two-day period that rises by `rise`, after this bar?
   def rise(rise)
-    i    = ticker.bars.index self
-    fin  = ticker.bars.size - 1
-    bars = ticker.bars[i..fin]
+    bars  = Bar.where(:ticker => ticker) { date >= self.date }
+               .order(Sequel.asc(:date))
+               .all
+    i    = bars.index self
+    fin  = bars.size - 1
+    bars = bars[i..fin]
 
     # oldest bar is first
     bars.each_cons(2).find do |span|
@@ -181,8 +180,10 @@ Bar#future.
 
 @s Measurements of Past Bar Performance
 
-Tools for evaluating a stock's previous performance. The algorithm has at times
-used the $r^2$ value, the MSE from the $r^2$, and the average volume.
+Tools for evaluating a stock's previous performance. The main algorithm has at
+times used the $r^2$ value, the MSE from the $r^2$, and the average volume. Now,
+my algorithm uses the `rank` attribute of each bar, whose formula is detailed
+[on the main stocks page](/files/stocks.html).
 
 --- Measurements of Past Bar Performance
   def change_from(bar)
@@ -232,15 +233,76 @@ done, and the bars of data I have for it.
 
 --- models/ticker.rb
 class Ticker < Sequel::Model
-  one_to_many :bars, :order => :time
-  one_to_many :splits, :order => :ex
+  one_to_many :bars, :order => :date
+  one_to_many :splits, :order => :date
+
+  @{Measurement of Ticker Ranking}
 
   @{Measurements of Past Ticker Performance}
 
   @{Measurements of Future Ticker Change}
 
   @{Split Handling}
+
+  @{AlphaVantage Integration}
+
+  # hook to ensure no orphans
+  def before_destroy
+    splits.map {|s| s.destroy }
+    bars.map {|b| b.destroy }
+    super
+  end
 end
+---
+
+@s Measurement of Ticker Ranking
+
+--- Measurement of Ticker Ranking
+  # Return N_trade / P_day rankings
+  #
+  # This would be SO MUCH FASTER if I just wrote the SQL by hand (since Sequel
+  # doesn't allow me to do GROUP BY and AVG)
+  def self.rankings(stocks: nil, date: Time.parse(Date.today.to_s), prior: 10)
+    @@rankings ||= {}
+    return @@rankings[[stocks, date, prior]] if @@rankings[[stocks, date, prior]]
+
+    tids = stocks.map {|t| t.id}
+
+    query = DB[:bars].where(:ticker_id => tids, :date => (date - prior.days)..date)
+                     .group(:ticker_id)
+                     .select_append(:ticker_id)
+                     .sql
+    query.gsub! "*", "AVG(`volume`)"
+    volumes = DB.fetch(query).all.inject({}) do |vols, hash|
+      vols[hash[:ticker_id]] = hash[:"AVG(`volume`)"]
+      vols
+    end
+
+    closes = DB[:bars].select(:close, :ticker_id)
+                      .where(:ticker_id => tids, :date => date)
+                      .all
+    closes = closes.inject({}) do |cls, hash|
+      cls[hash[:ticker_id]] = hash[:close]
+      cls
+    end
+
+    # {"SYM" => [Rank, Value]}
+    ranks = {}
+
+    values = {}
+    stocks.each do |stock|
+      if volumes[stock.id] == nil || closes[stock.id] == nil
+        values[stock] = 0
+      else
+        values[stock] = volumes[stock.id] / closes[stock.id]
+      end
+    end
+    sorted_values = values.values.sort.reverse
+
+    values.each {|tick, value| ranks[tick.id] = [sorted_values.index(value), value] }
+
+    @@rankings[[stocks, date, prior]] = ranks
+  end
 ---
 
 @s Measurements of Past Ticker Performance
@@ -252,7 +314,7 @@ end
     bars[[idx - prior + 1, 0].max..(idx + post)]
   end
 
-  def volume(at: nil, prior: 10, post: 0)
+  def volumes(at: nil, prior: 10, post: 0)
     history(:around => at, :prior => prior, :post => post).map {|b| b.volume }
   end
 
@@ -305,43 +367,82 @@ end
 
 @s Split Handling
 
-A common bug here and everywhere is whether I'm measuring trading days or
-calendar days. I should always be counting trading days.
+A common bug when writing split-handling code is that I will accidentally count
+calendar days, when I should be counting trading days.
+
+Splits are recorded in the database and track whether they've been applied to
+the data. The adjusted prices are thus also permanently recorded. The original
+price is theoretically available because of the ratios are stored as strings ("1
+for 20") in each split record, but I have not verified that they are accurate.
 
 --- Split Handling
-  # measure trading days, not calendar days, because
-  # we need to be consistent. the only way to look at trading
-  # days is to look at what we have the data for (otherwise we
-  # need some *serious* calendar skillz)
-  def split_after?(bar, days: 64)
-    sell = bars[bars.index(bar) + days] || bars.last
-    splits.any? do |split|
-      split.ex <= sell.time and split.ex >= bar.time
-    end
-  end
-
   # normalize the prices to get rid of splits
   # percentage drops will still be evident
-  def normalize!
-    return @normalized if @normalized
-    bars.each {|b| b.id = nil }
+  #
+  # THIS SHOULD BE RARELY CALLED
+  # THE DATA SHOULD BE STORED IN ITS NORMALIZED FORM
+  def normalize!(debug: false)
+    # operating on hashes and optimized to minimize calls to the DB
+    # and also minimizing the number of objects created
+    ticker.splits.each do |split|
+      next if split.applied
 
-    splits.each do |split|
-      unnormalized = bars.filter {|b| b.time <= split.ex }
-      next unless unnormalized.size >= 2
-      ratio = unnormalized[-1].open / unnormalized[-2].close
-      unnormalized[0..-2].map do |b|
-        b.close *= ratio
-        b.open  *= ratio
-        b.high  *= ratio
-        b.low   *= ratio
-      end
+      unnorm_size = DB[:bars].where(:ticker_id => id,
+                                    :date => Time.parse('1 jan 1900')..split[:date])
+                             .count
+
+      next unless unnorm_size >= 2
+
+      unnormal = DB[:bars].where(:ticker_id => id,
+                                 :date => (split[:date] - 30 * 86400)..split[:date])
+                          .order(Sequel.asc(:date))
+                          .all
+      ratio = unnormal[-1][:open] / unnormal[-2][:close]
+
+      puts "\tupdating #{unnorm_size} bars" if debug
+
+      DB[:bars].where(:ticker_id => id,
+                      :date => Time.parse('1 jan 1900')..(split[:date] - 1.day))
+               .update(:close => Sequel[:close] * ratio,
+                       :open  => Sequel[:open]  * ratio,
+                       :high  => Sequel[:high]  * ratio,
+                       :low   => Sequel[:low]   * ratio)
+
+      split.applied = true
+      split.save
     end
-
-    @normalized = true
   end
 
-  def normalized?; @normalized; end
+  def normalized?; splits.all {|s| s.applied } ; end
+---
+
+@s AlphaVantage Integration
+
+AlphaVantage is a site that provides more accurate historical stock data than
+Alpaca, at the expense of being limited to 5 API calls/minute and 500 calls/day.
+In addition, I can only query one stock per call.
+
+--- AlphaVantage Integration
+  def download!(since: '2008-01-01')
+    stock  = AV_CLIENT.stock :symbol => symbol
+    series = stock.timeseries :outputsize => 'full'
+
+    bars = series.output['Time Series (Daily)']
+    bars = bars.filter {|k, bar| k > since }
+
+    insertion = bars.map do |k, bar|
+      {:date   => Time.parse(k),
+       :open   => bar['1. open'].to_f,
+       :high   => bar['2. high'].to_f,
+       :low    => bar['3. low'].to_f,
+       :close  => bar['4. close'].to_f,
+       :volume => bar['5. volume'].to_i,
+       :span   => 'day',
+       :ticker_id => id
+      }
+    end
+    DB[:bars].multi_insert insertion
+  end
 ---
 
 @s Split Table
@@ -359,10 +460,10 @@ a column name: it means "execution date".
 DB.create_table? :splits do
   primary_key :id
   foreign_key :ticker_id, :tickers
-  index :ticker_id
-
   string :ratio
-  datetime :ex
+  datetime :date
+
+  index :ticker_id
 end
 ---
 
@@ -380,16 +481,26 @@ Just a helper method for quickly saving the results from a web query.
 
 --- Alpaca Ruby API integration
 class Alpaca::Trade::Api::Bar
+  def date; @time; end
+
   def save(symbol, period)
     ::Bar.create :span   => period,
                  :close  => @close,
                  :high   => @high,
                  :low    => @low,
                  :open   => @open,
-                 :time   => @time,
+                 :date   => @time,
                  :volume => @volume,
                  :ticker_id => ::Ticker.where(:symbol => symbol).first.id
   end
+end
+
+class Numeric
+  # useful for dealing with Time
+  def days
+    self * 86400.0
+  end
+  alias_method :day, :days
 end
 ---
 

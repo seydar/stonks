@@ -10,7 +10,6 @@ require './simulator.rb'
 require 'statistics'
 require 'histogram/array'
 
-# Configure the Alpaca API
 Alpaca::Trade::Api.configure do |config|
   config.endpoint   = "https://api.alpaca.markets"
   config.key_id     = CONFIG[:Alpaca][:ID]

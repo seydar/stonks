@@ -137,6 +137,19 @@ td {
   text-align: right;
 }
 
+pre {
+  margin-left: 15px;
+  margin-right: 5px;
+
+  padding-left: 10px;
+  padding-bottom: 5px;
+
+  border-radius: 10px;
+
+  background: black;
+  font-size: 15px;
+}
+
 </style>
 </head>
 <body onload="prettyPrint()">
@@ -606,7 +619,7 @@ during the year).
 <p>This raises an interesting point: I am not looking to simply maximize the ROI
 over an arbitrary time horizon. Rather, I am trying to maximize my earnings,
 which depend on my ability to reinvest my earnings from individual stocks, which
-leads me to want to maximize the term <span class="math">\frac{ROI}{t_{hold}}</span>.
+means I want to maximize my ROI but to minimize my hold time.
 </p>
 <p><br/>
 </p>
@@ -869,26 +882,40 @@ class Simulator
   attr_accessor :stocks
   attr_accessor :after
   attr_accessor :before
+  attr_accessor :m
+  attr_accessor :b
 
-  def initialize(stocks: nil, drop: -0.3, vol: 10_000_000, after: nil, before: nil)
+  def initialize(stocks:  nil,
+                 drop:   -0.3,
+                 rank:    60,
+                 m:      -0.00,
+                 b:       0.6,
+                 after:   nil,
+                 before:  nil)
     @stocks = stocks
     @after  = after
     @before = before
+    @m      = m
+    @b      = b
 
     @assessor = Assessor.new
 
 <span class="nocode pln">    {When Do We Buy?, <a href="stocks.html#1:4">4</a>}</span>
-
+    
 <span class="nocode pln">    {When Do We Sell?, <a href="stocks.html#1:5">5</a>}</span>
   end
 
   def run
     @assessor.assess_buys @stocks, :after  =&gt; @after,
                                    :before =&gt; @before
-    @results = @assessor.assess_sells
+    assess_sells
   end
 
+  def assess_sells
+    @results = @assessor.assess_sells
+  end
 end
+
 </pre>
 
 
@@ -932,8 +959,8 @@ class Assessor
     fin    = opts[:before] || Time.parse(Date.today.to_s)
     fin    = fin.is_a?(Time) ? fin : Time.parse(fin.to_s)
 
-    bars   = Bar.where(:time =&gt; debut..fin, :ticker_id =&gt; tids)
-                .order(:ticker_id, Sequel.asc(:time))
+    bars   = Bar.where(:date =&gt; debut..fin, :ticker_id =&gt; tids)
+                .order(:ticker_id, Sequel.asc(:date))
                 .all
     groups = bars.group_by {|b| b.ticker_id }
 
@@ -951,7 +978,7 @@ class Assessor
         # verify that the history is consecutive
         day_deltas = history.each_cons(2).map {|a, b| b.date - a.date }
 
-        if day_deltas.any? {|v| v &gt; 4 }
+        if day_deltas.any? {|v| v &gt; 4.days }
           false
         else
           buy? history
@@ -976,19 +1003,21 @@ class Assessor
     #
     # From here on out, we're dealing with *simulation*.
     @holding = @holding.map do |stock|
-      index = stock.ticker.bars.index stock
-      stock.ticker.bars[index + 1] || stock
+      bars  = Bar.where(:ticker =&gt; stock.ticker,
+                        :date =&gt; stock.date..(stock.date + 7.days))
+                 .order(Sequel.asc(:date))
+                 .all
+      index = bars.index stock
+      bars[index + 1] || stock
     end
-    @holding.each {|stock| stock.ticker.normalize! }
-    @holding = @holding.map {|stock| stock.refresh }
   end
 
   def assess_sells
     sales = @holding.map do |stock|
-      bars   = stock.ticker.bars
-      orig_i = bars.index stock
-
-      sell_bar = bars[orig_i..-1].find {|day| sell? stock, day }
+      bars     = Bar.where(:ticker =&gt; stock.ticker) { date &gt;= stock.date }
+                    .order(Sequel.asc(:date))
+                    .all
+      sell_bar = bars.find {|day| sell? stock, day }
 
       {:buy  =&gt; stock,
        :sell =&gt; sell_bar,
@@ -1001,8 +1030,8 @@ class Assessor
     assess_buys tickers, opts
     assess_sells
   end
-
 end
+
 </pre>
 
 
@@ -1018,36 +1047,41 @@ unresolved issue with their data (January 2018 data for AFL).
 <div class="codeblock">
 <span class="codeblock_name">{<strong>market.rb</strong> <a href="stocks.html#1:8">8</a>}</span>
 <pre class="prettyprint lang-">
+require 'yaml'
+CONFIG = YAML.load File.read("config.yml")
+
 require 'open-uri'
 require 'alpaca/trade/api'
+require 'alphavantagerb'
 require './db.rb'
 require './assessor.rb'
 require './simulator.rb'
 require 'statistics'
 require 'histogram/array'
 
-<span class="nocode pln">{Configure the Alpaca API, <a href="stocks.html#1:9">9</a>}</span>
+<span class="nocode pln">{Configure the Market APIs, <a href="stocks.html#1:9">9</a>}</span>
 </pre>
 
 
 
 </div>
 </div>
-<a name="1:9"><div class="section"><h4>9. Configure the Alpaca API</h4></a>
+<a name="1:9"><div class="section"><h4>9. Configure the Market APIs</h4></a>
 <p>As a matter of boilerplate, I need to link up to the Alpaca API in order to
 trade.
 </p>
 
 <div class="codeblock">
-<span class="codeblock_name">{Configure the Alpaca API <a href="stocks.html#1:9">9</a>}</span>
+<span class="codeblock_name">{Configure the Market APIs <a href="stocks.html#1:9">9</a>}</span>
 <pre class="prettyprint lang-">
 Alpaca::Trade::Api.configure do |config|
   config.endpoint   = "https://api.alpaca.markets"
-  config.key_id     = "XXXXXXXXXXXXXXXXXXXXXXXXXX"
-  config.key_secret = "XXXXXXXXXXXXXXXXXXXXXXXXXX"
+  config.key_id     = CONFIG[:Alpaca][:ID]
+  config.key_secret = CONFIG[:Alpaca][:secret]
 end
 
-CLIENT = Alpaca::Trade::Api::Client.new
+ALP_CLIENT = Alpaca::Trade::Api::Client.new
+AV_CLIENT  = Alphavantage::Client.new :key =&gt; CONFIG[:AV][:key]
 
 <span class="nocode pln">{Enhance the Alpaca Ruby API, <a href="stocks.html#1:10">10</a>}</span>
 </pre>

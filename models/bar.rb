@@ -42,14 +42,6 @@ class Bar < Sequel::Model
        .count - 1
   end
 
-  def before_split?(days: 90)
-    ticker.split_after? self, :days => days
-  end
-
-  def refresh
-    ticker.bars.filter {|b| b.date == date }[0]
-  end
-
   # the "rise" part of the name is baked into the `>=`
   # How many trading days does it take to rise by `percent`?
   # Returns -1 if it never does.
@@ -138,14 +130,6 @@ class Bar < Sequel::Model
 
   def regression(prior: 10)
     ticker.regression(:at => self, :prior => prior)
-  end
-
-  def ranking
-    @ranking || ticker.rankings.find {|r| r.date == date }
-  end
-
-  def ranking=(val)
-    @ranking = val
   end
 end
 

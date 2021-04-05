@@ -2,8 +2,7 @@ require 'pry'
 require './market.rb'
 require './script/helpers.rb'
 
-schemes = [{:m => -0.03, :b => 3.0},
-           {:m =>  0.00, :b => 0.6}]
+schemes = [{:m =>  0.00, :b => 0.6}]
 
 sim = Simulator.new
 sim.assessor.holding = (ARGV[0]..(ARGV[1] || ARGV[0])).inject([]) do |sum, year|

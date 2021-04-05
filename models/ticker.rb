@@ -1,7 +1,6 @@
 class Ticker < Sequel::Model
   one_to_many :bars, :order => :date
   one_to_many :splits, :order => :date
-  one_to_many :rankings, :order => :date
 
   # Return N_trade / P_day rankings
   #
@@ -101,17 +100,6 @@ class Ticker < Sequel::Model
     end
   end
 
-  # measure trading days, not calendar days, because
-  # we need to be consistent. the only way to look at trading
-  # days is to look at what we have the data for (otherwise we
-  # need some *serious* calendar skillz)
-  def split_after?(bar, days: 64)
-    sell = bars[bars.index(bar) + days] || bars.last
-    splits.any? do |split|
-      split.date <= sell.date and split.date >= bar.date
-    end
-  end
-
   # normalize the prices to get rid of splits
   # percentage drops will still be evident
   #
@@ -151,12 +139,6 @@ class Ticker < Sequel::Model
 
   def normalized?; splits.all {|s| s.applied } ; end
 
-  def before_destroy
-    splits.map {|s| s.destroy }
-    bars.map {|b| b.destroy }
-    super
-  end
-
   def download!(since: '2008-01-01')
     stock  = AV_CLIENT.stock :symbol => symbol
     series = stock.timeseries :outputsize => 'full'
@@ -176,6 +158,13 @@ class Ticker < Sequel::Model
       }
     end
     DB[:bars].multi_insert insertion
+  end
+
+  # hook to ensure no orphans
+  def before_destroy
+    splits.map {|s| s.destroy }
+    bars.map {|b| b.destroy }
+    super
   end
 end
 

@@ -661,26 +661,40 @@ class Simulator
   attr_accessor :stocks
   attr_accessor :after
   attr_accessor :before
+  attr_accessor :m
+  attr_accessor :b
 
-  def initialize(stocks: nil, drop: -0.3, vol: 10_000_000, after: nil, before: nil)
+  def initialize(stocks:  nil,
+                 drop:   -0.3,
+                 rank:    60,
+                 m:      -0.00,
+                 b:       0.6,
+                 after:   nil,
+                 before:  nil)
     @stocks = stocks
     @after  = after
     @before = before
+    @m      = m
+    @b      = b
 
     @assessor = Assessor.new
 
     @{When Do We Buy?}
-
+    
     @{When Do We Sell?}
   end
 
   def run
     @assessor.assess_buys @stocks, :after  => @after,
                                    :before => @before
-    @results = @assessor.assess_sells
+    assess_sells
   end
 
+  def assess_sells
+    @results = @assessor.assess_sells
+  end
 end
+
 ---
 
 @s The Assessor
@@ -720,8 +734,8 @@ class Assessor
     fin    = opts[:before] || Time.parse(Date.today.to_s)
     fin    = fin.is_a?(Time) ? fin : Time.parse(fin.to_s)
 
-    bars   = Bar.where(:time => debut..fin, :ticker_id => tids)
-                .order(:ticker_id, Sequel.asc(:time))
+    bars   = Bar.where(:date => debut..fin, :ticker_id => tids)
+                .order(:ticker_id, Sequel.asc(:date))
                 .all
     groups = bars.group_by {|b| b.ticker_id }
 
@@ -739,7 +753,7 @@ class Assessor
         # verify that the history is consecutive
         day_deltas = history.each_cons(2).map {|a, b| b.date - a.date }
 
-        if day_deltas.any? {|v| v > 4 }
+        if day_deltas.any? {|v| v > 4.days }
           false
         else
           buy? history
@@ -764,19 +778,21 @@ class Assessor
     #
     # From here on out, we're dealing with *simulation*.
     @holding = @holding.map do |stock|
-      index = stock.ticker.bars.index stock
-      stock.ticker.bars[index + 1] || stock
+      bars  = Bar.where(:ticker => stock.ticker,
+                        :date => stock.date..(stock.date + 7.days))
+                 .order(Sequel.asc(:date))
+                 .all
+      index = bars.index stock
+      bars[index + 1] || stock
     end
-    @holding.each {|stock| stock.ticker.normalize! }
-    @holding = @holding.map {|stock| stock.refresh }
   end
 
   def assess_sells
     sales = @holding.map do |stock|
-      bars   = stock.ticker.bars
-      orig_i = bars.index stock
-
-      sell_bar = bars[orig_i..-1].find {|day| sell? stock, day }
+      bars     = Bar.where(:ticker => stock.ticker) { date >= stock.date }
+                    .order(Sequel.asc(:date))
+                    .all
+      sell_bar = bars.find {|day| sell? stock, day }
 
       {:buy  => stock,
        :sell => sell_bar,
@@ -789,8 +805,8 @@ class Assessor
     assess_buys tickers, opts
     assess_sells
   end
-
 end
+
 ---
 
 @s Accessing Market Data
@@ -800,30 +816,35 @@ data. Alpaca's data is unadjusted for splits, and I have found at least one
 unresolved issue with their data (January 2018 data for AFL).
 
 --- market.rb
+require 'yaml'
+CONFIG = YAML.load File.read("config.yml")
+
 require 'open-uri'
 require 'alpaca/trade/api'
+require 'alphavantagerb'
 require './db.rb'
 require './assessor.rb'
 require './simulator.rb'
 require 'statistics'
 require 'histogram/array'
 
-@{Configure the Alpaca API}
+@{Configure the Market APIs}
 ---
 
-@s Configure the Alpaca API
+@s Configure the Market APIs
 
 As a matter of boilerplate, I need to link up to the Alpaca API in order to
 trade.
 
---- Configure the Alpaca API
+--- Configure the Market APIs
 Alpaca::Trade::Api.configure do |config|
   config.endpoint   = "https://api.alpaca.markets"
-  config.key_id     = "XXXXXXXXXXXXXXXXXXXXXXXXXX"
-  config.key_secret = "XXXXXXXXXXXXXXXXXXXXXXXXXX"
+  config.key_id     = CONFIG[:Alpaca][:ID]
+  config.key_secret = CONFIG[:Alpaca][:secret]
 end
 
-CLIENT = Alpaca::Trade::Api::Client.new
+ALP_CLIENT = Alpaca::Trade::Api::Client.new
+AV_CLIENT  = Alphavantage::Client.new :key => CONFIG[:AV][:key]
 
 @{Enhance the Alpaca Ruby API}
 --- 
