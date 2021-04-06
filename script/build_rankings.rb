@@ -13,8 +13,7 @@ start.upto finish do |date|
   date = Time.parse date.to_s
 
   # {Ticker ID => [Rank, Value]}
-  #rankings = Ticker.rankings :stocks => NYSE, :date => date
-  rankings = Ticker.rankings :stocks => Commodities, :date => date
+  rankings = Ticker.rankings :stocks => NYSE, :date => date
   rankings.each do |tid, (rank, value)|
     trie[tid][date] = {:rank => rank, :value => value}
   end

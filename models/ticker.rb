@@ -10,7 +10,7 @@ class Ticker < Sequel::Model
     @@rankings ||= {}
     return @@rankings[[stocks, date, prior]] if @@rankings[[stocks, date, prior]]
 
-    tids = stocks.map {|t| t.id}
+    tids = stocks.map {|t| t.id }
 
     query = DB[:bars].where(:ticker_id => tids, :date => (date - prior.days)..date)
                      .group(:ticker_id)
