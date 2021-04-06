@@ -35,7 +35,9 @@ class Ticker < Sequel::Model
 
     values = {}
     stocks.each do |stock|
-      if volumes[stock.id] == nil || closes[stock.id] == nil
+      if volumes[stock.id] == nil ||
+         closes[stock.id] == nil  ||
+         closes[stock.id] == 0.0
         values[stock] = 0
       else
         values[stock] = volumes[stock.id] / closes[stock.id]
@@ -139,7 +141,7 @@ class Ticker < Sequel::Model
 
   def normalized?; splits.all {|s| s.applied } ; end
 
-  def download!(since: '2008-01-01')
+  def download_stock(after: '1900-01-01', before: Date.today.strftime("%Y-%m-%d"))
     stock  = AV_CLIENT.stock :symbol => symbol
     series = stock.timeseries :outputsize => 'full'
 
@@ -157,7 +159,30 @@ class Ticker < Sequel::Model
        :ticker_id => id
       }
     end
-    DB[:bars].multi_insert insertion
+    #DB[:bars].multi_insert insertion
+  end
+
+  def download_futures(after: '1900-01-01', before: Date.today.strftime("%Y-%m-%d"))
+    url = "https://query1.finance.yahoo.com/v7/finance/download/" +
+          "#{symbol}?" +
+          "period1=#{after.to_i}&" +
+          "period2=#{before.to_i}&" +
+          "interval=1d&events=history&includeAdjustedClose=true"
+    user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_2_3) " +
+                 "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 " +
+                 "Safari/605.1.15"
+    data = URI.open(url, "User-Agent" => user_agent) do |site|
+      site.read
+    end
+
+    data.split("\n").map {|line| line.split "," }.map do |line|
+      {:date  => Time.parse(line[0]),
+       :open  => line[1].to_f,
+       :high  => line[2].to_f,
+       :low   => line[3].to_f,
+       :close => line[5].to_f,
+       :volume => line[6].to_f}
+    end
   end
 
   # hook to ensure no orphans

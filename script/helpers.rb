@@ -43,21 +43,9 @@ def cache(fname, &blk)
   end
 end
 
-def simulate(year: nil,
-             drop: nil,
-             rank: 60,
-             stocks: NYSE,
-             m: -0.02,
-             b: 5.2,
-             folder: "rank")
+def simulate(**kwargs)
   cache("data/#{folder}_sim/#{year}_d#{drop}_m#{m}_b#{b}.sim") do
-    sim = Simulator.new :stocks => stocks,
-                        :drop   => drop,
-                        :rank   => rank,
-                        :m      => m,
-                        :b      => b,
-                        :after  => "1 jan #{year}",
-                        :before => "31 dec #{year}"
+    sim = buys(**kwargs)
     sim.run.map {|r| dehydrate r }
   end.map {|r| hydrate r }
 end
@@ -67,10 +55,33 @@ def holdings(**kwargs)
   res.map {|h| h[:buy] }
 end
 
-def simulator(**kwargs)
+def simulator(holds=nil, **kwargs)
   sim = Simulator.new
-  sim.assessor.holding = holdings(**kwargs)
+  sim.assessor.holding = holds || holdings(**kwargs)
   sim
+end
+
+def buys(year: nil,
+         drop: nil,
+         rank: 60,
+         stocks: NYSE,
+         m: -0.02,
+         b: 5.2,
+         folder: "rank")
+
+  # Allow `:year => 2018..2021`
+  debut = year.is_a?(Range) ? year.first : year
+  fin   = year.is_a?(Range) ? year.last  : year
+
+  sim = Simulator.new :stocks => stocks,
+                      :drop   => drop,
+                      :rank   => rank,
+                      :m      => m,
+                      :b      => b,
+                      :after  => "1 jan #{debut}",
+                      :before => "31 dec #{fin}"
+  sim.assess_buys
+  sim.holding
 end
 
 def profit(results, circulation: 15.0, pieces: 10, reinvest: false, debug: false)

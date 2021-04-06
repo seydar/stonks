@@ -32,9 +32,14 @@ class Simulator
       ].all?
     end
     
-    # for ROI: m = -0.02, b = 5.0
+    # for ROI: m = -0.02, b = 5.2
     # for $$$: m = -0.03, b = 3.0
     #      or: m = -0.00, b = 0.6
+    #
+    # honestly i've done a terrible job of evaluating the different
+    # sell signals
+    #
+    # TODO suck less
     @assessor.sell_when do |original, today|
       days_held = today.trading_days_from original
       
@@ -44,14 +49,22 @@ class Simulator
     end
   end
 
-  def run
+  def assess_buys
     @assessor.assess_buys @stocks, :after  => @after,
                                    :before => @before
-    assess_sells
   end
 
   def assess_sells
     @results = @assessor.assess_sells
+  end
+
+  def run
+    assess_buys
+    assess_sells
+  end
+
+  def holding
+    @assessor.holding
   end
 end
 

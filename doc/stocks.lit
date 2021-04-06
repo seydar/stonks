@@ -253,7 +253,7 @@ the close of the next):
 tids  = Ticker.where(:exchange => 'NYSE').all.map {|t| t.id }
 debut = Time.parse('1 jan 2019')
 fin   = Time.parse('31 dec 2019')
-bars  = Bar.where(:time => debut..fin, :ticker_id => tids)
+bars  = Bar.where(:date => debut..fin, :ticker_id => tids)
            .order(:ticker_id, Sequel.asc(:date))
            .all
 groups  = bars.group_by {|b| b.ticker_id }
