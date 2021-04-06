@@ -17,11 +17,11 @@ end
 
 def text_ari(buy: [], sell: [])
   unless buy.empty?
-    `ruby /home/ari/servers/stonks/script/text_ari.rb buy #{buy.map {|b| b[:buy].ticker.symbol }}`
+    `HOME=/home/ari; ruby /home/ari/servers/stonks/script/text_ari.rb buy #{buy.map {|b| b[:buy].ticker.symbol }}`
   end
 
   unless sell.empty?
-    `ruby /home/ari/servers/stonks/script/text_ari.rb sell #{sell.map {|b| b[:sell].ticker.symbol }}`
+    `HOME=/home/ari; ruby /home/ari/servers/stonks/script/text_ari.rb sell #{sell.map {|b| b[:sell].ticker.symbol }}`
   end
 end
 
@@ -48,6 +48,11 @@ unless Time.parse((Date.today - 1).to_s) <= latest_bar
     end
   end
   puts "\t#{stocks_updated} stocks updated"
+
+  if stocks_updated > 0
+    puts "building rankings..."
+    `HOME=/home/ari; ruby script/build_rankings.rb #{latest_bar.strftime("%d %b %Y")}`
+  end
 end
 
 sim = Simulator.new :stocks => nyse, :after => START, :before => FIN
