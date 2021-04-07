@@ -32,7 +32,7 @@ def perc(num); "%0.3f%%" % (num * 100); end
 # download and save the latest information
 # i acknowledge that this assumes that all tickers are updated at the same time
 latest_bar = nyse[5].bars.last.date
-unless Time.parse((Date.today - 1).to_s) <= latest_bar
+unless Time.parse((Date.today - 1).to_s) < latest_bar
   puts "downloading data after #{latest_bar}..."
   updates = Bar.download nyse, :after => latest_bar
   updates.merge! Bar.download([spy_ticker], :after => spy_ticker.bars.last.date)

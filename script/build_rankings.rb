@@ -1,7 +1,7 @@
 require './market.rb'
 require './script/helpers.rb'
 require 'upsert'
-require 'pry'
+#require 'pry'
 
 start  = ARGV[0] ? Date.parse(ARGV[0]) : Date.today
 finish = Date.today
@@ -38,5 +38,5 @@ end
 
 puts "#{num} rows across #{finish - start} days update"
 
-binding.pry
+#binding.pry
 
