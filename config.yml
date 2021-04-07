@@ -1,9 +1,0 @@
----
-:Alpaca:
-  :ID: "AKYX3PV15W7C6IVMFV7L"
-  :secret: "7lztPWuYcZFynkrun9RPhPcpmkC1iWztrGKZnIEW"
-:DB:
-  :path: 'data/tickers.db'
-:AV:
-  :key: "GI387ZJ0874WXW5S"
-
