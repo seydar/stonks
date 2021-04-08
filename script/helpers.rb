@@ -72,7 +72,11 @@ def cache(fname, &blk)
 end
 
 def simulate(**kwargs)
-  cache("data/#{folder}_sim/#{year}_d#{drop}_m#{m}_b#{b}.sim") do
+  kwargs[:folder] ||= "rank"
+  kwargs[:m] ||= -0.02
+  kwargs[:b] ||= 5.2
+
+  cache("data/#{kwargs[:folder]}_sim/#{kwargs[:year]}_d#{kwargs[:drop]}_m#{kwargs[:m]}_b#{kwargs[:b]}.sim") do
     sim = buys(**kwargs)
     sim.run.map {|r| dehydrate r }
   end.map {|r| hydrate r }
