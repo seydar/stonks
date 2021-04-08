@@ -6,6 +6,7 @@ o   Regularly pick a random set of bars (N = ~500) and check the mean ROI
 o   Integrate with Quantopian's zipline
     -> https://www.zipline.io
 o   Make `simulate` take a range of years and combine results
+o   Add jupyter-esque capabilities to Literate
 
 DONE
 -----------------------------------
