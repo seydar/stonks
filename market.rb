@@ -33,6 +33,17 @@ class Alpaca::Trade::Api::Client
       hash[symbol] = json[symbol].map { |bar| Alpaca::Trade::Api::Bar.new(bar) }
     end
   end 
+
+  # Enabling me to use the "qty" query parameter. Playing it extra safe
+  # by not even sending the parameter unless there's a specified number
+  def close_position(symbol: nil, qty: nil)
+    response = delete_request(endpoint,
+                              "v2/positions/#{symbol}#{qty ? "?qty=#{qty}" : ""}")
+    raise NoPositionForSymbol,
+          JSON.parse(response.body)['message'] if response.status == 404
+
+    Position.new(JSON.parse(response.body))
+  end
 end
 
 ##############################################################

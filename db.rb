@@ -35,9 +35,27 @@ DB.create_table? :splits do
   index :ticker_id
 end
 
+DB.create_table? :accounts do
+  primary_key :id
+  string :name
+  string :alpaca_id
+  string :alpaca_secret
+  float :circulation
+end
+
+DB.create_table? :orders do
+  primary_key :id
+  foreign_key :account_id, :accounts
+  foreign_key :bought_id, :bars
+  foreign_key :sold_id, :bars
+  integer :quantity
+  datetime :date
+end
+
 require './models/ticker.rb'
 require './models/split.rb'
 require './models/bar.rb'
+require './models/account.rb'
 
 class Alpaca::Trade::Api::Bar
   def date; @time; end

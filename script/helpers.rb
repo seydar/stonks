@@ -27,7 +27,7 @@ Futures = {:energy     => ["CL=F", "QM=F", "BZ=F", "EH=F", "HO=F", "NN=F", "NG=F
                            "USDSEK=X", "USDBRL=X", "USDEGP=X", "USDILS=X", "USDKWD=X", "USDMXN=X",
                            "USDZAR=X", "USDTND=X"],
            :realty     => ["NYM=F"]
-          }
+          }.map {|k, h| [k, h.map {|sym| Ticker[:symbol => sym] }] }.to_h
 Commodities = {:soft => Futures[:food_fiber] + Futures[:grains] + Futures[:livestock],
                :hard => Futures[:energy] + Futures[:metals]
               }
