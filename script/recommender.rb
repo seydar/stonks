@@ -17,11 +17,11 @@ end
 
 def text_ari(buy: [], sell: [])
   unless buy.empty?
-    `HOME=/home/ari; ruby /home/ari/servers/stonks/script/text_ari.rb buy #{buy.map {|b| b[:buy].ticker.symbol }}`
+    `HOME=/home/ari; source /home/ari/.profile; ruby /home/ari/servers/stonks/script/text_ari.rb buy #{buy.map {|b| b[:buy].ticker.symbol }}`
   end
 
   unless sell.empty?
-    `HOME=/home/ari; ruby /home/ari/servers/stonks/script/text_ari.rb sell #{sell.map {|b| b[:sell].ticker.symbol }}`
+    `HOME=/home/ari; source /home/ari/.profile; ruby /home/ari/servers/stonks/script/text_ari.rb sell #{sell.map {|b| b[:sell].ticker.symbol }}`
   end
 end
 

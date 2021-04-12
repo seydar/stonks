@@ -77,7 +77,7 @@ def simulate(**kwargs)
   kwargs[:b] ||= 5.2
 
   cache("data/#{kwargs[:folder]}_sim/#{kwargs[:year]}_d#{kwargs[:drop]}_m#{kwargs[:m]}_b#{kwargs[:b]}.sim") do
-    sim = buys(**kwargs)
+    sim = buy(**kwargs)
     sim.run.map {|r| dehydrate r }
   end.map {|r| hydrate r }
 end
@@ -93,13 +93,17 @@ def simulator(holds=nil, **kwargs)
   sim
 end
 
-def buys(year: nil,
-         drop: nil,
-         rank: 60,
-         stocks: NYSE,
-         m: -0.02,
-         b: 5.2,
-         folder: "rank")
+def buys(**kwargs)
+  buy(**kwargs).holding
+end
+
+def buy(year: nil,
+        drop: nil,
+        rank: 60,
+        stocks: NYSE,
+        m: -0.02,
+        b: 5.2,
+        folder: "rank")
 
   # Allow `:year => 2018..2021`
   debut = year.is_a?(Range) ? year.first : year
@@ -113,7 +117,7 @@ def buys(year: nil,
                       :after  => "1 jan #{debut}",
                       :before => "31 dec #{fin}"
   sim.assess_buys
-  sim.holding
+  sim
 end
 
 def profit(results, circulation: 15.0, pieces: 10, reinvest: false, debug: false)
