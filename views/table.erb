@@ -18,7 +18,7 @@
     <div style='display: inline-block;'>
       <%= File.read "views/summary.html" %>
     </div>
-    <div style='display: inline-block; max-width: 50%; vertical-align: top; padding-left: 20px;'>
+    <div style='display: inline-block; max-width: 40%; vertical-align: top; padding-left: 20px;'>
       <br/>
       <br/>
       <p>
@@ -30,7 +30,7 @@
           buy when:
           <br/>
           <ul>
-            <li>20% price drop in 2 days</li>
+            <li>20% price drop in 2 days (open to close)</li>
             <li>
               stock is in the top 61 of the market movement potential
               (explained <b><a href="/files/stocks.html#1:4">here</a></b>)
@@ -41,25 +41,19 @@
           <br/>
           <ul>
             <li>
-              (fraction, not a percentage)
-              ROI > -0.02 * trading_days_held + 5.2
+              ROI > 520% - 2% * trading_days_held
             </li>
           </ul>
         </div>
       </p>
       <br/>
-      <p>
-        prices may be adjusted to reflect a split/reverse-split that occurred
-        after that date
-      </p>
-      <p>
-        drop occurs on one day, buy the next morning. prior 5 days is including
-        the day of the drop
-      </p>
-      <p>
-        <span id='future'>blue</span> figures are taken from the latest
-        closing prices, since the threshold to sell has not yet been reached
-      </p>
+      <ul style="padding-left: 20px;">
+        <li>prices may be adjusted to reflect splits/reverse-splits</li>
+        <li>drop occurs on one day, buy the next morning</li>
+        <li>prior 5 days is including the day of the drop</li>
+        <li><span id='future'>blue</span> figures are taken from the latest
+            closing prices, since the threshold to sell has not yet been reached</li>
+      </ul>
     </div>
     <br/>
     <center><h2><%= START.upcase %> - <%= FIN.upcase %></h2></center>

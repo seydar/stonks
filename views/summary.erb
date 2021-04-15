@@ -16,7 +16,7 @@
         <a href="/files/stock_recs.<%= data[:year] %>.html"><%= data[:year] %></a>
       </td>
       <td><%= data[:num] %></td>
-      <td><%= data[:hold] %></td>
+      <td><%= data[:hold] == 1000 ? "(unsold)" : data[:hold] %></td>
       <td><%= (data[:sp500] * 100).round 3 %>%</td>
       <td><%= (data[:mean] * 100).round 3 %>%</td>
       <td><%= (data[:median] * 100).round 3 %>%</td>
