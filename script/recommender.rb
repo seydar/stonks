@@ -1,4 +1,5 @@
 require './market.rb'
+require './script/helpers.rb'
 require 'erb'
 
 START = "1 jan #{ARGV[0] || 2021}"
@@ -55,8 +56,8 @@ unless Time.parse((Date.today - 1).to_s) < latest_bar
   end
 end
 
-sim = Simulator.new :stocks => nyse, :after => START, :before => FIN
-results = sim.run
+# now a cache file will be produced for all of our hard work
+results = simulate :year => KIND.to_i, :drop => -0.2, :force => true
 
 # how well would we have done if we had just invested in SPY?
 results.each do |h|
@@ -85,6 +86,10 @@ text_ari :buy => new_buys, :sell => new_sells
 # <th><b>Sell Price</b></th>
 # <th><b>Sell ROI</b></th>
 # <th><b>SPY ROI</b></th>
+
+# Just used for accessing some defaults. Should prolly move defaults
+# to the config file
+sim = Simulator.new
 
 rows = results.sort_by {|r| r[:buy].date }.reverse.map do |rec|
   buy = rec[:buy]
@@ -130,8 +135,8 @@ liquidated_ROI = perc(liquidated_ROI)
 
 out = ERB.new(File.read("views/table.erb")).result
 
-fname = "/home/ari/servers/default/public/files/stock_recs.#{KIND}.html"
-#fname = "views/stock_recs.#{KIND}.html"
+#fname = "/home/ari/servers/default/public/files/stock_recs.#{KIND}.html"
+fname = "views/stock_recs.#{KIND}.html"
 open(fname, "w") {|f| f.write out }
 puts "file made @ #{fname}"
 

@@ -23,6 +23,7 @@ end
 years.each do |year, data|
   out = {:year   => year,
          :num    => data.size,
+         :hold   => data.map {|r| r[:hold] || 1000 }.median,
          :mean   => data.map {|r| r[:ROI] }.mean,
          :median => data.map {|r| r[:ROI] }.median,
          :stddev => data.map {|r| r[:ROI] }.standard_deviation,
