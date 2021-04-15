@@ -110,25 +110,25 @@ class Ticker < Sequel::Model
   def normalize!(debug: false)
     # operating on hashes and optimized to minimize calls to the DB
     # and also minimizing the number of objects created
-    ticker.splits.each do |split|
+    splits.each do |split|
       next if split.applied
 
       unnorm_size = DB[:bars].where(:ticker_id => id,
-                                    :date => Time.parse('1 jan 1900')..split[:date])
+                                    :date => Time.parse('1 jan 1900')..split.date)
                              .count
 
       next unless unnorm_size >= 2
 
       unnormal = DB[:bars].where(:ticker_id => id,
-                                 :date => (split[:date] - 30 * 86400)..split[:date])
+                                 :date => (split.date - 30 * 86400)..split.date)
                           .order(Sequel.asc(:date))
                           .all
       ratio = unnormal[-1][:open] / unnormal[-2][:close]
 
-      puts "\tupdating #{unnorm_size} bars" if debug
+      puts "\tupdating #{unnorm_size} bars before #{split.date}" if debug
 
       DB[:bars].where(:ticker_id => id,
-                      :date => Time.parse('1 jan 1900')..(split[:date] - 1.day))
+                      :date => Time.parse('1 jan 1900')..(split.date - 1.day))
                .update(:close => Sequel[:close] * ratio,
                        :open  => Sequel[:open]  * ratio,
                        :high  => Sequel[:high]  * ratio,

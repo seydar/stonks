@@ -1,4 +1,5 @@
 require 'yaml'
+Dir.chdir File.dirname(File.expand_path(__FILE__))
 CONFIG = YAML.load File.read("config.yml")
 
 require 'open-uri'
@@ -7,7 +8,7 @@ require 'alphavantagerb'
 require './db.rb'
 require './assessor.rb'
 require './simulator.rb'
-require 'statistics'
+#require 'statistics' # only used by the mse/r^2 methods which aren't currently in use. this package is in conflict with the kder package
 require 'histogram/array'
 
 Alpaca::Trade::Api.configure do |config|
