@@ -33,7 +33,9 @@ def perc(num); "%0.3f%%" % (num * 100); end
 # download and save the latest information
 # i acknowledge that this assumes that all tickers are updated at the same time
 latest_bar = nyse[5].bars.last.date
-unless Time.parse((Date.today - 1).to_s) < latest_bar
+yesterday = Time.parse((Date.today - 1).to_s)
+if latest_bar < yesterday ||
+   (latest_bar == yesterday && Time.now >= Time.parse("17:00"))
   puts "downloading data after #{latest_bar}..."
   updates = Bar.download nyse, :after => latest_bar
   updates.merge! Bar.download([spy_ticker], :after => spy_ticker.bars.last.date)
@@ -57,7 +59,7 @@ unless Time.parse((Date.today - 1).to_s) < latest_bar
 end
 
 # now a cache file will be produced for all of our hard work
-results = simulate :year => KIND.to_i, :drop => -0.2, :force => true
+results = simulate :year => KIND.to_i, :drop => -0.2, :force => (ARGV[-1] == "quick" ? false : true)
 
 # how well would we have done if we had just invested in SPY?
 results.each do |h|
