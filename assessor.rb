@@ -4,6 +4,7 @@ class Assessor
   attr_accessor :history_requirement
 
   attr_accessor :holding
+  attr_accessor :results
 
   def buy_when(history: 2, &b)
     @buying_plan = b
@@ -95,6 +96,8 @@ class Assessor
        :hold => sell_bar ? sell_bar.trading_days_from(stock)  : nil,
        :ROI  => sell_bar ? sell_bar.change_from(stock) : -1 }
     end
+
+    @results = sales
   end
 
   def assess(tickers, opts={})

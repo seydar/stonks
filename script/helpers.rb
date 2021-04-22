@@ -132,7 +132,7 @@ def holdings(**kwargs)
 end
 
 def simulator(holds=nil, **kwargs)
-  sim = Simulator.new
+  sim = Algorithms::Stocks.new #Simulator.new
   sim.assessor.holding = holds || holdings(**kwargs)
   sim
 end
@@ -154,13 +154,13 @@ def buy(year: nil,
   debut = year.is_a?(Range) ? year.first : year
   fin   = year.is_a?(Range) ? year.last  : year
 
-  sim = Simulator.new :stocks => stocks,
-                      :drop   => drop,
-                      :rank   => rank,
-                      :m      => m,
-                      :b      => b,
-                      :after  => "1 jan #{debut}",
-                      :before => "31 dec #{fin}"
+  sim = Algorithms::Stocks.new :stocks => stocks,
+                               :drop   => drop,
+                               :rank   => rank,
+                               :m      => m,
+                               :b      => b,
+                               :after  => "1 jan #{debut}",
+                               :before => "31 dec #{fin}"
   sim.assess_buys
   sim
 end

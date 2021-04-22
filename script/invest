@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
-require './market.rb'
-require './script/helpers.rb'
+
+###################################
+# Option parsing
+# #################################
 require 'optimist'
 
 opts = Optimist::options do
@@ -16,7 +18,7 @@ Usage:
   opt :drop, "What drop to look for in a buy signal", :default => -0.2
   opt :slope, "Slope for the sell curve", :short => "-m", :default => -0.02
   opt :yint, "y-intercept for the sell curve", :short => "-b", :default => 5.2
-  opt :reinvest, "Reinvest dividends to increase the investment amount", :default => true
+  opt :"no-reinvest", "Don't reinvest dividends"
 end
 
 # parse the year
@@ -29,14 +31,30 @@ else
   opts[:year] = opts[:year].to_i
 end
 
-p opts
-Optimist::die "year must be >= 2008" unless opts[:year] >= 2008
+case opts[:year]
+when Range
+  Optimist::die "year must be >= 2008" unless opts[:year].first >= 2008
+when Integer
+  Optimist::die "year must be >= 2008" unless opts[:year] >= 2008
+end
+
+#####################################
+# Actual simulation
+#####################################
+
+require './market.rb'
+require './script/helpers.rb'
 
 schemes = [{:m => opts[:slope],  :b => opts[:yint]}]
 
 if opts[:cached]
-  sells = simulate :year => opts[:year], :drop => opts[:drop]
+  sells = simulate :year => opts[:year],
+                   :drop => opts[:drop],
+                   :m    => opts[:slope],
+                   :b    => opts[:yint]
 else
+  # For caching purposes, it doesn't matter what the sell criteria are
+  # since we're going to redo the sell testing anyways
   sim = simulator :year => opts[:year], :drop => opts[:drop]
 end
 
@@ -52,7 +70,7 @@ comparison = schemes.map do |scheme|
     sells = sim.assess_sells
   end
 
-  puts "stats: #{scheme.inspect} (reinvest: #{opts[:reinvest]})"
+  puts "stats: #{scheme.inspect} (reinvest: #{!opts[:"no-reinvest"]}, pieces: #{opts[:pieces]})"
   puts "\tmed. hold:   #{sells.map {|h| h[:hold] || 1000 }.median}"
   puts "\tmed. ROI:    #{sells.map {|h| h[:ROI] }.median}"
   puts "\tavg. ROI:    #{sells.map {|h| h[:ROI] }.mean}"
@@ -60,7 +78,7 @@ comparison = schemes.map do |scheme|
 
   prof = profit sells, :circulation => opts[:cash],
                        :pieces      => opts[:pieces],
-                       :reinvest    => opts[:reinvest]
+                       :reinvest    => !opts[:"no-reinvest"]
   puts "\tskips:       #{prof[:skips].size}"
   puts "\tprofits:     #{opts[:cash]} -> #{prof[:cash]}"
   puts "\tcirculation: #{prof[:circulation]}"
