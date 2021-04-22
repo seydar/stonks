@@ -1,3 +1,5 @@
+require './assessor.rb'
+
 class Simulator
   attr_accessor :results
   attr_accessor :assessor

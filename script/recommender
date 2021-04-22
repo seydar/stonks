@@ -20,6 +20,8 @@ spy = proc do |debut, fin|
 end
 
 def text_ari(buy: [], sell: [])
+  return unless defined? Auberge
+
   unless buy.empty?
     str = buy.map {|b| b[:buy].ticker.symbol }.join ", "
     CONFIG[:phones].each do |phone|
@@ -65,7 +67,7 @@ if latest_bar < yesterday ||
 
   if stocks_updated > 0
     puts "building rankings..."
-    `HOME=/home/ari; ruby script/build_rankings.rb #{latest_bar.strftime("%d %b %Y")}`
+    `HOME=/home/ari; script/build_rankings #{latest_bar.strftime("%d %b %Y")}`
   end
 end
 
@@ -102,7 +104,7 @@ text_ari :buy => new_buys, :sell => new_sells
 
 # Just used for accessing some defaults. Should prolly move defaults
 # to the config file
-sim = Simulator.new
+sim = Algorithms::Stocks.new
 
 rows = results.sort_by {|r| r[:buy].date }.reverse.map do |rec|
   buy = rec[:buy]
