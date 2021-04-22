@@ -1,6 +1,9 @@
+#!/usr/bin/env ruby
 require './market.rb'
 require './script/helpers.rb'
 require 'erb'
+
+require "/home/ari/servers/auberge.rb" if File.exist? "/home/ari/servers/auberge.rb"
 
 START = "1 jan #{ARGV[0] || 2021}"
 FIN   = ARGV[0] ? "31 dec #{ARGV[0]}" : Date.today.strftime("%d %b %Y")
@@ -18,11 +21,13 @@ end
 
 def text_ari(buy: [], sell: [])
   unless buy.empty?
-    `HOME=/home/ari; source /home/ari/.profile; ruby /home/ari/servers/stonks/script/text_ari.rb buy #{buy.map {|b| b[:buy].ticker.symbol }}`
+    Auberge::Phone.sms :to => '16037297097',
+                       :body => "but #{buy.map {|b| b[:buy].ticker.symbol }}"
   end
 
   unless sell.empty?
-    `HOME=/home/ari; source /home/ari/.profile; ruby /home/ari/servers/stonks/script/text_ari.rb sell #{sell.map {|b| b[:sell].ticker.symbol }}`
+    Auberge::Phone.sms :to => '16037297097',
+                       :body => "but #{sell.map {|b| b[:sell].ticker.symbol }}"
   end
 end
 

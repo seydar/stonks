@@ -1,6 +1,7 @@
 require 'sqlite3'
 require 'sequel'
 require 'alpaca/trade/api'
+require 'linefit'
 
 DB = Sequel.connect "sqlite://#{CONFIG[:DB][:path]}"
 

@@ -66,5 +66,9 @@ class Simulator
   def holding
     @assessor.holding
   end
+
+  def holding=(val)
+    @assessor.holding = val
+  end
 end
 

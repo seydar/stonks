@@ -1,0 +1,70 @@
+#!/usr/bin/env ruby
+require './market.rb'
+require './script/helpers.rb'
+require 'optimist'
+
+opts = Optimist::options do
+  banner "Run a sample year of investing
+Usage:
+  profit_model.rb [options]
+"
+
+  opt :cached, "Use cached results"
+  opt :year, "Which year to model", :type => :string
+  opt :cash, "How much money to start with", :default => 10.0
+  opt :pieces, "How many pieces to divy the circulating cash to", :default => 50.0
+  opt :drop, "What drop to look for in a buy signal", :default => -0.2
+  opt :slope, "Slope for the sell curve", :short => "-m", :default => -0.02
+  opt :yint, "y-intercept for the sell curve", :short => "-b", :default => 5.2
+  opt :reinvest, "Reinvest dividends to increase the investment amount", :default => true
+end
+
+# parse the year
+# 2020
+# 2018..2020
+if opts[:year] =~ /\../
+  opts[:year] = opts[:year].split("..").map {|p| p.to_i }
+  opts[:year] = opts[:year][0]..opts[:year][1]
+else
+  opts[:year] = opts[:year].to_i
+end
+
+p opts
+Optimist::die "year must be >= 2008" unless opts[:year] >= 2008
+
+schemes = [{:m => opts[:slope],  :b => opts[:yint]}]
+
+if opts[:cached]
+  sells = simulate :year => opts[:year], :drop => opts[:drop]
+else
+  sim = simulator :year => opts[:year], :drop => opts[:drop]
+end
+
+puts "loaded #{(sells && sells.size) || sim.holding.size} trxs"
+puts "\tyear: #{opts[:year]}"
+puts "\tdrop: #{opts[:drop]}"
+
+comparison = schemes.map do |scheme|
+  unless opts[:cached]
+    sim.m = scheme[:m]
+    sim.b = scheme[:b]
+
+    sells = sim.assess_sells
+  end
+
+  puts "stats: #{scheme.inspect} (reinvest: #{opts[:reinvest]})"
+  puts "\tmed. hold:   #{sells.map {|h| h[:hold] || 1000 }.median}"
+  puts "\tmed. ROI:    #{sells.map {|h| h[:ROI] }.median}"
+  puts "\tavg. ROI:    #{sells.map {|h| h[:ROI] }.mean}"
+  puts "\tROI / hold:  #{sells.map {|h| h[:ROI] }.mean / sells.map {|h| h[:hold] || 1000 }.median}"
+
+  prof = profit sells, :circulation => opts[:cash],
+                       :pieces      => opts[:pieces],
+                       :reinvest    => opts[:reinvest]
+  puts "\tskips:       #{prof[:skips].size}"
+  puts "\tprofits:     #{opts[:cash]} -> #{prof[:cash]}"
+  puts "\tcirculation: #{prof[:circulation]}"
+
+  prof
+end
+

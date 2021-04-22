@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 require './market.rb'
 require './script/helpers.rb'
 require 'open-uri'

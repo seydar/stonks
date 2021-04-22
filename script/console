@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 require 'pry'
 require './market.rb'
 require './script/helpers.rb'

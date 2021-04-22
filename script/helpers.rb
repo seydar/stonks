@@ -79,6 +79,22 @@ def cache(fname, force: false, &blk)
   end
 end
 
+def cached(folder="rank", **kwargs)
+  files = Dir["data/#{folder}_sim/*"].sort
+  files = files.map do |file|
+    path = File.basename(file)
+    parts = path.split "_"
+
+    {:year => parts[0].to_i,
+     :drop => parts[1][1..-1].to_f,
+     :m    => parts[2][1..-1].to_f,
+     :b    => parts[3][1..-1].to_f,
+     :path => file}
+  end
+
+  files.filter {|h| kwargs.all? {|k, v| h[k] == v } }
+end
+
 def simulate(**kwargs)
   # Have to verify these defaults because the filename is created here
   # but the defaults are otherwise supplied in `#buy`
@@ -86,6 +102,16 @@ def simulate(**kwargs)
   kwargs[:m] ||= -0.02
   kwargs[:b] ||= 5.2
   force = kwargs.delete :force
+
+  if kwargs[:year].is_a? Range
+    sum = kwargs[:year].map do |year|
+      kwargs[:year] = year
+
+      simulate **kwargs
+    end.inject :+
+
+    return sum
+  end
 
   fname = "data/#{kwargs[:folder]}_sim/" +
           "#{kwargs[:year]}" +
@@ -96,7 +122,7 @@ def simulate(**kwargs)
 
   cache(fname, :force => force) do
     sim = buy(**kwargs)
-    sim.run.map {|r| dehydrate r }
+    sim.assess_sells.map {|r| dehydrate r }
   end.map {|r| hydrate r }
 end
 
@@ -111,6 +137,7 @@ def simulator(holds=nil, **kwargs)
   sim
 end
 
+# is this even useful? or is it just confusing
 def buys(**kwargs)
   buy(**kwargs).holding
 end
