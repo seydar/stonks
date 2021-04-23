@@ -5,6 +5,21 @@ module Algorithms
 
     FOLDER = "upward"
 
+    DEFAULTS = {:m    => 0.0,
+                :b    => 0.3,
+                :rise => 0.3}
+
+    def self.cache_name(**kwargs)
+      opts = DEFAULTS.merge kwargs
+
+      "data/#{FOLDER}/" +
+      "#{opts[:year]}" +
+      "_d#{opts[:rise]}" +
+      "_m#{opts[:m]}" +
+      "_b#{opts[:b]}" +
+      ".sim"
+    end
+
     def initialize(stocks:  nil,
                    after:   nil,
                    before:  nil,

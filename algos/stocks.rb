@@ -4,6 +4,21 @@ module Algorithms
     attr_accessor :b
 
     FOLDER = "volatile_drop"
+
+    DEFAULTS = {:m    =>  -0.02,
+                :b    =>   5.2,
+                :drop =>  -0.2}
+
+    def self.cache_name(**kwargs)
+      opts = DEFAULTS.merge kwargs
+
+      "data/#{FOLDER}/" +
+      "#{opts[:year]}" +
+      "_d#{opts[:drop]}" +
+      "_m#{opts[:m]}" +
+      "_b#{opts[:b]}" +
+      ".sim"
+    end
   
     def initialize(stocks:  nil,
                    drop:   -0.2,

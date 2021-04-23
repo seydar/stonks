@@ -43,6 +43,9 @@ def uusi(txt); "<span id='future'>#{txt}</span>"; end
 def money(num); "$%0.3f" % num; end
 def perc(num); "%0.3f%%" % (num * 100); end
 
+# This is all I'm offering to folks now
+CONFIG[:algorithm] = Algorithms::VolatileDrop
+
 # download and save the latest information
 # i acknowledge that this assumes that all tickers are updated at the same time
 latest_bar = nyse[5].bars.last.date
@@ -104,7 +107,7 @@ text_ari :buy => new_buys, :sell => new_sells
 
 # Just used for accessing some defaults. Should prolly move defaults
 # to the config file
-sim = Algorithms::Stocks.new
+sim = Algorithm.new
 
 rows = results.sort_by {|r| r[:buy].date }.reverse.map do |rec|
   buy = rec[:buy]

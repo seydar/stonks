@@ -79,6 +79,8 @@ def cache(fname, force: false, &blk)
   end
 end
 
+# TODO this hardcodes the formatting used by the algorithms to determine
+# the cache file naming scheme
 def cached(folder=Algorithm::FOLDER, **kwargs)
   FileUtils.mkdir "data/#{folder}" unless File.exists? "data/#{folder}"
 
@@ -87,22 +89,17 @@ def cached(folder=Algorithm::FOLDER, **kwargs)
     path = File.basename(file)
     parts = path.split "_"
 
-    {:year => parts[0].to_i,
-     :drop => parts[1][1..-1].to_f,
-     :m    => parts[2][1..-1].to_f,
-     :b    => parts[3][1..-1].to_f,
-     :path => file}
+    {:year              => parts[0].to_i,
+     parts[1][0].to_sym => parts[1][1..-1].to_f,
+     parts[2][0].to_sym => parts[2][1..-1].to_f,
+     parts[3][0].to_sym => parts[3][1..-1].to_f,
+     :path              => file}
   end
 
   files.filter {|h| kwargs.all? {|k, v| h[k] == v } }
 end
 
 def simulate(**kwargs)
-  # Have to verify these defaults because the filename is created here
-  # but the defaults are otherwise supplied in `#buy`
-  kwargs[:folder] ||= Algorithm::FOLDER
-  kwargs[:m] ||= -0.02
-  kwargs[:b] ||= 5.2
   force = kwargs.delete :force
 
   if kwargs[:year].is_a? Range
@@ -115,12 +112,7 @@ def simulate(**kwargs)
     return sum
   end
 
-  fname = "data/#{kwargs[:folder]}/" +
-          "#{kwargs[:year]}" +
-          "_d#{kwargs[:drop]}" +
-          "_m#{kwargs[:m]}" +
-          "_b#{kwargs[:b]}" +
-          ".sim"
+  fname = Algorithm.cache_name **kwargs
 
   cache(fname, :force => force) do
     sim = buy(**kwargs)
@@ -144,25 +136,15 @@ def buys(**kwargs)
   buy(**kwargs).holding
 end
 
-def buy(year: nil,
-        drop: nil,
-        rank: 60,
-        stocks: NYSE,
-        m: -0.02,
-        b: 5.2,
-        folder: Algorithm::FOLDER)
-
+def buy(year: nil, stocks: NYSE, **kwargs)
   # Allow `:year => 2018..2021`
   debut = year.is_a?(Range) ? year.first : year
   fin   = year.is_a?(Range) ? year.last  : year
 
   sim = Algorithm.new :stocks => stocks,
-                      :drop   => drop,
-                      :rank   => rank,
-                      :m      => m,
-                      :b      => b,
                       :after  => "1 jan #{debut}",
-                      :before => "31 dec #{fin}"
+                      :before => "31 dec #{fin}",
+                      **kwargs
   sim.assess_buys
   sim
 end
