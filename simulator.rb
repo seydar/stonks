@@ -41,3 +41,5 @@ end
 
 Dir['./algos/*.rb'].each {|f| require f }
 
+Algorithm = eval("Algorithms::#{CONFIG[:algorithm]}")
+

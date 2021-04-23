@@ -1,12 +1,17 @@
 module Algorithms
   class Upward < Simulator
+    attr_accessor :m
+    attr_accessor :b
+
+    FOLDER = "upward"
+
     def initialize(stocks:  nil,
                    after:   nil,
                    before:  nil,
                    rise:    0.1,
                    rank:    60,
-                   m:      -0.02,
-                   b:       5.2)
+                   m:       0.0,
+                   b:       0.3)
       super(:stocks => stocks,
             :after => after,
             :before => before)

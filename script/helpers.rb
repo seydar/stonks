@@ -79,8 +79,10 @@ def cache(fname, force: false, &blk)
   end
 end
 
-def cached(folder="rank", **kwargs)
-  files = Dir["data/#{folder}_sim/*"].sort
+def cached(folder=Algorithm::FOLDER, **kwargs)
+  FileUtils.mkdir "data/#{folder}" unless File.exists? "data/#{folder}"
+
+  files = Dir["data/#{folder}/*"].sort
   files = files.map do |file|
     path = File.basename(file)
     parts = path.split "_"
@@ -98,7 +100,7 @@ end
 def simulate(**kwargs)
   # Have to verify these defaults because the filename is created here
   # but the defaults are otherwise supplied in `#buy`
-  kwargs[:folder] ||= "rank"
+  kwargs[:folder] ||= Algorithm::FOLDER
   kwargs[:m] ||= -0.02
   kwargs[:b] ||= 5.2
   force = kwargs.delete :force
@@ -113,7 +115,7 @@ def simulate(**kwargs)
     return sum
   end
 
-  fname = "data/#{kwargs[:folder]}_sim/" +
+  fname = "data/#{kwargs[:folder]}/" +
           "#{kwargs[:year]}" +
           "_d#{kwargs[:drop]}" +
           "_m#{kwargs[:m]}" +
@@ -132,8 +134,8 @@ def holdings(**kwargs)
 end
 
 def simulator(holds=nil, **kwargs)
-  sim = Algorithms::Stocks.new #Simulator.new
-  sim.assessor.holding = holds || holdings(**kwargs)
+  sim = Algorithm.new #Simulator.new
+  sim.holding = holds || holdings(**kwargs)
   sim
 end
 
@@ -148,19 +150,19 @@ def buy(year: nil,
         stocks: NYSE,
         m: -0.02,
         b: 5.2,
-        folder: "rank")
+        folder: Algorithm::FOLDER)
 
   # Allow `:year => 2018..2021`
   debut = year.is_a?(Range) ? year.first : year
   fin   = year.is_a?(Range) ? year.last  : year
 
-  sim = Algorithms::Stocks.new :stocks => stocks,
-                               :drop   => drop,
-                               :rank   => rank,
-                               :m      => m,
-                               :b      => b,
-                               :after  => "1 jan #{debut}",
-                               :before => "31 dec #{fin}"
+  sim = Algorithm.new :stocks => stocks,
+                      :drop   => drop,
+                      :rank   => rank,
+                      :m      => m,
+                      :b      => b,
+                      :after  => "1 jan #{debut}",
+                      :before => "31 dec #{fin}"
   sim.assess_buys
   sim
 end

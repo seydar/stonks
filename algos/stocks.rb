@@ -1,7 +1,9 @@
 module Algorithms
-  class Stocks < Simulator
+  class VolatileDrop < Simulator
     attr_accessor :m
     attr_accessor :b
+
+    FOLDER = "volatile_drop"
   
     def initialize(stocks:  nil,
                    drop:   -0.2,
