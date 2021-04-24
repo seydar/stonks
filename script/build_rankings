@@ -4,6 +4,8 @@ require './script/helpers.rb'
 require 'upsert'
 #require 'pry'
 
+ENV['UPSERT_DEBUG'] = "false"
+
 start  = ARGV[0] ? Date.parse(ARGV[0]) : Date.today
 finish = Date.today
 
