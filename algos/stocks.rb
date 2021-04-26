@@ -26,7 +26,8 @@ module Algorithms
                    m:      -0.02,
                    b:       5.2,
                    after:   nil,
-                   before:  nil)
+                   before:  nil,
+                   **extra)
       super(:stocks => stocks,
             :after => after,
             :before => before)

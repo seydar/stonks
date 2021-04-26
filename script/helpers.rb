@@ -125,6 +125,7 @@ def holdings(**kwargs)
   res.map {|h| h[:buy] }
 end
 
+# TODO this should also install the results
 def simulator(holds=nil, **kwargs)
   sim = Algorithm.new #Simulator.new
   sim.holding = holds || holdings(**kwargs)
