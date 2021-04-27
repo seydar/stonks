@@ -5,11 +5,14 @@ o   Regularly pick a random set of bars (N = ~500) and check the mean ROI
     given the standard sell signal (ROI >= m*x + b)
 o   Integrate with Quantopian's zipline
     -> https://www.zipline.io
-o   Make `simulate` take a range of years and combine results
 o   Add jupyter-esque capabilities to Literate
+o   Find a similar line to determine how long to wait after a drop
+    before buying
+o   Expand to NASDAQ and ARCA
 
 DONE
 -----------------------------------
+x   Make `simulate` take a range of years and combine results
 x   Add config file for DB location and API keys
 x   Filter buys according to ticker ranking
     -> maybe change the drop so that there are more to choose from

@@ -18,7 +18,7 @@ url = proc {|ticker| "http://stocksplithistory.com/?symbol=#{ticker}" }
 # end
 
 NYSE.each do |sym|
-  print "reviewing #{sym.symbol}: "
+  #print "reviewing #{sym.symbol}: "
   doc = Nokogiri::HTML(URI.open(url[sym.symbol.downcase]))
   possibilities = doc.at 'td:contains("Split History Table")'
   table = possibilities.children[0]
@@ -35,7 +35,7 @@ NYSE.each do |sym|
     Split.create :ticker_id => sym.id,
                  :ratio     => tds[-1],
                  :date      => date
-    print "."
+    #print "."
   end
   puts
 end
@@ -43,8 +43,8 @@ end
 # reflect the splits in the data permanently. or rather... hide the splits in
 # the data, permanently
 NYSE.each do |ticker|
-  p ticker.symbol
-  puts "\t#{ticker.splits.size} splits"
+  next if ticker.splits.size == 0
+  puts "#{ticker.symbol}: #{ticker.splits.size} splits"
 
   ticker.normalize! :debug => true
 end
