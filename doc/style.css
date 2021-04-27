@@ -44,7 +44,8 @@ table, th, tr {
 
 th {
   padding-left: 10px;
-  color: #2bbc8a;
+  /*color: #2bbc8a;*/
+  font-style: bold;
 }
 
 td {
