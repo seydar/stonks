@@ -71,6 +71,8 @@ def cache(fname, force: false, &blk)
   if File.exists?(fname) && !force
     return Marshal.load(File.read(fname))
   else
+    FileUtils.mkdir File.dirname(fname) unless File.exists?(File.dirname(fname))
+
     print "writing #{fname}..."
     res = blk.call
     open(fname, "w") {|f| f.write Marshal.dump(res) }
@@ -82,8 +84,6 @@ end
 # TODO this hardcodes the formatting used by the algorithms to determine
 # the cache file naming scheme
 def cached(folder=Algorithm::FOLDER, **kwargs)
-  FileUtils.mkdir "data/#{folder}" unless File.exists? "data/#{folder}"
-
   files = Dir["data/#{folder}/*"].sort
   files = files.map do |file|
     path = File.basename(file)

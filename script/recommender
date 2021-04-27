@@ -28,6 +28,10 @@ def text_ari(buy: [], sell: [])
       Auberge::Phone.sms :to => phone,
                          :body => "buy #{str}"
     end
+
+    # do the automatic buy
+    ari = Account.first
+    buy.each {|b| ari.buy b[:buy] }
   end
 
   unless sell.empty?
@@ -36,6 +40,10 @@ def text_ari(buy: [], sell: [])
       Auberge::Phone.sms :to => phone,
                          :body => "sell #{str}"
     end
+
+    # do the automatic sell
+    ari = Account.first
+    sell.each {|h| ari.sell h }
   end
 end
 
