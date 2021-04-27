@@ -146,7 +146,7 @@ class Ticker < Sequel::Model
     series = stock.timeseries :outputsize => 'full'
 
     bars = series.output['Time Series (Daily)']
-    bars = bars.filter {|k, bar| k > since }
+    bars = bars.filter {|k, bar| k > after && k < before }
 
     insertion = bars.map do |k, bar|
       {:date   => Time.parse(k),
