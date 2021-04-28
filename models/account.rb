@@ -9,8 +9,8 @@ class Account < Sequel::Model
                                                :key_secret => alpaca_secret
   end
 
-  def investment(bar, pieces: 50.0)
-    ((circulation / pieces.to_f) / bar.close).floor
+  def investment(bar, pxs: self.pieces)
+    ((circulation / pxs.to_f) / bar.close).floor
   end
 
   def buy(bar)

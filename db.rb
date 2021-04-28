@@ -42,6 +42,7 @@ DB.create_table? :accounts do
   string :alpaca_id
   string :alpaca_secret
   float :circulation
+  float :pieces
 end
 
 DB.create_table? :orders do
