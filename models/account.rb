@@ -10,20 +10,30 @@ class Account < Sequel::Model
   end
 
   def investment(bar, pxs: self.pieces)
-    ((circulation / pxs.to_f) / bar.close).floor
+    quantity_for_cash :cash => (circulation / pxs.to_f)
   end
 
-  def buy(bar)
-    qty = investment bar
+  def quantity_for_cash(bar, cash: circulation / self.pieces.to_f)
+    (cash / bar.close).floor
+  end
+
+  def buy(bar, quantity: nil, cash: nil)
+    raise if quantity && cash # can only choose one
+
+    # Sometime I might want to pass in a hash straight from the algorithm
+    # without having to pluck out the bar
+    bar = Hash === bar ? bar[:buy] : bar
+
+    quantity ||= cash ? quantity_for_cash(bar, :cash => cash) : investment(bar)
     client.new_order :symbol => bar.ticker.symbol,
-                     :qty    => qty,
+                     :qty    => quantity,
                      :side   => 'buy',
                      :type   => 'market',
                      :time_in_force => 'day'
 
     Order.create :account_id => id,
                  :bought_id  => bar.id,
-                 :quantity   => qty,
+                 :quantity   => quantity,
                  :date       => Time.now
   end
 
