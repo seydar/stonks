@@ -39,6 +39,7 @@ class Account < Sequel::Model
 
   def sell(hash)
     order = orders.find {|o| o.bought == hash[:buy] }
+    return nil unless order
 
     # Actually do the transaction
     client.close_position :symbol => hash[:sell].ticker.symbol,
