@@ -51,15 +51,12 @@ def uusi(txt); "<span id='future'>#{txt}</span>"; end
 def money(num); "$%0.3f" % num; end
 def perc(num); "%0.3f%%" % (num * 100); end
 
-# This is all I'm offering to folks now
-CONFIG[:algorithm] = Algorithms::VolatileDrop
-
 # download and save the latest information
 # i acknowledge that this assumes that all tickers are updated at the same time
 latest_bar = nyse[5].bars.last.date
 yesterday = Time.parse((Date.today - 1).to_s)
 if latest_bar < yesterday ||
-   (latest_bar == yesterday && Time.now >= Time.parse("17:00"))
+   (latest_bar == yesterday && Time.now >= Time.parse("16:15"))
   puts "downloading data after #{latest_bar}..."
   updates = Bar.download nyse, :after => latest_bar
   updates.merge! Bar.download([spy_ticker], :after => spy_ticker.bars.last.date)
