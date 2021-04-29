@@ -108,6 +108,8 @@ class Ticker < Sequel::Model
   # THIS SHOULD BE RARELY CALLED
   # THE DATA SHOULD BE STORED IN ITS NORMALIZED FORM
   def normalize!(debug: false)
+    puts "#{symbol}: #{splits.size} splits" if debug
+
     # operating on hashes and optimized to minimize calls to the DB
     # and also minimizing the number of objects created
     splits.each do |split|

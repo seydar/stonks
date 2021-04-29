@@ -44,7 +44,6 @@ end
 # the data, permanently
 NYSE.each do |ticker|
   next if ticker.splits.size == 0
-  puts "#{ticker.symbol}: #{ticker.splits.size} splits"
 
   ticker.normalize! :debug => true
 end
