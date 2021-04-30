@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
 # this will be run twice because i'm lazy and inefficient
-# TODO separate the "download data" functionality
 # TODO separate the "build the cache" functionality
 # TODO separate the "build the HTML" functionality
 

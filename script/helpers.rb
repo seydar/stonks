@@ -111,29 +111,23 @@ def simulate(**kwargs)
     return sum
   end
 
-  fname = Algorithm.cache_name **kwargs
+  sim = Algorithm.new **kwargs
+  sim.after  = Time.parse("1 jan #{kwargs[:year]}")
+  sim.before = Time.parse("31 dec #{kwargs[:year]}")
 
-  cache(fname, :force => force) do
+  res = cache(sim.cache_name, :force => force) do
     sim = buy(**kwargs)
     sim.assess_sells.map {|r| dehydrate r }
   end.map {|r| hydrate r }
+
+  sim.holding = res.map {|h| h[:buy] }
+  sim.results = res
+  sim
 end
 
 def holdings(**kwargs)
   res = simulate(**kwargs)
   res.map {|h| h[:buy] }
-end
-
-# TODO this should also install the results
-def simulator(holds=nil, **kwargs)
-  sim = Algorithm.new #Simulator.new
-  sim.holding = holds || holdings(**kwargs)
-  sim
-end
-
-# is this even useful? or is it just confusing
-def buys(**kwargs)
-  buy(**kwargs).holding
 end
 
 def buy(year: nil, stocks: NYSE, **kwargs)

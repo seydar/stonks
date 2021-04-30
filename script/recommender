@@ -75,18 +75,18 @@ puts "\t#{updates.size} bars updated"
 Bar.build_rankings latest_bar.to_s if updates.size > 0
 
 # now a cache file will be produced for all of our hard work
-results = simulate :year => KIND.to_i, :drop => -0.2, :force => !QUICK
+sim = simulate :year => KIND.to_i, :drop => -0.2, :force => !QUICK
 
 # how well would we have done if we had just invested in SPY?
-results.each do |h|
+sim.results.each do |h|
   sell_date = h[:sell] ? h[:sell].date : h[:buy].ticker.bars.last.date
   h[:spy] = spy[h[:buy].date, sell_date]
 end
 
 # could be the day after the deciding day, or it could be the deciding day (if
 # there's no new bar after it, aka it's bleeding edge)
-new_buys  = results.filter {|h| h[:buy].date >= latest_bar }
-new_sells = results.filter {|h| h[:sell] && h[:sell].date >= latest_bar }
+new_buys  = sim.results.filter {|h| h[:buy].date >= latest_bar }
+new_sells = sim.results.filter {|h| h[:sell] && h[:sell].date >= latest_bar }
 print "buy: "
 puts "\t[#{new_buys.map {|t| t[:buy].ticker.symbol }.join ", "}]"
 print "sell: "
@@ -107,12 +107,8 @@ text_ari :buy => new_buys, :sell => new_sells
 
 # Just used for accessing some defaults. Should prolly move defaults
 # to the config file
-#
-# TODO have the simulator return a full `Simulator` instead of just the
-#      results hash
-sim = Algorithm.new
 
-rows = results.sort_by {|r| r[:buy].date }.reverse.map do |rec|
+rows = sim.results.sort_by {|r| r[:buy].date }.reverse.map do |rec|
   buy = rec[:buy]
   latest = buy.ticker.bars.last
   latest_roi = (latest.close / buy.open) - 1
@@ -144,8 +140,8 @@ rows = results.sort_by {|r| r[:buy].date }.reverse.map do |rec|
    spy_roi]
 end
 
-mean_ROI       = perc(results.map {|r| r[:ROI] }.mean)
-liquidated_ROI = results.map do |r|
+mean_ROI       = perc(sim.results.map {|r| r[:ROI] }.mean)
+liquidated_ROI = sim.results.map do |r|
   if r[:sell]
     r[:ROI]
   else
@@ -156,7 +152,6 @@ liquidated_ROI = perc(liquidated_ROI)
 
 out = ERB.new(File.read("views/table.erb")).result
 
-#fname = "/home/ari/servers/default/public/files/stock_recs.#{KIND}.html"
 fname = "views/stock_recs.#{KIND}.html"
 open(fname, "w") {|f| f.write out }
 puts "file made @ #{fname}"

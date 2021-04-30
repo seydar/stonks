@@ -48,22 +48,14 @@ require './script/helpers.rb'
 
 schemes = [{:m => opts[:slope],  :b => opts[:yint]}]
 
-if opts[:cached]
-  sells = simulate :year => opts[:year],
-                   :drop => opts[:drop],
-                   :rise => opts[:rise],
-                   :m    => opts[:slope],
-                   :b    => opts[:yint]
-else
-  # For caching purposes, it doesn't matter what the sell criteria are
-  # since we're going to redo the sell testing anyways
-  sim = simulator :year => opts[:year],
-                  :drop => opts[:drop],
-                  :rise => opts[:rise]
-end
+sim = simulate :year => opts[:year],
+               :drop => opts[:drop],
+               :rise => opts[:rise],
+               :m    => opts[:slope],
+               :b    => opts[:yint]
 
 puts "algorithm: #{CONFIG[:algorithm]}"
-puts "loaded #{(sells && sells.size) || sim.holding.size} trxs"
+puts "loaded #{sim.holding.size} trxs"
 puts "\tyear: #{opts[:year]}"
 puts "\tdrop: #{opts[:drop]}"
 
@@ -72,8 +64,10 @@ comparison = schemes.map do |scheme|
     sim.m = scheme[:m]
     sim.b = scheme[:b]
 
-    sells = sim.assess_sells
+    sim.assess_sells
   end
+
+  sells = sim.results
 
   puts "stats: #{scheme.inspect} (reinvest: #{!opts[:"no-reinvest"]}, pieces: #{opts[:pieces]})"
   puts "\tmed. hold:   #{sells.map {|h| h[:hold] || 1000 }.median}"

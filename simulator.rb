@@ -1,7 +1,6 @@
 require './assessor.rb'
 
 class Simulator
-  attr_accessor :results
   attr_accessor :assessor
   attr_accessor :stocks
   attr_accessor :after
@@ -16,18 +15,42 @@ class Simulator
     @assessor = Assessor.new
   end
 
+  # TODO rebuild all caches in the commented-out format
+  def cache_name
+    vars = instance_variables - [:@after, :@before, :@stocks, :@assessor]
+
+    #"data/#{self.class::FOLDER}/" +
+    #"#{[after.year.to_s, before.year.to_s].uniq.join "-"}_"+ 
+    #"#{after.to_i}-#{before.to_i}_" +
+    #vars.sort.map {|v| v.to_s[1] + instance_variable_get(v).to_s }.join("_") +
+    #".sim"
+
+    "data/#{self.class::FOLDER}/" +
+    "#{[after.year.to_s, before.year.to_s].uniq.join "-"}_" +
+    vars.map {|v| v.to_s[1] + instance_variable_get(v).to_s }.join("_") +
+    ".sim"
+  end
+
   def assess_buys
     @assessor.assess_buys @stocks, :after  => @after,
                                    :before => @before
   end
 
   def assess_sells
-    @results = @assessor.assess_sells
+    @assessor.assess_sells
   end
 
   def run
     assess_buys
     assess_sells
+  end
+
+  def results
+    @assessor.results
+  end
+
+  def results=(val)
+    @assessor.results = val
   end
 
   def holding
