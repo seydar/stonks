@@ -16,14 +16,11 @@ START = "1 jan #{ARGV[0] || 2021}"
 FIN   = ARGV[0] ? "31 dec #{ARGV[0]}" : Date.today.strftime("%d %b %Y")
 KIND  = ARGV[0] || "2021"
 
-nyse = Ticker.where(:exchange => 'NYSE').all
-spy_ticker = Ticker.where(:symbol => 'SPY').first
-
 spy = proc do |debut, fin|
-  buy  = spy_ticker.bars.sort_by {|b| (debut - b.date).abs }.first
-  sell = spy_ticker.bars.sort_by {|b| (fin - b.date).abs }.first
+  buy  = SPY.bars.sort_by {|b| (debut - b.date).abs }.first
+  sell = SPY.bars.sort_by {|b| (fin - b.date).abs }.first
 
-  (sell.close / buy.close) - 1
+  sell.change_from buy
 end
 
 def text_ari(buy: [], sell: [])
@@ -42,7 +39,9 @@ def text_ari(buy: [], sell: [])
   end
 
   unless sell.empty?
-    str = sell.map {|b| b[:sell].ticker.symbol }.join ", "
+    str = sell.map do |b|
+      "#{b[:sell].ticker.symbol} (#{h[:buy].date.strftime "%Y-%m-%d" })\n"
+    end.join ", "
     CONFIG[:phones].each do |phone|
       Auberge::Phone.sms :to => phone,
                          :body => "sell #{str}"
@@ -59,32 +58,21 @@ def money(num); "$%0.3f" % num; end
 def perc(num); "%0.3f%%" % (num * 100); end
 
 # download and save the latest information
+#
 # i acknowledge that this assumes that all tickers are updated at the same time
-latest_bar = nyse[5].bars.last.date
-yesterday = Time.parse((Date.today - 1).to_s)
-if latest_bar < yesterday ||
-   (latest_bar == yesterday && Time.now >= Time.parse("16:15"))
-  puts "downloading data after #{latest_bar}..."
-  updates = Bar.download nyse, :after => latest_bar
-  updates.merge! Bar.download([spy_ticker], :after => spy_ticker.bars.last.date)
+# TODO ensure that dates are unique among their span
+#
+# NYSE[5] is an arbitrary selection
+latest_bar = NYSE[5].bars.last.date
 
-  puts "\tsaving data..."
-  stocks_updated = 0
-  updates.each do |sym, bz|
-    bz.each do |b|
-      unless b.date == Time.parse(Date.today.to_s) && Time.now < Time.parse('17:00')
-        stocks_updated += 1
-        b.save sym, 'day'
-      end
-    end
-  end
-  puts "\t#{stocks_updated} stocks updated"
+puts "downloading data after #{latest_bar}..."
+updates = Market::Stock.install NYSE, :after => latest_bar
+spy_ups = Market::Stock.install [SPY], :after => SPY.bars.last.date
+updates = updates.values + spy_ups.values
 
-  if stocks_updated > 0
-    puts "building rankings..."
-    `HOME=/home/ari; script/build_rankings #{latest_bar.strftime("%d %b %Y")}`
-  end
-end
+puts "\t#{updates.size} bars updated"
+
+Bar.build_rankings latest_bar.to_s if updates.size > 0
 
 # now a cache file will be produced for all of our hard work
 results = simulate :year => KIND.to_i, :drop => -0.2, :force => !QUICK
@@ -99,10 +87,10 @@ end
 # there's no new bar after it, aka it's bleeding edge)
 new_buys  = results.filter {|h| h[:buy].date >= latest_bar }
 new_sells = results.filter {|h| h[:sell] && h[:sell].date >= latest_bar }
-puts "buy:"
-puts "\t#{new_buys.map {|t| t[:buy].ticker.symbol }.join ", "}"
-puts "sell:"
-puts "\t#{new_sells.map {|t| t[:buy].ticker.symbol }.join ", "}"
+print "buy: "
+puts "\t[#{new_buys.map {|t| t[:buy].ticker.symbol }.join ", "}]"
+print "sell: "
+puts "\t[#{new_sells.map {|t| t[:buy].ticker.symbol }.join ", "}]"
 
 text_ari :buy => new_buys, :sell => new_sells
 
@@ -119,6 +107,9 @@ text_ari :buy => new_buys, :sell => new_sells
 
 # Just used for accessing some defaults. Should prolly move defaults
 # to the config file
+#
+# TODO have the simulator return a full `Simulator` instead of just the
+#      results hash
 sim = Algorithm.new
 
 rows = results.sort_by {|r| r[:buy].date }.reverse.map do |rec|

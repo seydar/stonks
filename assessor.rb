@@ -66,12 +66,10 @@ class Assessor
     # This is key because the `Bar#change_from` method operates on the opening
     # price of the earlier day.
     #
-    # If it's `nil` because we're dealing with some HOT OF THE PRESS stock
-    # recommendations, then... I don't really have a plan for that yet.
-    # Then the stock doesn't exist. Send a text, whatever. I need to include
-    # some notification system here.
-    #
-    # TODO include the notification system at this point.
+    # If `bars[index + 1]` is nil because we're dealing with some HOT OF THE
+    # PRESS stock recommendations, then... I don't really have a plan for that
+    # yet.  Then the stock doesn't exist, so just present the stock itself.
+    # It'll stay until the time period is recalculated, which happens often.
     #
     # From here on out, we're dealing with *simulation*.
     @holding = @holding.map do |stock|

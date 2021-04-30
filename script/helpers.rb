@@ -1,4 +1,5 @@
 NYSE = Ticker.where(:exchange => 'NYSE').all
+SPY  = Ticker[:symbol => 'SPY']
 
 # https://www.purefinancialacademy.com/futures-markets
 Futures = {:energy     => ["CL=F", "QM=F", "BZ=F", "EH=F", "HO=F", "NN=F", "NG=F",
@@ -81,8 +82,6 @@ def cache(fname, force: false, &blk)
   end
 end
 
-# TODO this hardcodes the formatting used by the algorithms to determine
-# the cache file naming scheme
 def cached(folder=Algorithm::FOLDER, **kwargs)
   files = Dir["data/#{folder}/*"].sort
   files = files.map do |file|

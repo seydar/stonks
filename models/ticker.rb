@@ -143,50 +143,6 @@ class Ticker < Sequel::Model
 
   def normalized?; splits.all {|s| s.applied } ; end
 
-  def download_stock(after: '1900-01-01', before: Date.today.strftime("%Y-%m-%d"))
-    stock  = AV_CLIENT.stock :symbol => symbol
-    series = stock.timeseries :outputsize => 'full'
-
-    bars = series.output['Time Series (Daily)']
-    bars = bars.filter {|k, bar| k > after && k < before }
-
-    insertion = bars.map do |k, bar|
-      {:date   => Time.parse(k),
-       :open   => bar['1. open'].to_f,
-       :high   => bar['2. high'].to_f,
-       :low    => bar['3. low'].to_f,
-       :close  => bar['4. close'].to_f,
-       :volume => bar['5. volume'].to_i,
-       :span   => 'day',
-       :ticker_id => id
-      }
-    end
-    #DB[:bars].multi_insert insertion
-  end
-
-  def download_futures(after: '1900-01-01', before: Date.today.strftime("%Y-%m-%d"))
-    url = "https://query1.finance.yahoo.com/v7/finance/download/" +
-          "#{symbol}?" +
-          "period1=#{after.to_i}&" +
-          "period2=#{before.to_i}&" +
-          "interval=1d&events=history&includeAdjustedClose=true"
-    user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_2_3) " +
-                 "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 " +
-                 "Safari/605.1.15"
-    data = URI.open(url, "User-Agent" => user_agent) do |site|
-      site.read
-    end
-
-    data.split("\n").map {|line| line.split "," }.map do |line|
-      {:date  => Time.parse(line[0]),
-       :open  => line[1].to_f,
-       :high  => line[2].to_f,
-       :low   => line[3].to_f,
-       :close => line[5].to_f,
-       :volume => line[6].to_f}
-    end
-  end
-
   # hook to ensure no orphans
   def before_destroy
     splits.map {|s| s.destroy }

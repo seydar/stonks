@@ -1,24 +1,6 @@
 class Bar < Sequel::Model
   many_to_one :ticker
 
-  def self.download(tickers, opts={})
-    span = opts.delete(:span) || 'day'
-
-    opts.each do |k, v| 
-      if [String, Date, DateTime, Time].include? v.class
-        opts[k] = DateTime.parse(v.to_s).to_s
-      end
-    end
-
-    # `CLIENT.bars` returns a hash, so this will also merge them all
-    # into one. key collision will only happen if the key is duplicated
-    # in the `ticker` argument.
-    symbols = tickers.map {|t| t.symbol }
-    symbols.each_slice(50).map do |ticks|
-      ALP_CLIENT.bars span, ticks, opts
-    end.inject({}) {|h, v| h.merge v }
-  end
-
   def inspect
     "#<Bar id => #{id}, sym => #{ticker.symbol}, date => #{date.strftime "%Y-%m-%d"}, o => #{open}, c => #{close}, v => #{volume}, r => #{rank}>"
   end
@@ -130,6 +112,46 @@ class Bar < Sequel::Model
 
   def regression(prior: 10)
     ticker.regression(:at => self, :prior => prior)
+  end
+
+  #########################################
+
+  def self.build_rankings(stocks: [],
+                          start:  Date.today,
+                          finish: Date.today,
+                          debug:  false)
+    trie = Hash.new {|h, k| h[k] = {} }
+    
+    start.upto finish do |date|
+      puts date if debug
+      date = Time.parse date.to_s
+    
+      # {Ticker ID => [Rank, Value]}
+      rankings = Ticker.rankings :stocks => NYSE, :date => date
+      rankings.each do |tid, (rank, value)|
+        trie[tid][date] = {:rank => rank, :value => value}
+      end
+    end
+    
+    bars = DB[:bars].select(:id, :ticker_id, :date)
+                    .where(:date => Time.parse(start.to_s)..Time.parse(finish.to_s))
+                    .all
+    
+    num = 0
+    DB.synchronize do |conn|
+      Upsert.batch(conn, :bars) do |upsert|
+        bars.each do |bar|
+          rank = trie[bar[:ticker_id]][bar[:date]]
+          next unless rank
+          upsert.row({:id => bar[:id]}, :rank       => rank[:rank],
+                                        :rank_value => rank[:value])
+          num += 1
+        end
+      end
+    end
+    
+    puts "updated #{num} rows across #{finish - start} days" if debug
+    num
   end
 end
 

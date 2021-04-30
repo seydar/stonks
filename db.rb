@@ -2,6 +2,9 @@ require 'sqlite3'
 require 'sequel'
 require 'alpaca/trade/api'
 require 'linefit'
+require 'upsert'
+
+ENV['UPSERT_DEBUG'] = "false"
 
 DB = Sequel.connect "sqlite://#{CONFIG[:DB][:path]}"
 
@@ -75,9 +78,26 @@ class Alpaca::Trade::Api::Bar
 end
 
 class Numeric
+  def seconds
+    self
+  end
+  alias_method :second, :seconds
+  alias_method :sec, :seconds
+
+  def minutes
+    self * 60
+  end
+  alias_method :minute, :minutes
+  alias_method :min, :minutes
+
+  def hours
+    self * 60.minutes
+  end
+  alias_method :hour, :hours
+
   # useful for dealing with Time
   def days
-    self * 86400.0
+    self * 24.hours
   end
   alias_method :day, :days
 end
