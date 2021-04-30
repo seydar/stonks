@@ -125,11 +125,6 @@ def simulate(**kwargs)
   sim
 end
 
-def holdings(**kwargs)
-  res = simulate(**kwargs)
-  res.map {|h| h[:buy] }
-end
-
 def buy(year: nil, stocks: NYSE, **kwargs)
   # Allow `:year => 2018..2021`
   debut = year.is_a?(Range) ? year.first : year
