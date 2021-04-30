@@ -5,6 +5,13 @@ require 'erb'
 
 require "/home/ari/servers/auberge.rb" if File.exist? "/home/ari/servers/auberge.rb"
 
+if ARGV[-1] == "quick"
+  ARGV.pop
+  QUICK = true
+else
+  QUICK = false
+end
+
 START = "1 jan #{ARGV[0] || 2021}"
 FIN   = ARGV[0] ? "31 dec #{ARGV[0]}" : Date.today.strftime("%d %b %Y")
 KIND  = ARGV[0] || "2021"
@@ -80,7 +87,7 @@ if latest_bar < yesterday ||
 end
 
 # now a cache file will be produced for all of our hard work
-results = simulate :year => KIND.to_i, :drop => -0.2, :force => (ARGV[-1] == "quick" ? false : true)
+results = simulate :year => KIND.to_i, :drop => -0.2, :force => !QUICK
 
 # how well would we have done if we had just invested in SPY?
 results.each do |h|

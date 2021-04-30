@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+
+# this will be run twice because i'm lazy and inefficient
+# TODO separate the "download data" functionality
+
+# Go through once to build the cache files
+(2008..2020).each do |year|
+  `script/recommender #{year}`
+  puts "built #{year}"
+end
+
+puts `script/recommender` # for the current year
+
+# build the summary table
+`script/build_tables`
+puts "built summary table"
+
+# now regenerate the HTML, using the caches we've built
+(2008..2020).each do |year|
+  `script/recommender #{year} quick`
+end
+
+`script/recommender quick` # for the current year
+
+puts "HTML regenerated"
+
+`script/publish`
+puts "published"
+
