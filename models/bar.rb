@@ -20,7 +20,7 @@ class Bar < Sequel::Model
   end
 
   def inspect
-    "#<Bar id => #{id}, sym => #{ticker.symbol}, date => #{date.strftime "%Y-%m-%d"}, o => #{open}, c => #{close}, h => #{high}, l => #{low}>"
+    "#<Bar id => #{id}, sym => #{ticker.symbol}, date => #{date.strftime "%Y-%m-%d"}, o => #{open}, c => #{close}, v => #{volume}, r => #{rank}>"
   end
 
   # GREAT trick here: the goal is to figure out how many records
