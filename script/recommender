@@ -70,9 +70,6 @@ updates = Market::Stock.install NYSE, :after => latest_bar
 spy_ups = Market::Stock.install [SPY], :after => SPY.bars.last.date
 updates = (updates.values + spy_ups.values).flatten
 
-require 'pry'
-binding.pry
-
 puts "\t#{updates.size} bars updated"
 
 if updates.size > 0
