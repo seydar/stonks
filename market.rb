@@ -87,6 +87,9 @@ module Market
         ALP_CLIENT.bars span, ticks, opts
       end.inject({}) {|h, v| h.merge v }
 
+      #require 'pry'
+      #binding.pry
+
       # strip out any bar that could be from today's incomplete data
       data.each do |sym, bars|
         bars.delete_if do |bar|
