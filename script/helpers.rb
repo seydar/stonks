@@ -102,13 +102,18 @@ def simulate(**kwargs)
   force = kwargs.delete :force
 
   if kwargs[:year].is_a? Range
-    sum = kwargs[:year].map do |year|
-      kwargs[:year] = year
 
-      simulate **kwargs
+    res = kwargs[:year].map do |year|
+      simulate(**kwargs, :year => year).results
     end.inject :+
 
-    return sum
+    sim = Algorithm.new **kwargs
+    sim.after  = Time.parse("1 jan #{kwargs[:year].first}")
+    sim.before = Time.parse("31 dec #{kwargs[:year].last}")
+    sim.holding = res.map {|h| h[:buy] }
+    sim.results = res
+
+    return sim
   end
 
   sim = Algorithm.new **kwargs
