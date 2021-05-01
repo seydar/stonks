@@ -166,11 +166,11 @@ def profit(results, circulation: 15.0, pieces: 10, reinvest: false, debug: false
       if trade[:action] == :buy
         tally << tally.last - investment[trade[:stock]]
 
-        puts "buying #{trade[:stock].ticker.symbol} for " +
+        puts "buying #{trade[:stock].ticker.symbol} (#{trade[:stock].date.strftime("%Y-%m-%d")}) for " +
              "#{investment[trade[:stock]]}"         if debug
 
       else # we're selling something we've successfully bought
-        puts "selling #{trade[:stock].ticker.symbol} at " +
+        puts "selling #{trade[:stock].ticker.symbol} (#{trade[:stock].date.strftime("%Y-%m-%d")}) at " +
              "#{(trade[:ROI] * 100).round(3)}% " +
              "($#{investment[trade[:original]].round(3)} => " +
              "$#{(investment[trade[:original]] *

@@ -20,6 +20,7 @@ Usage:
   opt :slope, "Slope for the sell curve", :short => "-m", :default => -0.02
   opt :yint, "y-intercept for the sell curve", :short => "-b", :default => 5.2
   opt :"no-reinvest", "Don't reinvest dividends"
+  opt :debug, "Print debugging output"
 end
 
 # parse the year
@@ -77,7 +78,8 @@ comparison = schemes.map do |scheme|
 
   prof = profit sells, :circulation => opts[:cash],
                        :pieces      => opts[:pieces],
-                       :reinvest    => !opts[:"no-reinvest"]
+                       :reinvest    => !opts[:"no-reinvest"],
+                       :debug       => opts[:debug]
   puts "\tskips:       #{prof[:skips].size}"
   puts "\tprofits:     #{opts[:cash]} -> #{prof[:cash]}"
   puts "\tcirculation: #{prof[:circulation]}"
