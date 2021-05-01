@@ -122,6 +122,7 @@ class Bar < Sequel::Model
                           debug:  false)
     trie = Hash.new {|h, k| h[k] = {} }
     
+    puts "#{finish - start + 1} day#{finish - start == 0 ? "" : "s"}" if debug
     start.upto finish do |date|
       puts date if debug
       date = Time.parse date.to_s

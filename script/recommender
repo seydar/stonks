@@ -72,7 +72,11 @@ updates = updates.values + spy_ups.values
 
 puts "\t#{updates.size} bars updated"
 
-Bar.build_rankings latest_bar.to_s if updates.size > 0
+if updates.size > 0
+  Bar.build_rankings :stocks => NYSE,
+                     :start => Date.parse(latest_bar.to_s),
+                     :debug => true
+end
 
 # now a cache file will be produced for all of our hard work
 sim = simulate :year => KIND.to_i, :drop => -0.2, :force => !QUICK

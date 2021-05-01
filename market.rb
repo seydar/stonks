@@ -98,7 +98,7 @@ module Market
 
     def install(tickers, opts={})
       updates = download tickers, opts
-      updates.map {|sym, bars| bars.map {|b| b.save sym, 'day' } }.flatten.to_h
+      updates.map {|sym, bars| [sym, bars.map {|b| b.save sym, 'day' }] }.to_h
     end
 
     # can only do one stock at a time
