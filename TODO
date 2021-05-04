@@ -12,6 +12,9 @@ o   Expand to NASDAQ and ARCA
 o   Plot the graph of all year-long time periods (not just jan 1 - jan 1,
     but jan 2 - jan 2, etc.)
 o   Rename all the cache files
+o   Add a rebalancing method to Accounts so that I can add more money and
+    have some of it go to support my earlier investments (if they're still
+    down). I guess it's a doubling-down function
 
 DONE
 -----------------------------------

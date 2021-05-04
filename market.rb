@@ -100,6 +100,10 @@ module Market
     end
 
     def install(tickers, opts={})
+      return {} if opts[:after] == Time.parse(Date.today.to_s)
+      return {} if opts[:after] == Time.parse(Date.today.to_s) - 1.day &&
+                   Time.now <= Time.parse('16:00')
+
       updates = download tickers, opts
       updates.map {|sym, bars| [sym, bars.map {|b| b.save sym, 'day' }] }.to_h
     end

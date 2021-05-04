@@ -87,3 +87,6 @@ comparison = schemes.map do |scheme|
   prof
 end
 
+#require 'pry'
+#binding.pry
+
