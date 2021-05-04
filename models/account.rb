@@ -10,11 +10,11 @@ class Account < Sequel::Model
   end
 
   def investment(bar, pxs: self.pieces)
-    quantity_for_cash :cash => (circulation / pxs.to_f)
+    quantity_for_cash bar, :cash => (circulation / pxs.to_f)
   end
 
   def quantity_for_cash(bar, cash: circulation / self.pieces.to_f)
-    (cash / bar.close).floor
+    (cash.to_f / bar.close).floor
   end
 
   def buy(bar, quantity: nil, cash: nil)
@@ -31,10 +31,15 @@ class Account < Sequel::Model
                      :type   => 'market',
                      :time_in_force => 'day'
 
-    Order.create :account_id => id,
-                 :bought_id  => bar.id,
-                 :quantity   => quantity,
-                 :date       => Time.now
+    o   = Order.where(:account_id => id, :bought_id => bar.id).first
+    o ||= Order.create :account_id => id,
+                       :bought_id  => bar.id,
+                       :quantity   => 0,
+                       :date       => Time.now
+    o.quantity += quantity
+    o.save
+
+    o
   end
 
   def sell(hash)

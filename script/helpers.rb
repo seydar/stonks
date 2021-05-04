@@ -41,6 +41,10 @@ Commodities = {:soft => Futures[:food_fiber] + Futures[:grains] + Futures[:lives
                :hard => Futures[:energy] + Futures[:metals]
               }
 
+def T(val)
+  Time.parse(val.to_s)
+end
+
 class Array
   def median
     sort[size / 2]

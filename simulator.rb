@@ -60,6 +60,31 @@ class Simulator
   def holding=(val)
     @assessor.holding = val
   end
+
+  # Maybe `h[:hold]` should always be filled out?
+  # Same with `h[:latest]`?
+  def still_negative
+    unsold = results.filter {|h| h[:sold] == nil }
+
+    ticks = unsold.map {|h| h[:buy].ticker }
+    #latests = Bar.where(:ticker => ticks)
+    #             .order(Sequel.desc(:date))
+    #             .group(:ticker_id)
+    #             .all
+    latests = ticks.map do |t|
+      [t, Bar.where(:ticker => t)
+             .order(Sequel.desc(:date))
+             .first]
+    end.to_h
+
+    unsold.each do |h|
+      h[:latest] = latests[h[:buy].ticker]
+      h[:ROI] = h[:latest].change_from h[:buy]
+      h[:hold] = h[:latest].trading_days_from h[:buy]
+    end
+
+    unsold.filter {|h| h[:ROI] < 0 }
+  end
 end
 
 Dir['./algos/*.rb'].each {|f| require f }
