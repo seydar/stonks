@@ -9,8 +9,6 @@ START = "1 jan #{ARGV[0] || 2021}"
 FIN   = ARGV[0] ? "31 dec #{ARGV[0]}" : Date.today.strftime("%d %b %Y")
 KIND  = ARGV[0] || "2021"
 
-sim = simulate :year => KIND.to_i, :drop => -0.2, :force => false
-
 spy = proc do |debut, fin|
   buy  = SPY.bars.sort_by {|b| (debut - b.date).abs }.first
   sell = SPY.bars.sort_by {|b| (fin - b.date).abs }.first
@@ -52,19 +50,22 @@ def uusi(txt); "<span id='future'>#{txt}</span>"; end
 def money(num); "$%0.3f" % num; end
 def perc(num); "%0.3f%%" % (num * 100); end
 
+sim = simulate :year => KIND.to_i, :drop => -0.2, :force => false
+
 # how well would we have done if we had just invested in SPY?
 sim.results.each do |h|
-  sell_date = h[:sell] ? h[:sell].date : h[:buy].ticker.bars.last.date
+  sell_date = h[:sell] ? h[:sell].date : h[:buy].ticker.latest_bar.date
   h[:spy] = spy[h[:buy].date, sell_date]
 end
 
 # could be the day after the deciding day, or it could be the deciding day (if
 # there's no new bar after it, aka it's bleeding edge)
-new_buys  = sim.results.filter {|h| h[:buy].date >= latest_bar }
-new_sells = sim.results.filter {|h| h[:sell] && h[:sell].date >= latest_bar }
-print "buy: "
+latest_date = NYSE[5].latest_bar.date
+new_buys  = sim.results.filter {|h| h[:buy].date >= latest_date }
+new_sells = sim.results.filter {|h| h[:sell] && h[:sell].date >= latest_date }
+print "\tbuy: "
 puts "\t[#{new_buys.map {|t| t[:buy].ticker.symbol }.join ", "}]"
-print "sell: "
+print "\tsell: "
 puts "\t[#{new_sells.map {|t| t[:buy].ticker.symbol }.join ", "}]"
 
 text_ari :buy => new_buys, :sell => new_sells
@@ -80,12 +81,9 @@ text_ari :buy => new_buys, :sell => new_sells
 # <th><b>Sell ROI</b></th>
 # <th><b>SPY ROI</b></th>
 
-# Just used for accessing some defaults. Should prolly move defaults
-# to the config file
-
 rows = sim.results.sort_by {|r| r[:buy].date }.reverse.map do |rec|
   buy = rec[:buy]
-  latest = buy.ticker.bars.last
+  latest = buy.ticker.latest_bar
   latest_roi = (latest.close / buy.open) - 1
 
   symbol     = "<a href='https://finance.yahoo.com/quote/" +
@@ -120,7 +118,7 @@ liquidated_ROI = sim.results.map do |r|
   if r[:sell]
     r[:ROI]
   else
-    (r[:buy].ticker.bars.last.close / r[:buy].open) - 1
+    (r[:buy].ticker.latest_bar.close / r[:buy].open) - 1
   end
 end.mean
 liquidated_ROI = perc(liquidated_ROI)

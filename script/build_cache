@@ -15,18 +15,18 @@ KIND  = ARGV[0] || "2021"
 # TODO ensure that dates are unique among their span
 #
 # NYSE[5] is an arbitrary selection
-latest_bar = NYSE[5].bars.last.date
+latest_date = NYSE[5].latest_bar.date
 
-puts "downloading data after #{latest_bar}..."
-updates = Market::Stock.install NYSE, :after => latest_bar
-spy_ups = Market::Stock.install [SPY], :after => SPY.bars.last.date
+puts "downloading data after #{latest_date}..."
+updates = Market::Stock.install NYSE, :after => latest_date
+spy_ups = Market::Stock.install [SPY], :after => SPY.latest_bar.date
 updates = (updates.values + spy_ups.values).flatten
 
 puts "\t#{updates.size} bars updated"
 
 if updates.size > 0
   Bar.build_rankings :stocks => NYSE,
-                     :start => Date.parse(latest_bar.to_s),
+                     :start => Date.parse(latest_date.to_s),
                      :debug => true
 end
 

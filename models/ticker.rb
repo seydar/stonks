@@ -50,6 +50,10 @@ class Ticker < Sequel::Model
     @@rankings[[stocks, date, prior]] = ranks
   end
 
+  def latest_bar
+    @latest ||= Bar.where(:ticker => self).order(Sequel.desc(:date)).limit(1).first
+  end
+
   # bar history based on a bar
   def history(around: nil, prior: 10, post: 5)
     idx  = around ? bars.index(around) : -1
