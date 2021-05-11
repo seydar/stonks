@@ -9,6 +9,8 @@ START = "1 jan #{ARGV[0] || 2021}"
 FIN   = ARGV[0] ? "31 dec #{ARGV[0]}" : Date.today.strftime("%d %b %Y")
 KIND  = ARGV[0] || "2021"
 
+puts "building a cache for #{KIND}:"
+
 spy = proc do |debut, fin|
   buy  = SPY.bars.sort_by {|b| (debut - b.date).abs }.first
   sell = SPY.bars.sort_by {|b| (fin - b.date).abs }.first
