@@ -35,7 +35,7 @@ def text_ari(buy: [], sell: [])
 
   unless sell.empty?
     str = sell.map do |b|
-      "#{b[:sell].ticker.symbol} (#{h[:buy].date.strftime "%Y-%m-%d" })\n"
+      "#{b[:sell].ticker.symbol} (#{b[:buy].date.strftime "%Y-%m-%d" })\n"
     end.join ", "
     CONFIG[:phones].each do |phone|
       Auberge::Phone.sms :to => phone,
