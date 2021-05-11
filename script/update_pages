@@ -12,10 +12,10 @@ puts "built summary table"
 
 # now generate the HTML
 (2008..2020).each do |year|
-  `script/recommender #{year}`
+  `script/build_html #{year}`
 end
 
-`script/recommender` # for the current year
+`script/build_html` # for the current year
 
 puts "HTML regenerated"
 
