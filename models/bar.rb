@@ -20,7 +20,6 @@ class Bar < Sequel::Model
     dates = [date, from.date].sort
 
     Bar.where(:ticker => ticker, :date => dates[0]..dates[-1])
-       .order(Sequel.asc(:date))
        .count - 1
   end
 
@@ -48,16 +47,26 @@ class Bar < Sequel::Model
     -1
   end
 
-  # What is the maximum percent rise when compared to `self` over the next
-  # `days` trading days?
-  def max_rise_over(days)
+  def changes_over(days)
     bars  = Bar.where(:ticker => ticker,
-                      :date => date..(date + (days * 1.4).ceil * 86_400))
+                      :date => date..(date + (days.days * 1.4).ceil))
                .order(Sequel.asc(:date))
                .all
     index = bars.index self
     range = bars[index..(index + days)]
-    range.map {|b| [b, b.change_from(self)] }.max_by {|a| a[1] }
+    range.map {|b| [b, b.change_from(self)] }
+  end
+
+  # What is the maximum percent rise when compared to `self` over the next
+  # `days` trading days?
+  def max_rise_over(days)
+    changes_over(days).max_by {|a| a[1] }
+  end
+
+  # What is the maximum percent rise when compared to `self` over the next
+  # `days` trading days?
+  def max_drop_over(days)
+    changes_over(days).min_by {|a| a[1] }
   end
 
   # When is the first two-day period that drops by `drop`, after this bar?

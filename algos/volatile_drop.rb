@@ -6,12 +6,12 @@ module Algorithms
     FOLDER = "volatile_drop"
 
     def initialize(stocks:  nil,
+                   after:   nil,
+                   before:  nil,
                    drop:   -0.2,
                    rank:    60,
                    m:      -0.02,
                    b:       5.2,
-                   after:   nil,
-                   before:  nil,
                    **extra)
       super(:stocks => stocks,
             :after => after,
