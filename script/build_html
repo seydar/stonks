@@ -35,11 +35,11 @@ def text_ari(buy: [], sell: [])
 
   unless sell.empty?
     str = sell.map do |b|
-      "#{b[:sell].ticker.symbol} (#{b[:buy].date.strftime "%Y-%m-%d" })\n"
-    end.join ", "
+      "#{b[:sell].ticker.symbol} (#{b[:buy].date.strftime "%Y-%m-%d" }) @ %0.1f%%" % (100 * b[:ROI])
+    end.join "\n"
     CONFIG[:phones].each do |phone|
       Auberge::Phone.sms :to => phone,
-                         :body => "sell #{str}"
+                         :body => "sell:\n#{str}"
     end
 
     # do the automatic sell
