@@ -87,14 +87,11 @@ module Market
         ALP_CLIENT.bars span, ticks, opts
       end.inject({}) {|h, v| h.merge v }
 
-      #require 'pry'
-      #binding.pry
-
       # strip out any bar that could be from today's incomplete data
       data.each do |sym, bars|
         bars.delete_if do |bar|
           bar.date == Time.parse(Date.today.to_s) &&
-          Time.now < (Time.parse(CLOSE) + 15 * 60)
+          Time.now < (Time.parse(CLOSE) + DELAY)
         end
       end
     end
@@ -102,7 +99,7 @@ module Market
     def install(tickers, opts={})
       return {} if opts[:after] == Time.parse(Date.today.to_s)
       return {} if opts[:after] == Time.parse(Date.today.to_s) - 1.day &&
-                   Time.now <= Time.parse('16:00')
+                   Time.now <= (Time.parse(CLOSE) + DELAY)
 
       updates = download tickers, opts
       updates.map {|sym, bars| [sym, bars.map {|b| b.save sym, 'day' }] }.to_h
@@ -110,8 +107,8 @@ module Market
 
     # can only do one stock at a time
     # AlphaVantage
-    def download_stock(stock, after: '1900-01-01', before: Date.today.strftime("%Y-%m-%d"))
-      stock  = AV_CLIENT.stock :symbol => stock.symbol
+    def download_stock(ticker, after: '1900-01-01', before: Date.today.strftime("%Y-%m-%d"))
+      stock  = AV_CLIENT.stock :symbol => ticker.symbol
       series = stock.timeseries :outputsize => 'full'
 
       bars = series.output['Time Series (Daily)']
@@ -125,7 +122,7 @@ module Market
          :close  => bar['4. close'].to_f,
          :volume => bar['5. volume'].to_i,
          :span   => 'day',
-         :ticker_id => id
+         :ticker_id => ticker.id
         }
       end
       #DB[:bars].multi_insert insertion

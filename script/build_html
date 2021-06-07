@@ -9,6 +9,9 @@ START = "1 jan #{ARGV[0] || 2021}"
 FIN   = ARGV[0] ? "31 dec #{ARGV[0]}" : Date.today.strftime("%d %b %Y")
 KIND  = ARGV[0] || "2021"
 
+# Ensure that previous orders are completed so that they can be properly sold
+Account.all.map {|acc| acc.complete! }
+
 puts "building HTML for #{KIND}:"
 
 spy = proc do |debut, fin|
@@ -62,6 +65,10 @@ end
 
 # could be the day after the deciding day, or it could be the deciding day (if
 # there's no new bar after it, aka it's bleeding edge)
+# TODO FIXME orders are rejected if placed just after 5pm, and if a new buy
+# signal appears one day, it will also appear as a new buy the next day, which
+# currently results in an extra buy order sent to alpaca (even though the first
+# one will be rejected)
 latest_date = NYSE[5].latest_bar.date
 new_buys  = sim.results.filter {|h| h[:buy].date >= latest_date }
 new_sells = sim.results.filter {|h| h[:sell] && h[:sell].date >= latest_date }

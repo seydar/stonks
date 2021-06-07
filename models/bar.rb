@@ -1,6 +1,20 @@
 class Bar < Sequel::Model
   many_to_one :ticker
 
+  def next
+    bars = Bar.where(:date => date..(date + 10.days), :ticker => ticker)
+              .order(Sequel.asc(:date))
+              .all
+    bars[1] # `bars[0]` is `self`
+  end
+
+  def prev
+    bars = Bar.where(:date => (date - 10.days)..date, :ticker => ticker)
+              .order(Sequel.asc(:date))
+              .all
+    bars[-2] # `bars[-1]` is `self`
+  end
+
   def inspect
     "#<Bar id => #{id}, sym => #{ticker.symbol}, date => #{date.strftime "%Y-%m-%d"}, o => #{open}, c => #{close}, v => #{volume}, r => #{rank}>"
   end

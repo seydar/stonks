@@ -41,11 +41,11 @@ class Assessor
     # create groups of size `@history_requirement`, and then
     # pass that history to the checker
     # most recent bar is at -1, oldest bar is at 0
-    groups.map do |ticker_id, bars|
+    @holding = groups.map do |ticker_id, bars|
       # assume the history is 
       histories = bars.each_cons history_requirement
 
-      @holding += histories.filter do |history|
+      histories.filter do |history|
 
         # verify that the history is consecutive
         day_deltas = history.each_cons(2).map {|a, b| b.date - a.date }
@@ -56,7 +56,7 @@ class Assessor
           buy? history
         end
       end.map {|history| history.last }
-    end
+    end.flatten
 
     # `@holding` currently references the days that a decision to buy is made
     # (using the day's closing price), but we don't *actually* buy until the

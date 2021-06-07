@@ -72,11 +72,35 @@ class Account < Sequel::Model
 
     remote_status.all? {|p| local_status[p.symbol] == p.qty.to_i }
   end
+
+  def complete!
+    orders.filter {|o| o.incomplete? }.each {|o| o.complete! }
+  end
+
 end
 
 class Order < Sequel::Model
   many_to_one :account
   many_to_one :bought, :class => Bar
   many_to_one :sold, :class => Bar
+
+  def incomplete?
+    !complete?
+  end
+
+  def complete?
+    complete
+  end
+
+  def complete!
+    return true if complete?
+
+    self.bought = bought.next
+
+    return false unless self.bought
+
+    self.complete = true
+    self.save
+  end
 end
 

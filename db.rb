@@ -55,6 +55,7 @@ DB.create_table? :orders do
   foreign_key :sold_id, :bars
   integer :quantity
   datetime :date
+  boolean :complete
 end
 
 require './models/ticker.rb'
