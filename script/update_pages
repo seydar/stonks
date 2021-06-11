@@ -15,7 +15,7 @@ puts "built summary table"
   puts `script/build_html #{year}`
 end
 
-`script/build_html` # for the current year
+puts `script/build_html` # for the current year
 
 puts "HTML regenerated"
 
