@@ -24,6 +24,9 @@ end
 def text_ari(buy: [], sell: [])
   return unless defined? Auberge
 
+  # fix the double-buys
+  buy = buy.filter {|h| ari.orders.any? {|o| o.bought == h[:buy] } }
+
   unless buy.empty?
     str = buy.map {|b| b[:buy].ticker.symbol }.join ", "
     CONFIG[:phones].each do |phone|
@@ -65,10 +68,16 @@ end
 
 # could be the day after the deciding day, or it could be the deciding day (if
 # there's no new bar after it, aka it's bleeding edge)
-# TODO FIXME orders are rejected if placed just after 5pm, and if a new buy
-# signal appears one day, it will also appear as a new buy the next day, which
-# currently results in an extra buy order sent to alpaca (even though the first
-# one will be rejected)
+#
+# OLD BUG #############################
+#
+# if a new buy signal appears one day, it will also appear as a new
+# buy the next day, which currently results in an extra buy order sent to
+# alpaca
+#
+# the buy day for a hot-off-the-press buy signal will be today, and
+# then when it's no longer hot-off-the-press, it changes to be the next day
+# (still "today"), so it looks like another new buy
 latest_date = NYSE[5].latest_bar.date
 new_buys  = sim.results.filter {|h| h[:buy].date >= latest_date }
 new_sells = sim.results.filter {|h| h[:sell] && h[:sell].date >= latest_date }

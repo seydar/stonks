@@ -54,6 +54,10 @@ class Ticker < Sequel::Model
     @latest ||= Bar.where(:ticker => self).order(Sequel.desc(:date)).limit(1).first
   end
 
+  def first_bar
+    @first ||= Bar.where(:ticker => self).order(Sequel.asc(:date)).limit(1).first
+  end
+
   # bar history based on a bar
   def history(around: nil, prior: 10, post: 5)
     idx  = around ? bars.index(around) : -1
