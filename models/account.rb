@@ -17,7 +17,7 @@ class Account < Sequel::Model
     (cash.to_f / bar.close).floor
   end
 
-  def buy(bar, quantity: nil, cash: nil)
+  def buy(bar, quantity: nil, cash: nil, dry: false)
     raise if quantity && cash # can only choose one
 
     # Sometime I might want to pass in a hash straight from the algorithm
@@ -25,6 +25,8 @@ class Account < Sequel::Model
     bar = Hash === bar ? bar[:buy] : bar
 
     quantity ||= cash ? quantity_for_cash(bar, :cash => cash) : investment(bar)
+    return [bar, quantity] if dry
+
     client.new_order :symbol => bar.ticker.symbol,
                      :qty    => quantity,
                      :side   => 'buy',
@@ -75,6 +77,48 @@ class Account < Sequel::Model
 
   def complete!
     orders.filter {|o| o.incomplete? }.each {|o| o.complete! }
+  end
+
+  def rebalance!
+    sim    = simulate :year => (Time.now.year - 1)..Time.now.year
+
+    # (obviously) only buy more of stocks which we haven't sold yet
+    unsold = sim.results.filter {|h| h[:hold].nil? }
+
+    # install some data so that we can better make our decisions
+    unsold.each do |h|
+      h[:latest] = h[:buy].ticker.latest_bar
+      h[:ROI]    = h[:latest].change_from h[:buy]
+      h[:hold]   = h[:latest].trading_days_from h[:buy]
+    end
+
+    # only buy stocks that are still down
+    targets = unsold.filter {|h| h[:ROI] < 0 }
+
+    # only buy stocks that have been held for < 100 days
+    #
+    # THIS IS ARBITRARILY CHOSEN (kinda). Eventually, if you hold
+    # long enough, you just gotta give up. Maybe this should be based
+    # off of the sell-signal's desired ROI.
+    targets = targets.filter {|h| h[:hold] < 100 }
+
+    # only buy stocks that are still available
+    # (I'm sure Alpaca would prevent me from buying them anyways, but
+    # I don't want to test their interlock)
+    latest_date = targets.map    {|h| h[:latest].date }.max
+    targets     = targets.filter {|h| h[:latest].date == latest_date }
+
+    # Limited investment per stock
+    per_stock = client.account.cash / targets.size.to_f
+
+    # Actually buy each stock
+    targets.map do |target|
+      # since the order thinks we're buying `target[:buy]`, but we want the
+      # pricing to be based off of `target[:latest]`
+      quantity = quantity_for_cash target[:latest], :cash => per_stock
+
+      buy target, :quantity => quantity
+    end
   end
 
 end

@@ -1,3 +1,5 @@
+require 'fileutils'
+
 NYSE = Ticker.where(:exchange => 'NYSE').all
 SPY  = Ticker[:symbol => 'SPY']
 
