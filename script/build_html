@@ -25,6 +25,7 @@ def text_ari(buy: [], sell: [])
   return unless defined? Auberge
 
   # fix the double-buys
+  ari = Account.first
   buy = buy.filter {|h| ari.orders.any? {|o| o.bought == h[:buy] } }
 
   unless buy.empty?
@@ -35,7 +36,6 @@ def text_ari(buy: [], sell: [])
     end
 
     # do the automatic buy
-    ari = Account.first
     buy.each {|b| ari.buy b[:buy] }
   end
 
