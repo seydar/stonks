@@ -24,10 +24,6 @@ end
 def text_ari(buy: [], sell: [])
   return unless defined? Auberge
 
-  # fix the double-buys
-  ari = Account.first
-  buy = buy.filter {|h| ari.orders.any? {|o| o.bought == h[:buy] } }
-
   unless buy.empty?
     str = buy.map {|b| b[:buy].ticker.symbol }.join ", "
     CONFIG[:phones].each do |phone|
@@ -81,6 +77,11 @@ end
 latest_date = NYSE[5].latest_bar.date
 new_buys  = sim.results.filter {|h| h[:buy].date >= latest_date }
 new_sells = sim.results.filter {|h| h[:sell] && h[:sell].date >= latest_date }
+
+# fix the double-buys
+ari = Account.first
+new_buys = new_buys.filter {|h| not ari.orders.any? {|o| o.bought == h[:buy] } }
+
 print "\tbuy: "
 puts "\t[#{new_buys.map {|t| t[:buy].ticker.symbol }.join ", "}]"
 print "\tsell: "
