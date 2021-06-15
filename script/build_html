@@ -32,6 +32,7 @@ def text_ari(buy: [], sell: [])
     end
 
     # do the automatic buy
+    ari = Account.first
     buy.each {|b| ari.buy b[:buy] }
   end
 
