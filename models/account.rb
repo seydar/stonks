@@ -79,9 +79,15 @@ class Account < Sequel::Model
     orders.filter {|o| o.incomplete? }.each {|o| o.complete! }
   end
 
+  # 1. Get all buy signals
+  # 2. Filter them to be the ones that are negative
+  # 3. Buy them
   def rebalance!
+    # 1. Get all buy signals
     sim    = simulate :year => (Time.now.year - 1)..Time.now.year
 
+    # 2. Filter them to be the ones that are negative
+    #
     # (obviously) only buy more of stocks which we haven't sold yet
     unsold = sim.results.filter {|h| h[:hold].nil? }
 
@@ -108,6 +114,8 @@ class Account < Sequel::Model
     latest_date = targets.map    {|h| h[:latest].date }.max
     targets     = targets.filter {|h| h[:latest].date == latest_date }
 
+    # 3. Buy them
+    #
     # Limited investment per stock
     per_stock = client.account.cash / targets.size.to_f
 

@@ -12,7 +12,7 @@ require 'kder'
 require 'histogram/array'
 
 Alpaca::Trade::Api.configure do |config|
-  config.endpoint   = "https://api.alpaca.markets"
+  config.endpoint   = "https://data.alpaca.markets"
   config.key_id     = CONFIG[:Alpaca][:ID]
   config.key_secret = CONFIG[:Alpaca][:secret]
 end
@@ -30,6 +30,18 @@ class Alpaca::Trade::Api::Client
     validate_timeframe(timeframe)
     response = get_request(data_endpoint, "v1/bars/#{timeframe}", opts)
     json = JSON.parse(response.body)
+    json.keys.each_with_object({}) do |symbol, hash|
+      hash[symbol] = json[symbol].map { |bar| Alpaca::Trade::Api::Bar.new(bar) }
+    end
+  end 
+
+  def stock_bars(symbol, opts={})
+    opts[:limit] ||= 100
+    opts[:timeframe] ||= '1Day'
+
+    response = get_request(data_endpoint, "v2/stocks/#{symbol}/bars", opts)
+    json = JSON.parse(response.body)
+    p json
     json.keys.each_with_object({}) do |symbol, hash|
       hash[symbol] = json[symbol].map { |bar| Alpaca::Trade::Api::Bar.new(bar) }
     end
@@ -99,7 +111,7 @@ module Market
     def install(tickers, opts={})
       return {} if opts[:after] == Time.parse(Date.today.to_s)
       return {} if opts[:after] == Time.parse(Date.today.to_s) - 1.day &&
-                   Time.now <= (Time.parse(CLOSE) + DELAY)
+                   Time.now < (Time.parse(CLOSE) + DELAY)
 
       updates = download tickers, opts
       updates.map {|sym, bars| [sym, bars.map {|b| b.save sym, 'day' }] }.to_h

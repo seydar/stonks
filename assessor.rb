@@ -26,10 +26,8 @@ class Assessor
   def assess_buys(tickers, opts={})
     tids = tickers.map {|t| t.id }
 
-    debut  = opts[:after] || Time.parse('1 march 1900')
-    debut  = debut.is_a?(Time) ? debut : Time.parse(debut.to_s)
-    fin    = opts[:before] || Time.parse(Date.today.to_s)
-    fin    = fin.is_a?(Time) ? fin : Time.parse(fin.to_s)
+    debut  = Time.parse(opts[:after].to_s  || '1 march 1900')
+    fin    = Time.parse(opts[:before].to_s || Date.today.to_s)
 
     bars   = Bar.where(:date => debut..fin, :ticker_id => tids)
                 .order(:ticker_id, Sequel.asc(:date))
