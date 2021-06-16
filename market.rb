@@ -12,7 +12,7 @@ require 'kder'
 require 'histogram/array'
 
 Alpaca::Trade::Api.configure do |config|
-  config.endpoint   = "https://data.alpaca.markets"
+  config.endpoint   = "https://api.alpaca.markets"
   config.key_id     = CONFIG[:Alpaca][:ID]
   config.key_secret = CONFIG[:Alpaca][:secret]
 end
