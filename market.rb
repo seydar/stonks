@@ -35,6 +35,18 @@ class Alpaca::Trade::Api::Client
     end
   end 
 
+  def stock_bars(symbol, opts={})
+    opts[:limit] ||= 100
+    opts[:timeframe] ||= '1Day'
+
+    response = get_request(data_endpoint, "v2/stocks/#{symbol}/bars", opts)
+    json = JSON.parse(response.body)
+    p json
+    json.keys.each_with_object({}) do |symbol, hash|
+      hash[symbol] = json[symbol].map { |bar| Alpaca::Trade::Api::Bar.new(bar) }
+    end
+  end 
+
   # Enabling me to use the "qty" query parameter. Playing it extra safe
   # by not even sending the parameter unless there's a specified number
   def close_position(symbol: nil, qty: nil)
@@ -99,7 +111,7 @@ module Market
     def install(tickers, opts={})
       return {} if opts[:after] == Time.parse(Date.today.to_s)
       return {} if opts[:after] == Time.parse(Date.today.to_s) - 1.day &&
-                   Time.now <= (Time.parse(CLOSE) + DELAY)
+                   Time.now < (Time.parse(CLOSE) + DELAY)
 
       updates = download tickers, opts
       updates.map {|sym, bars| [sym, bars.map {|b| b.save sym, 'day' }] }.to_h
