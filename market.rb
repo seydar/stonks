@@ -113,8 +113,12 @@ module Market
       return {} if opts[:after] == Time.parse(Date.today.to_s) - 1.day &&
                    Time.now < (Time.parse(CLOSE) + DELAY)
 
+      # provide a hash so that we can get the ID without
+      # fetching the symbol from the DB
+      tids    = tickers.map {|t| [t.symbol, t] }.to_h
+
       updates = download tickers, opts
-      updates.map {|sym, bars| [sym, bars.map {|b| b.save sym, 'day' }] }.to_h
+      updates.map {|sym, bars| [sym, bars.map {|b| b.save tids[sym], 'day' }] }.to_h
     end
 
     # can only do one stock at a time

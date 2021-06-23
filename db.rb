@@ -67,6 +67,12 @@ class Alpaca::Trade::Api::Bar
   def date; @time; end
 
   def save(symbol, period)
+    if symbol.is_a? ::Ticker
+      tid = symbol.id
+    else
+      tid = ::Ticker.where(:symbol => symbol).first.id
+    end
+
     ::Bar.create :span   => period,
                  :close  => @close,
                  :high   => @high,
@@ -74,7 +80,7 @@ class Alpaca::Trade::Api::Bar
                  :open   => @open,
                  :date   => @time,
                  :volume => @volume,
-                 :ticker_id => ::Ticker.where(:symbol => symbol).first.id
+                 :ticker_id => tid
   end
 end
 
