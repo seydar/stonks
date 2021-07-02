@@ -37,7 +37,7 @@ NYSE.each do |sym|
                  :date      => date
     #print "."
   end
-  puts
+  #puts
 end
 
 # reflect the splits in the data permanently. or rather... hide the splits in

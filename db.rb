@@ -28,6 +28,7 @@ DB.create_table? :tickers do
   primary_key :id
   string :symbol
   string :exchange
+  boolean :active
 end
 
 DB.create_table? :splits do

@@ -14,13 +14,6 @@ Account.all.map {|acc| acc.complete! }
 
 puts "building HTML for #{KIND}:"
 
-spy = proc do |debut, fin|
-  buy  = SPY.bars.sort_by {|b| (debut - b.date).abs }.first
-  sell = SPY.bars.sort_by {|b| (fin - b.date).abs }.first
-
-  sell.change_from buy
-end
-
 def text_ari(buy: [], sell: [])
   return unless defined? Auberge
 
@@ -60,7 +53,7 @@ sim = simulate :year => KIND.to_i, :drop => -0.2, :force => false
 # how well would we have done if we had just invested in SPY?
 sim.results.each do |h|
   sell_date = h[:sell] ? h[:sell].date : h[:buy].ticker.latest_bar.date
-  h[:spy] = spy[h[:buy].date, sell_date]
+  h[:spy] = spy(h[:buy].date, sell_date)
 end
 
 # could be the day after the deciding day, or it could be the deciding day (if

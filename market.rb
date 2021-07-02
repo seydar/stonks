@@ -35,6 +35,7 @@ class Alpaca::Trade::Api::Client
     end
   end 
 
+  # FIXME
   def stock_bars(symbol, opts={})
     opts[:limit] ||= 100
     opts[:timeframe] ||= '1Day'
@@ -84,6 +85,7 @@ module Market
     # Alpaca download but don't install
     def download(tickers, opts={})
       span = opts.delete(:span) || 'day'
+      opts[:limit] ||= 1000
 
       opts.each do |k, v| 
         if [String, Date, DateTime, Time].include? v.class
@@ -106,6 +108,26 @@ module Market
           Time.now < (Time.parse(CLOSE) + DELAY)
         end
       end
+
+      # provide a hash so that we can get the ID without
+      # fetching the symbol from the DB
+      tids    = tickers.map {|t| [t.symbol, t] }.to_h
+
+      # Put the data in a hash format so that it's consistent with the
+      # AlphaVantage style and allows for easy use with DB#multi_insert
+      data.map do |sym, bars|
+        [sym, bars.map do |bar|
+          {:date   => bar.time,
+           :open   => bar.open,
+           :high   => bar.high,
+           :low    => bar.low,
+           :close  => bar.close,
+           :volume => bar.volume,
+           :span   => 'day',
+           :ticker_id => tids[sym].id
+          }
+        end]
+      end.to_h
     end
 
     def install(tickers, opts={})
@@ -113,12 +135,10 @@ module Market
       return {} if opts[:after] == Time.parse(Date.today.to_s) - 1.day &&
                    Time.now < (Time.parse(CLOSE) + DELAY)
 
-      # provide a hash so that we can get the ID without
-      # fetching the symbol from the DB
-      tids    = tickers.map {|t| [t.symbol, t] }.to_h
-
       updates = download tickers, opts
-      updates.map {|sym, bars| [sym, bars.map {|b| b.save tids[sym], 'day' }] }.to_h
+      DB[:bars].multi_insert updates.values.flatten
+
+      updates
     end
 
     # can only do one stock at a time
@@ -130,7 +150,7 @@ module Market
       bars = series.output['Time Series (Daily)']
       bars = bars.filter {|k, bar| k > after && k < before }
 
-      insertion = bars.map do |k, bar|
+      bars.map do |k, bar|
         {:date   => Time.parse(k),
          :open   => bar['1. open'].to_f,
          :high   => bar['2. high'].to_f,
@@ -141,11 +161,11 @@ module Market
          :ticker_id => ticker.id
         }
       end
-      #DB[:bars].multi_insert insertion
     end
 
     def install_stock(stock, **kwargs)
-      DB[:bars].multi_insert stock, **kwargs
+      data = download_stock stock, **kwargs
+      DB[:bars].multi_insert data
     end
   end
 

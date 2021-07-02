@@ -2,16 +2,19 @@ module Algorithms
   class RPD < Simulator
     attr_accessor :m
     attr_accessor :b
+    attr_accessor :drop
+    attr_accessor :rise
 
     FOLDER = "rpd"
 
+    # Use 28 pieces
     def initialize(stocks:  nil,
                    after:   nil,
                    before:  nil,
-                   drop:   -0.2,
+                   drop:   -0.1,
                    rank:    60,
                    m:      -0.00,
-                   b:       0.01,
+                   b:       10.0,
                    **extra)
       super(:stocks => stocks,
             :after => after,
@@ -43,9 +46,9 @@ module Algorithms
       assessor.sell_when do |original, today|
         days_held = today.trading_days_from original
         
-        sell_point = [@m * days_held + @b, 0].max
-      
-        (today.change_from(original) / days_held) >= sell_point
+        [today.change_from(original) / (days_held + 1) > 0.4, # Initial rise
+         today.change_from(original) > 0.1, # 
+        days_held >= @b].any?
       end
     end
   end

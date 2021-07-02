@@ -79,11 +79,25 @@ class Simulator
 
     unsold.each do |h|
       h[:latest] = latests[h[:buy].ticker]
-      h[:ROI] = h[:latest].change_from h[:buy]
-      h[:hold] = h[:latest].trading_days_from h[:buy]
+      h[:ROI]    = h[:latest].change_from h[:buy]
+      h[:hold]   = h[:latest].trading_days_from h[:buy]
     end
 
     unsold.filter {|h| h[:ROI] < 0 }
+  end
+
+  def stats
+    stats = {:date        => after..before,
+             :buys        => results.size,
+             :median_hold => results.map {|h| h[:hold] || 1000 }.median,
+             :sp500       => spy(after, before),
+             :mean_ROI    => results.map {|h| h[:ROI] }.mean,
+             :median_ROI  => results.map {|h| h[:ROI] }.median,
+             :stddev_ROI  => results.map {|h| h[:ROI] }.standard_deviation
+            }
+    stats[:sharpe] = stats[:mean_ROI] / stats[:stddev_ROI]
+
+    stats
   end
 end
 

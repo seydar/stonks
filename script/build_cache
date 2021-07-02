@@ -1,18 +1,56 @@
 #!/usr/bin/env ruby
+
+###################################
+# Option parsing
+# #################################
+require 'optimist'
+
+opts = Optimist::options do
+  banner "Build a cache for a simulation
+Usage:
+  script/build_cache [options]
+"
+
+  opt :algorithm, "Which algorithm to use", :default => "VolatileDrop"
+  opt :year, "Which year to model", :type => :string
+  opt :drop, "What drop to look for in a buy signal", :default => -0.2
+  opt :rise, "What rise to look for in a buy signal", :default => 0.25
+  opt :slope, "Slope for the sell curve", :short => "-m", :type => :float
+  opt :yint, "y-intercept for the sell curve", :short => "-b", :type => :float
+end
+
+# parse the year
+# 2020
+# 2018..2020
+if opts[:year] =~ /\../
+  opts[:year] = opts[:year].split("..").map {|p| p.to_i }
+  opts[:year] = opts[:year][0]..opts[:year][1]
+else
+  opts[:year] = opts[:year].to_i
+end
+
+case opts[:year]
+when Range
+  Optimist::die "year must be >= 2000" unless opts[:year].first >= 2000
+when Integer
+  Optimist::die "year must be >= 2000" unless opts[:year] >= 2000
+end
+
+##############################
+# Build the cache
+##############################
+
 require './market.rb'
 require './script/helpers.rb'
 require 'erb'
 
 require "/home/ari/servers/auberge.rb" if File.exist? "/home/ari/servers/auberge.rb"
 
-START = "1 jan #{ARGV[0] || 2021}"
-FIN   = ARGV[0] ? "31 dec #{ARGV[0]}" : Date.today.strftime("%d %b %Y")
-KIND  = ARGV[0] || "2021"
-
 # download and save the latest information
 #
 # i acknowledge that this assumes that all tickers are updated at the same time
 # TODO ensure that dates are unique among their span
+# TODO ensure active/inactive get properly updated
 #
 # NYSE[5] is an arbitrary selection
 latest_date = NYSE[5].latest_bar.date
@@ -20,16 +58,33 @@ latest_date = NYSE[5].latest_bar.date
 puts "downloading data after #{latest_date}..."
 updates = Market::Stock.install NYSE, :after => latest_date
 spy_ups = Market::Stock.install [SPY], :after => SPY.latest_bar.date
+
 updates = (updates.values + spy_ups.values).flatten
 
 puts "\t#{updates.size} bars updated"
 
 if updates.size > 0
   Bar.build_rankings :stocks => NYSE,
-                     :start => Date.parse(latest_date.to_s),
-                     :debug => true
+                     :start  => Date.parse(latest_date.to_s),
+                     :debug  => true
 end
 
+####################
+# Run the simulator
+####################
+
+original_verbose, $VERBOSE = $VERBOSE, nil
+Algorithm = eval "Algorithms::#{opts[:algorithm]}"
+$VERBOSE = original_verbose
+
+opts[:slope] ||= Algorithm.new.m
+opts[:yint]  ||= Algorithm.new.b
+
 # now a cache file will be produced for all of our hard work
-simulate :year => KIND.to_i, :drop => -0.2, :force => true
+sim = simulate :year  => opts[:year],
+               :drop  => opts[:drop],
+               :rise  => opts[:rise],
+               :m     => opts[:slope],
+               :b     => opts[:yint],
+               :force => true
 

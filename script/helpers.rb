@@ -1,7 +1,9 @@
 require 'fileutils'
 
-NYSE = Ticker.where(:exchange => 'NYSE').all
-SPY  = Ticker[:symbol => 'SPY']
+NYSE     = Ticker.where(:exchange => 'NYSE').all
+ACTIVE   = Ticker.where(:exchange => 'NYSE', :active => true).all
+DELISTED = Ticker.where(:exchange => 'NYSE', :active => false).all
+SPY      = Ticker[:symbol => 'SPY']
 
 # https://www.purefinancialacademy.com/futures-markets
 Futures = {:energy     => ["CL=F", "QM=F", "BZ=F", "EH=F", "HO=F", "NN=F", "NG=F",
@@ -105,12 +107,13 @@ def cached(folder=Algorithm::FOLDER, **kwargs)
 end
 
 def simulate(**kwargs)
+  # is this line even necessary? FIXME
   force = kwargs.delete :force
 
   if kwargs[:year].is_a? Range
 
     res = kwargs[:year].map do |year|
-      simulate(**kwargs, :year => year).results
+      simulate(**kwargs, :year => year, :force => force).results
     end.inject :+
 
     sim = Algorithm.new **kwargs
@@ -136,7 +139,7 @@ def simulate(**kwargs)
   sim
 end
 
-def buy(year: nil, stocks: NYSE, **kwargs)
+def buy(year: nil, stocks: ACTIVE, **kwargs)
   # Allow `:year => 2018..2021`
   debut = year.is_a?(Range) ? year.first : year
   fin   = year.is_a?(Range) ? year.last  : year
@@ -149,15 +152,15 @@ def buy(year: nil, stocks: NYSE, **kwargs)
   sim
 end
 
-def profit(results, circulation: 15.0, pieces: 10, reinvest: false, debug: false)
-  timeline = results.map do |h|
-    o = [{:action => :buy, :stock => h[:buy]}]
+def profit(results, circulation: 10.0, pieces: 10, reinvest: true, debug: false)
+  timeline = results.inject([]) do |o, h|
+    o << {:action => :buy, :stock => h[:buy]}
     o << {:action   => :sell,
           :stock    => h[:sell],
           :original => h[:buy],
           :ROI      => h[:ROI]} if h[:sell]
     o
-  end.flatten(1).sort_by {|r| r[:stock].date }
+  end.sort_by {|r| [r[:stock].date, r[:action]] }
 
   skips = []
   investment = Hash.new {|h, k| h[k] = circulation.to_f / pieces }
@@ -172,15 +175,16 @@ def profit(results, circulation: 15.0, pieces: 10, reinvest: false, debug: false
       if trade[:action] == :buy
         tally << tally.last - investment[trade[:stock]]
 
-        puts "buying #{trade[:stock].ticker.symbol} (#{trade[:stock].date.strftime("%Y-%m-%d")}) for " +
+        puts "buying #{trade[:stock].ticker.symbol}\t(#{trade[:stock].date.strftime("%Y-%m-%d")}) for " +
              "#{investment[trade[:stock]]}"         if debug
 
       else # we're selling something we've successfully bought
-        puts "selling #{trade[:stock].ticker.symbol} (#{trade[:stock].date.strftime("%Y-%m-%d")}) at " +
+        puts "selling #{trade[:stock].ticker.symbol}\t(#{trade[:stock].date.strftime("%Y-%m-%d")}) at " +
              "#{(trade[:ROI] * 100).round(3)}% " +
              "($#{investment[trade[:original]].round(3)} => " +
              "$#{(investment[trade[:original]] *
-                 (1 + trade[:ROI])).round(3)})"     if debug
+                 (1 + trade[:ROI])).round(3)}) " +
+             "[#{trade[:stock].trading_days_from trade[:original]}]" if debug
 
         profit = investment[trade[:original]] * trade[:ROI]
         tally << tally.last + investment[trade[:original]] + profit
@@ -201,5 +205,12 @@ def profit(results, circulation: 15.0, pieces: 10, reinvest: false, debug: false
    :circulation => circulation,
    :cash => history[-1]
   }
+end
+
+def spy(debut, fin)
+  buy  = SPY.bars.sort_by {|b| (debut - b.date).abs }.first
+  sell = SPY.bars.sort_by {|b| (fin - b.date).abs }.first
+
+  sell.change_from buy
 end
 

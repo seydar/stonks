@@ -2,9 +2,12 @@ module Algorithms
   class VolatileDrop < Simulator
     attr_accessor :m
     attr_accessor :b
+    attr_accessor :drop
+    attr_accessor :rise
 
     FOLDER = "volatile_drop"
 
+    # use 23 pieces
     def initialize(stocks:  nil,
                    after:   nil,
                    before:  nil,

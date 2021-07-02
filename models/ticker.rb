@@ -122,26 +122,31 @@ class Ticker < Sequel::Model
       next if split.applied
 
       unnorm_size = DB[:bars].where(:ticker_id => id,
-                                    :date => Time.parse('1 jan 1900')..split.date)
+                                    :date => (split.date - 30 * 86400)..split.date)
                              .count
 
-      next unless unnorm_size >= 2
+      if unnorm_size >= 2
+        unnormal = DB[:bars].where(:ticker_id => id,
+                                   :date => (split.date - 30 * 86400)..split.date)
+                            .order(Sequel.asc(:date))
+                            .all
 
-      unnormal = DB[:bars].where(:ticker_id => id,
-                                 :date => (split.date - 30 * 86400)..split.date)
-                          .order(Sequel.asc(:date))
-                          .all
-      ratio = unnormal[-1][:open] / unnormal[-2][:close]
 
-      puts "#{symbol}: #{splits.size} splits" if debug
-      puts "\tupdating #{unnorm_size} bars before #{split.date}" if debug
+        # I should've been saving the ratio I use the whole time, but I only
+        # thought to do it after I'd already erased the original work
+        ratio = unnormal[-1][:open] / unnormal[-2][:close]
+        split.ratio = ratio
 
-      DB[:bars].where(:ticker_id => id,
-                      :date => Time.parse('1 jan 1900')..(split.date - 1.day))
-               .update(:close => Sequel[:close] * ratio,
-                       :open  => Sequel[:open]  * ratio,
-                       :high  => Sequel[:high]  * ratio,
-                       :low   => Sequel[:low]   * ratio)
+        puts "#{symbol}: #{splits.size} splits" if debug
+        puts "\tupdating #{unnorm_size} bars before #{split.date}" if debug
+
+        DB[:bars].where(:ticker_id => id,
+                        :date => Time.parse('1 jan 1900')..(split.date - 1.day))
+                 .update(:close => Sequel[:close] * ratio,
+                         :open  => Sequel[:open]  * ratio,
+                         :high  => Sequel[:high]  * ratio,
+                         :low   => Sequel[:low]   * ratio)
+      end
 
       split.applied = true
       split.save
