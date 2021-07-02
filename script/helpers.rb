@@ -83,7 +83,7 @@ def cache(fname, force: false, &blk)
     FileUtils.mkdir File.dirname(fname) unless File.exists?(File.dirname(fname))
 
     print "writing #{fname}..."
-    res = blk.call
+    res = blk.call force
     open(fname, "w") {|f| f.write Marshal.dump(res) }
     puts "!"
     res
@@ -129,7 +129,7 @@ def simulate(**kwargs)
   sim.after  = Time.parse("1 jan #{kwargs[:year]}")
   sim.before = Time.parse("31 dec #{kwargs[:year]}")
 
-  res = cache(sim.cache_name, :force => force) do
+  res = cache(sim.cache_name, :force => force) do |frc|
     sim = buy(**kwargs)
     sim.assess_sells.map {|r| dehydrate r }
   end.map {|r| hydrate r }
@@ -139,7 +139,7 @@ def simulate(**kwargs)
   sim
 end
 
-def buy(year: nil, stocks: ACTIVE, **kwargs)
+def buy(year: nil, stocks: NYSE, **kwargs)
   # Allow `:year => 2018..2021`
   debut = year.is_a?(Range) ? year.first : year
   fin   = year.is_a?(Range) ? year.last  : year

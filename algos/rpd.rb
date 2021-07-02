@@ -13,11 +13,10 @@ module Algorithms
                    before:  nil,
                    drop:   -0.1,
                    rank:    60,
-                   m:      -0.00,
                    b:       10.0,
                    **extra)
       super(:stocks => stocks,
-            :after => after,
+            :after  => after,
             :before => before)
       @drop = drop
       @m = m

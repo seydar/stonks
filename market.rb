@@ -97,7 +97,7 @@ module Market
       # into one. key collision will only happen if the key is duplicated
       # in the `ticker` argument.
       symbols = tickers.map {|t| t.symbol }
-      data = symbols.each_slice(50).map do |ticks|
+      data    = symbols.each_slice(50).map do |ticks|
         ALP_CLIENT.bars span, ticks, opts
       end.inject({}) {|h, v| h.merge v }
 
@@ -111,7 +111,7 @@ module Market
 
       # provide a hash so that we can get the ID without
       # fetching the symbol from the DB
-      tids    = tickers.map {|t| [t.symbol, t] }.to_h
+      tids = tickers.map {|t| [t.symbol, t] }.to_h
 
       # Put the data in a hash format so that it's consistent with the
       # AlphaVantage style and allows for easy use with DB#multi_insert

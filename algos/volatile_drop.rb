@@ -17,7 +17,7 @@ module Algorithms
                    b:       5.2,
                    **extra)
       super(:stocks => stocks,
-            :after => after,
+            :after  => after,
             :before => before)
       @drop = drop
       @m = m

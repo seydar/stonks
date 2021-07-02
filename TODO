@@ -16,6 +16,11 @@ o   Apply already-applied splits to data < 2008
 o   You buy at the next day's opening... but wouldn't you also be selling
     at the next day's opening as well? (currently you sell at that day's
     closing)
+o   Use Class#inherited to track available algorithms so that we don't have
+    to do this weird text-to-constant eval magic
+o   When rebuilding caches for the website, only recalculate the ones that
+    are still unsold (i.e. partial rebuild)
+    -> Watch out for hot-off-the-press buys? Will that introduce a bug?
 
 DONE
 -----------------------------------
