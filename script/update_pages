@@ -2,7 +2,7 @@
 
 # Build all of the caches
 (2008..2021).each do |year|
-  `script/build_cache #{year}`
+  `script/build_cache -y #{year}`
   puts "built #{year}"
 end
 
