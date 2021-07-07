@@ -18,9 +18,7 @@ o   You buy at the next day's opening... but wouldn't you also be selling
     closing)
 o   Use Class#inherited to track available algorithms so that we don't have
     to do this weird text-to-constant eval magic
-o   When rebuilding caches for the website, only recalculate the ones that
-    are still unsold (i.e. partial rebuild)
-    -> Watch out for hot-off-the-press buys? Will that introduce a bug?
+o   Identify delisted stocks as those with a 7-day break in trading
 
 DONE
 -----------------------------------
@@ -51,4 +49,7 @@ x   Sometimes, script/invest will end up with a negative circulation value
     -> get a repro case
     -> has trouble with stocks that are bought in the morning and sold at night
     -> `script/invest -a RPD 
+x   When rebuilding caches for the website, only recalculate the ones that
+    are still unsold (i.e. partial rebuild)
+    -> Watch out for hot-off-the-press buys? Will that introduce a bug?
 
