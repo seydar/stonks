@@ -2,6 +2,8 @@
   <tr>
     <th>Year</th>
     <th># of Buys</th>
+    <th># Unsold</th>
+    <th># Delist.</th>
     <th>Med. Hold</th>
     <th>S&P 500</th>
     <th>Mean ROI</th>
@@ -16,6 +18,8 @@
         <a href="/files/stock_recs.<%= data[:year] %>.html"><%= data[:year] %></a>
       </td>
       <td><%= data[:num] %></td>
+      <td><%= data[:num_unsold] %></td>
+      <td><%= data[:num_delisted] %></td>
       <td><%= data[:hold] == 10000 ? "(unsold)" : data[:hold] %></td>
       <td><%= (data[:sp500] * 100).round 3 %>%</td>
       <td><%= (data[:mean] * 100).round 3 %>%</td>

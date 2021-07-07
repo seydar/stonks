@@ -6,6 +6,8 @@ class Assessor
   attr_accessor :holding
   attr_accessor :results
 
+  DELISTING_DEADBAND = 7.days
+
   def buy_when(history: 2, &b)
     @buying_plan = b
     @history_requirement = history
@@ -90,16 +92,35 @@ class Assessor
       unverified_stocks, verified = @holding, []
     end
 
-    unverified = unverified_stocks.map do |stock|
+    # Stocks can be delisted, at which point stocks held will be no longer
+    # valid, but then a *new* ticker can start and can *reuse* the old name.
+    # And since any stocks held from the previous incarnation won't be valid
+    # for the new incarnation of the symbol, we need to separate those
+    # instances. We do this by looking for a stretch of 7 days (using the date,
+    # not the trading days, since trading days is calculated based on the
+    # availability of bar information for that specific stock) during which the
+    # stock is not traded (stocks can go intermittently inactive for short
+    # periods of time, but that doesn't imply delistment).
+    stocks_and_bars = unverified_stocks.map do |stock|
       bars     = Bar.where(:ticker => stock.ticker) { date >= stock.date }
                     .order(Sequel.asc(:date))
                     .all
+      periods = bars.slice_when do |before, after|
+        after.date - before.date >= DELISTING_DEADBAND
+      end
+
+      periods.map {|p| [stock, p] }
+    end.flatten 1
+
+    unverified = stocks_and_bars.map do |stock, bars|
       sell_bar = bars.find {|day| sell? stock, day }
 
       {:buy  => stock,
        :sell => sell_bar,
        :hold => sell_bar ? sell_bar.trading_days_from(stock)  : nil,
-       :ROI  => sell_bar ? sell_bar.change_from(stock) : -1 }
+       :ROI  => sell_bar ? sell_bar.change_from(stock) : -1,
+       :delisted => Time.now - bars.last.date >= DELISTING_DEADBAND
+      }
     end
 
     @results = (unverified + verified).sort_by {|h| h[:buy].date }
