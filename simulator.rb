@@ -33,11 +33,12 @@ class Simulator
 
   def assess_buys
     @assessor.assess_buys @stocks, :after  => @after,
-                                   :before => @before
+                                   :before => @before,
+                                   :force  => @force
   end
 
-  def assess_sells
-    @assessor.assess_sells
+  def assess_sells(partial: false)
+    @assessor.assess_sells :partial => partial
   end
 
   def run

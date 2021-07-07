@@ -18,7 +18,7 @@
     <div style='display: inline-block;'>
       <%= File.read "views/summary.html" %>
     </div>
-    <div style='display: inline-block; max-width: 40%; vertical-align: top; padding-left: 20px;'>
+    <div style='display: inline-block; max-width: 38%; vertical-align: top; padding-left: 20px;'>
       <br/>
       <br/>
       <p>
@@ -57,9 +57,9 @@
     </div>
     <br/>
     <center><h2><%= START.upcase %> - <%= FIN.upcase %></h2></center>
-    <p>SPY ROI for <%= START.upcase %> - <%= FIN.upcase %>: <%= uusi(perc(spy(Time.parse(START), Time.parse(FIN)))) %></p>
-    <p>mean ROI for trades shown: <%= uusi(mean_ROI) %></p>
-    <p>mean ROI if you were to also sell everything you're still holding: <%= uusi(liquidated_ROI) %></p>
+    <p>SPY ROI for <%= START.upcase %> - <%= FIN.upcase %>: <%= unsold(SPY.latest_bar, perc(spy(Time.parse(START), Time.parse(FIN)))) %></p>
+    <p>mean ROI for trades shown: <%= unsold(SPY.latest_bar, mean_ROI) %></p>
+    <p>mean ROI if you were to also sell everything you're still holding: <%= unsold(SPY.latest_bar, liquidated_ROI) %></p>
     <table>
       <tr>
         <th><b>Symbol</b></th>

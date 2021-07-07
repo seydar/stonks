@@ -153,7 +153,10 @@ class Ticker < Sequel::Model
     end
   end
 
-  def normalized?; splits.all {|s| s.applied } ; end
+  def normalized?; splits.all {|s| s.applied }; end
+
+  def active?;       active;  end
+  def delisted?; not active?; end
 
   # hook to ensure no orphans
   def before_destroy

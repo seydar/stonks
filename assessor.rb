@@ -80,8 +80,17 @@ class Assessor
     end
   end
 
-  def assess_sells
-    sales = @holding.map do |stock|
+  def assess_sells(partial: false)
+    # assumes `@holding` and `@results` are accurately mapped
+    if partial
+      verified = @results.filter {|h| h[:sell] }
+      unverified_stocks = @results.filter {|h| h[:sell].nil? }
+                                  .map    {|h| h[:buy] }
+    else
+      unverified_stocks, verified = @holding, []
+    end
+
+    unverified = unverified_stocks.map do |stock|
       bars     = Bar.where(:ticker => stock.ticker) { date >= stock.date }
                     .order(Sequel.asc(:date))
                     .all
@@ -93,12 +102,12 @@ class Assessor
        :ROI  => sell_bar ? sell_bar.change_from(stock) : -1 }
     end
 
-    @results = sales
+    @results = (unverified + verified).sort_by {|h| h[:buy].date }
   end
 
   def assess(tickers, opts={})
     assess_buys tickers, opts
-    assess_sells
+    assess_sells :partial => opts[:partial]
   end
 end
 

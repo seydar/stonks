@@ -77,7 +77,9 @@ def hydrate(hash)
 end
 
 def cache(fname, force: false, &blk)
-  if File.exists?(fname) && !force
+  # force can be false, :partial, or true
+  # treat `:partial` the same as `false`
+  if File.exists?(fname) && [false, :partial, nil].include?(force)
     return Marshal.load(File.read(fname))
   else
     FileUtils.mkdir File.dirname(fname) unless File.exists?(File.dirname(fname))
@@ -116,26 +118,27 @@ def simulate(**kwargs)
       simulate(**kwargs, :year => year, :force => force).results
     end.inject :+
 
-    sim = Algorithm.new **kwargs
-    sim.after  = Time.parse("1 jan #{kwargs[:year].first}")
-    sim.before = Time.parse("31 dec #{kwargs[:year].last}")
+    sim         = Algorithm.new **kwargs
+    sim.after   = Time.parse("1 jan #{kwargs[:year].first}")
+    sim.before  = Time.parse("31 dec #{kwargs[:year].last}")
     sim.holding = res.map {|h| h[:buy] }
     sim.results = res
 
     return sim
   end
 
-  sim = Algorithm.new **kwargs
+  sim        = Algorithm.new **kwargs
   sim.after  = Time.parse("1 jan #{kwargs[:year]}")
   sim.before = Time.parse("31 dec #{kwargs[:year]}")
 
-  res = cache(sim.cache_name, :force => force) do |frc|
+  res = cache(sim.cache_name, :force => force) do
     sim = buy(**kwargs)
     sim.assess_sells.map {|r| dehydrate r }
   end.map {|r| hydrate r }
 
   sim.holding = res.map {|h| h[:buy] }
   sim.results = res
+  sim.assess_sells :partial => true if force == :partial
   sim
 end
 
@@ -145,8 +148,8 @@ def buy(year: nil, stocks: NYSE, **kwargs)
   fin   = year.is_a?(Range) ? year.last  : year
 
   sim = Algorithm.new :stocks => stocks,
-                      :after  => "1 jan #{debut}",
-                      :before => "31 dec #{fin}",
+                      :after  => T("1 jan #{debut}"),
+                      :before => T("31 dec #{fin}"),
                       **kwargs
   sim.assess_buys
   sim

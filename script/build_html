@@ -44,7 +44,10 @@ def text_ari(buy: [], sell: [])
   end
 end
 
-def uusi(txt); "<span id='future'>#{txt}</span>"; end
+def unsold(bar, txt)
+  "<span id=#{bar.ticker.active? ? 'future' : 'delisted'}>#{txt}</span>"
+end
+
 def money(num); "$%0.3f" % num; end
 def perc(num); "%0.3f%%" % (num * 100); end
 
@@ -102,15 +105,15 @@ rows = sim.results.sort_by {|r| r[:buy].date }.reverse.map do |rec|
   symbol     = "<a href='https://finance.yahoo.com/quote/" +
                  "#{buy.ticker.symbol}'>#{buy.ticker.symbol}</a>"
   vol_avg    = buy.volumes(:prior => 5).mean.round(0)
-  buy_date   = buy.date == Date.today ? uusi(buy.date.strftime("%Y-%m-%d")) : buy.date.strftime("%Y-%m-%d")
-  buy_price  = buy.date == Date.today ? uusi(money(buy.close)) : money(buy.open)
+  buy_date   = buy.date == Date.today ? unsold(buy, buy.date.strftime("%Y-%m-%d")) : buy.date.strftime("%Y-%m-%d")
+  buy_price  = buy.date == Date.today ? unsold(buy, money(buy.close)) : money(buy.open)
   days_held  = rec[:hold] ? rec[:hold] : buy.trading_days_from(latest)
   roi_thresh = perc([sim.m * days_held + sim.b, 0].max)
-  days_held  = rec[:hold] ? days_held.to_i : uusi(days_held.to_i)
-  roi_thresh = rec[:hold] ? roi_thresh : uusi(roi_thresh)
-  sell_date  = rec[:sell] ? rec[:sell].date.strftime("%Y-%m-%d") : uusi("-")
-  sell_price = rec[:sell] ? money(rec[:sell].close) : uusi(money(latest.close))
-  sell_roi   = rec[:sell] ? perc(rec[:ROI]) : uusi(perc(latest_roi))
+  days_held  = rec[:hold] ? days_held.to_i : unsold(buy, days_held.to_i)
+  roi_thresh = rec[:hold] ? roi_thresh : unsold(buy, roi_thresh)
+  sell_date  = rec[:sell] ? rec[:sell].date.strftime("%Y-%m-%d") : unsold(buy, "-")
+  sell_price = rec[:sell] ? money(rec[:sell].close) : unsold(buy, money(latest.close))
+  sell_roi   = rec[:sell] ? perc(rec[:ROI]) : unsold(buy, perc(latest_roi))
   spy_roi    = perc(rec[:spy])
 
 

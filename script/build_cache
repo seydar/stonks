@@ -17,6 +17,7 @@ Usage:
   opt :rise, "What rise to look for in a buy signal", :default => 0.25
   opt :slope, "Slope for the sell curve", :short => "-m", :type => :float
   opt :yint, "y-intercept for the sell curve", :short => "-b", :type => :float
+  opt :partial, "Only update the stocks that are unsold"
 end
 
 # parse the year
@@ -81,11 +82,13 @@ $VERBOSE = original_verbose
 opts[:slope] ||= Algorithm.new.m
 opts[:yint]  ||= Algorithm.new.b
 
+force = opts[:partial] ? :partial : true
+
 # now a cache file will be produced for all of our hard work
 sim = simulate :year  => opts[:year],
                :drop  => opts[:drop],
                :rise  => opts[:rise],
                :m     => opts[:slope],
                :b     => opts[:yint],
-               :force => true
+               :force => force
 
