@@ -113,7 +113,7 @@ rows = sim.results.sort_by {|r| r[:buy].date }.reverse.map do |rec|
   roi_thresh = rec[:hold] ? roi_thresh : unsold(buy, roi_thresh)
   sell_date  = rec[:sell] ? rec[:sell].date.strftime("%Y-%m-%d") : unsold(buy, "-")
   sell_price = rec[:sell] ? money(rec[:sell].close) : unsold(buy, money(latest.close))
-  sell_roi   = rec[:sell] ? perc(rec[:ROI]) : unsold(buy, perc(latest_roi))
+  sell_roi   = rec[:sell] ? perc(rec[:ROI]) : unsold(buy, (rec[:delisted] ? perc(-1) : perc(latest_roi)))
   spy_roi    = perc(rec[:spy])
 
 
@@ -134,7 +134,11 @@ liquidated_ROI = sim.results.map do |r|
   if r[:sell]
     r[:ROI]
   else
-    (r[:buy].ticker.latest_bar.close / r[:buy].open) - 1
+    if r[:delisted]
+      -1
+    else
+      (r[:buy].ticker.latest_bar.close / r[:buy].open) - 1
+    end
   end
 end.mean
 liquidated_ROI = perc(liquidated_ROI)

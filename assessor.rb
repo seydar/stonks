@@ -6,7 +6,7 @@ class Assessor
   attr_accessor :holding
   attr_accessor :results
 
-  DELISTING_DEADBAND = 7.days
+  DELISTING_DEADBAND = 14.days
 
   def buy_when(history: 2, &b)
     @buying_plan = b
