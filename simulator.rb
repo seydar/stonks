@@ -88,17 +88,19 @@ class Simulator
   end
 
   def stats
-    stats = {:date        => after..before,
-             :buys        => results.size,
-             :median_hold => results.map {|h| h[:hold] || 1000 }.median,
-             :sp500       => spy(after, before),
-             :mean_ROI    => results.map {|h| h[:ROI] }.mean,
-             :median_ROI  => results.map {|h| h[:ROI] }.median,
-             :stddev_ROI  => results.map {|h| h[:ROI] }.standard_deviation
-            }
-    stats[:sharpe] = stats[:mean_ROI] / stats[:stddev_ROI]
+    statz  = {:date        => after..before,
+              :buys        => results.size,
+              :unsold      => results.filter {|h| h[:sell].nil? }.size,
+              :delisted    => results.filter {|h| h[:delisted] }.size,
+              :median_hold => results.map {|h| h[:hold] || 1000 }.median,
+              :sp500       => spy(after, before),
+              :mean_ROI    => results.map {|h| h[:ROI] }.mean,
+              :median_ROI  => results.map {|h| h[:ROI] }.median,
+              :stddev_ROI  => results.map {|h| h[:ROI] }.standard_deviation
+             }
+    statz[:sharpe] = statz[:mean_ROI] / statz[:stddev_ROI]
 
-    stats
+    statz
   end
 end
 

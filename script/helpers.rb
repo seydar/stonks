@@ -217,3 +217,23 @@ def spy(debut, fin)
   sell.change_from buy
 end
 
+# TODO remove the duplication between here and `Simulator#stats`
+def stats(results)
+  dates  = results.map {|h| h[:buy].date }.sort
+  after  = dates.first
+  before = dates.last
+  statz  = {:date        => after..before,
+            :buys        => results.size,
+            :unsold      => results.filter {|h| h[:sell].nil? }.size,
+            :delisted    => results.filter {|h| h[:delisted] }.size,
+            :median_hold => results.map {|h| h[:hold] || 1000 }.median,
+            :sp500       => spy(after, before),
+            :mean_ROI    => results.map {|h| h[:ROI] }.mean,
+            :median_ROI  => results.map {|h| h[:ROI] }.median,
+            :stddev_ROI  => results.map {|h| h[:ROI] }.standard_deviation
+           }
+  statz[:sharpe] = statz[:mean_ROI] / statz[:stddev_ROI]
+
+  statz
+end
+

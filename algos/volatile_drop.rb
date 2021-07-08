@@ -3,7 +3,7 @@ module Algorithms
     attr_accessor :m
     attr_accessor :b
     attr_accessor :drop
-    attr_accessor :rise
+    attr_accessor :rise # TODO get this out of here
 
     FOLDER = "volatile_drop"
 
@@ -15,6 +15,7 @@ module Algorithms
                    rank:    60,
                    m:      -0.02,
                    b:       5.2,
+                   min:     0.4,
                    **extra)
       super(:stocks => stocks,
             :after  => after,
@@ -30,7 +31,8 @@ module Algorithms
         [[today.change_from(yesterday) <= drop,
           today.change_from(today)     <= drop].any?,
   
-         today.rank <= rank
+         today.rank <= rank,
+         today.close >= min
         ].all?
       end
       

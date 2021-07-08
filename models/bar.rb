@@ -1,22 +1,36 @@
 class Bar < Sequel::Model
   many_to_one :ticker
 
-  def next
-    bars = Bar.where(:date => date..(date + 10.days), :ticker => ticker)
+  def next(num=1)
+    bars = Bar.where(:date   => date..(date + (10 + num * 1.4).days.ceil),
+                     :ticker => ticker)
               .order(Sequel.asc(:date))
+              .limit(num + 1)
               .all
-    bars[1] # `bars[0]` is `self`
+    num == 1 ? bars[1] : bars[1..num] # `bars[0]` is `self`
   end
 
-  def prev
-    bars = Bar.where(:date => (date - 10.days)..date, :ticker => ticker)
+  def prev(num=1)
+    bars = Bar.where(:date   => (date - (10 + num * 1.4).days.ceil)..date,
+                     :ticker => ticker)
               .order(Sequel.asc(:date))
+              .limit(num + 1)
               .all
-    bars[-2] # `bars[-1]` is `self`
+    num == 1 ? bars[-2] : bars[-(num + 1)..-2] # `bars[-1]` is `self`
   end
 
   def inspect
     "#<Bar id => #{id}, sym => #{ticker.symbol}, date => #{date.strftime "%Y-%m-%d"}, o => #{open}, c => #{close}, v => #{volume}, r => #{rank}>"
+  end
+
+  # NYSE delists you if you close at < $1.00 for 30 consecutive days
+  # NASDAQ is $1.47
+  def days_under_trading_min(min=1.0)
+    history = prev 30
+    history.slice_when {|b, a| b.close >= min || a.close >= min }
+           .filter {|bs| bs.all? {|b| b.close < min } }
+           .last
+           .size
   end
 
   # GREAT trick here: the goal is to figure out how many records
@@ -62,10 +76,7 @@ class Bar < Sequel::Model
   end
 
   def changes_over(days)
-    bars  = Bar.where(:ticker => ticker,
-                      :date => date..(date + (days.days * 1.4).ceil))
-               .order(Sequel.asc(:date))
-               .all
+    bars  = self.next days
     index = bars.index self
     range = bars[index..(index + days)]
     range.map {|b| [b, b.change_from(self)] }
