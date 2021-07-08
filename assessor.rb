@@ -101,7 +101,7 @@ class Assessor
     # availability of bar information for that specific stock) during which the
     # stock is not traded (stocks can go intermittently inactive for short
     # periods of time, but that doesn't imply delistment).
-    stocks_and_bars = unverified_stocks.map do |stock|
+    unverified = unverified_stocks.map do |stock|
       bars     = Bar.where(:ticker => stock.ticker) { date >= stock.date }
                     .order(Sequel.asc(:date))
                     .all
@@ -109,17 +109,21 @@ class Assessor
         after.date - before.date >= DELISTING_DEADBAND
       end
 
-      periods.map {|p| [stock, p] }
-    end.flatten 1
+      # this is the only period that starts from the holding bar
+      range = periods.first
 
-    unverified = stocks_and_bars.map do |stock, bars|
-      sell_bar = bars.find {|day| sell? stock, day }
+      sell_bar = range.find {|day| sell? stock, day }
+      delisted = if sell_bar
+                   false
+                 else 
+                   Time.now - range.last.date >= DELISTING_DEADBAND
+                 end
 
       {:buy  => stock,
        :sell => sell_bar,
        :hold => sell_bar ? sell_bar.trading_days_from(stock)  : nil,
        :ROI  => sell_bar ? sell_bar.change_from(stock) : -1,
-       :delisted => Time.now - bars.last.date >= DELISTING_DEADBAND
+       :delisted => delisted
       }
     end
 
