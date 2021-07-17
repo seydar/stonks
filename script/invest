@@ -84,7 +84,7 @@ comparison = schemes.map do |scheme|
   puts "\tmed. hold:   #{sells.map {|h| h[:hold] || 1000 }.median}"
   puts "\tmed. ROI:    #{sells.map {|h| h[:ROI] }.median}"
   puts "\tavg. ROI:    #{sells.map {|h| h[:ROI] }.mean}"
-  puts "\tROI / hold:  #{sells.map {|h| h[:ROI] }.mean / sells.map {|h| h[:hold] || 1000 }.median}"
+  puts "\t~ ROI/day:   #{sells.map {|h| h[:ROI] }.mean ** (1.0 / sells.map {|h| h[:hold] || 1000 }.median)}"
 
   prof = profit sells, :circulation => opts[:cash],
                        :pieces      => opts[:pieces],

@@ -36,6 +36,8 @@ this document, which have lent themselves to the below results:
   <tr>
     <th>Year</th>
     <th># of Buys</th>
+    <th># Unsold</th>
+    <th># Delist.</th>
     <th>Med. Hold</th>
     <th>S&P 500</th>
     <th>Mean ROI</th>
@@ -49,13 +51,15 @@ this document, which have lent themselves to the below results:
       <td>
         <a href="/files/stock_recs.2021.html">2021</a>
       </td>
-      <td>69</td>
+      <td>79</td>
+      <td>70</td>
+      <td>4</td>
       <td>(unsold)</td>
-      <td>10.276%</td>
-      <td>-90.873%</td>
+      <td>15.915%</td>
+      <td>-27.36%</td>
       <td>-100%</td>
-      <td>75.817%</td>
-      <td>-1.199</td>
+      <td>207.173%</td>
+      <td>-0.132</td>
     </tr>
   
     
@@ -63,13 +67,15 @@ this document, which have lent themselves to the below results:
       <td>
         <a href="/files/stock_recs.2020.html">2020</a>
       </td>
-      <td>348</td>
-      <td>197</td>
-      <td>15.086%</td>
-      <td>123.274%</td>
-      <td>136.923%</td>
-      <td>174.492%</td>
-      <td>0.706</td>
+      <td>326</td>
+      <td>67</td>
+      <td>14</td>
+      <td>202</td>
+      <td>15.559%</td>
+      <td>122.281%</td>
+      <td>124.107%</td>
+      <td>161.202%</td>
+      <td>0.759</td>
     </tr>
   
     
@@ -77,13 +83,15 @@ this document, which have lent themselves to the below results:
       <td>
         <a href="/files/stock_recs.2019.html">2019</a>
       </td>
-      <td>53</td>
-      <td>247</td>
-      <td>28.785%</td>
-      <td>79.495%</td>
-      <td>33.156%</td>
-      <td>169.753%</td>
-      <td>0.468</td>
+      <td>56</td>
+      <td>13</td>
+      <td>9</td>
+      <td>258</td>
+      <td>28.971%</td>
+      <td>32.208%</td>
+      <td>25.774%</td>
+      <td>114.065%</td>
+      <td>0.282</td>
     </tr>
   
     
@@ -91,13 +99,15 @@ this document, which have lent themselves to the below results:
       <td>
         <a href="/files/stock_recs.2018.html">2018</a>
       </td>
-      <td>30</td>
-      <td>350</td>
-      <td>-7.013%</td>
-      <td>20.217%</td>
-      <td>7.446%</td>
-      <td>95.144%</td>
-      <td>0.212</td>
+      <td>36</td>
+      <td>16</td>
+      <td>11</td>
+      <td>619</td>
+      <td>-6.691%</td>
+      <td>-14.905%</td>
+      <td>1.356%</td>
+      <td>98.101%</td>
+      <td>-0.152</td>
     </tr>
   
     
@@ -105,13 +115,15 @@ this document, which have lent themselves to the below results:
       <td>
         <a href="/files/stock_recs.2017.html">2017</a>
       </td>
-      <td>32</td>
-      <td>304</td>
-      <td>19.326%</td>
-      <td>207.064%</td>
-      <td>6.502%</td>
-      <td>618.783%</td>
-      <td>0.335</td>
+      <td>35</td>
+      <td>10</td>
+      <td>6</td>
+      <td>336</td>
+      <td>19.597%</td>
+      <td>-3.951%</td>
+      <td>3.633%</td>
+      <td>72.637%</td>
+      <td>-0.054</td>
     </tr>
   
     
@@ -119,13 +131,15 @@ this document, which have lent themselves to the below results:
       <td>
         <a href="/files/stock_recs.2016.html">2016</a>
       </td>
-      <td>50</td>
-      <td>211</td>
-      <td>9.643%</td>
-      <td>167.163%</td>
-      <td>121.088%</td>
-      <td>255.225%</td>
-      <td>0.655</td>
+      <td>44</td>
+      <td>5</td>
+      <td>4</td>
+      <td>226</td>
+      <td>8.97%</td>
+      <td>97.373%</td>
+      <td>100.718%</td>
+      <td>120.839%</td>
+      <td>0.806</td>
     </tr>
   
     
@@ -134,12 +148,14 @@ this document, which have lent themselves to the below results:
         <a href="/files/stock_recs.2015.html">2015</a>
       </td>
       <td>40</td>
-      <td>225</td>
-      <td>-0.759%</td>
-      <td>216.515%</td>
-      <td>80.867%</td>
-      <td>272.092%</td>
-      <td>0.796</td>
+      <td>3</td>
+      <td>3</td>
+      <td>257</td>
+      <td>-1.981%</td>
+      <td>131.033%</td>
+      <td>28.801%</td>
+      <td>184.098%</td>
+      <td>0.712</td>
     </tr>
   
     
@@ -147,13 +163,15 @@ this document, which have lent themselves to the below results:
       <td>
         <a href="/files/stock_recs.2014.html">2014</a>
       </td>
-      <td>24</td>
-      <td>260</td>
-      <td>12.366%</td>
-      <td>47.703%</td>
-      <td>18.585%</td>
-      <td>88.281%</td>
-      <td>0.54</td>
+      <td>26</td>
+      <td>4</td>
+      <td>2</td>
+      <td>290</td>
+      <td>11.664%</td>
+      <td>28.326%</td>
+      <td>5.528%</td>
+      <td>86.716%</td>
+      <td>0.327</td>
     </tr>
   
     
@@ -161,13 +179,15 @@ this document, which have lent themselves to the below results:
       <td>
         <a href="/files/stock_recs.2013.html">2013</a>
       </td>
-      <td>9</td>
-      <td>279</td>
-      <td>29.689%</td>
-      <td>41.125%</td>
-      <td>11.765%</td>
-      <td>62.839%</td>
-      <td>0.654</td>
+      <td>14</td>
+      <td>6</td>
+      <td>6</td>
+      <td>1844</td>
+      <td>27.276%</td>
+      <td>-16.44%</td>
+      <td>7.294%</td>
+      <td>89.023%</td>
+      <td>-0.185</td>
     </tr>
   
     
@@ -175,13 +195,15 @@ this document, which have lent themselves to the below results:
       <td>
         <a href="/files/stock_recs.2012.html">2012</a>
       </td>
-      <td>23</td>
-      <td>223</td>
-      <td>11.694%</td>
-      <td>94.904%</td>
-      <td>74.043%</td>
-      <td>81.324%</td>
-      <td>1.167</td>
+      <td>29</td>
+      <td>6</td>
+      <td>6</td>
+      <td>232</td>
+      <td>11.467%</td>
+      <td>55.28%</td>
+      <td>56.028%</td>
+      <td>107.682%</td>
+      <td>0.513</td>
     </tr>
   
     
@@ -189,13 +211,15 @@ this document, which have lent themselves to the below results:
       <td>
         <a href="/files/stock_recs.2011.html">2011</a>
       </td>
-      <td>18</td>
+      <td>22</td>
+      <td>1</td>
+      <td>0</td>
       <td>260</td>
-      <td>-0.199%</td>
-      <td>26.39%</td>
+      <td>-0.024%</td>
+      <td>31.464%</td>
       <td>15.335%</td>
-      <td>52.428%</td>
-      <td>0.503</td>
+      <td>53.519%</td>
+      <td>0.588</td>
     </tr>
   
     
@@ -203,13 +227,15 @@ this document, which have lent themselves to the below results:
       <td>
         <a href="/files/stock_recs.2010.html">2010</a>
       </td>
-      <td>9</td>
-      <td>241</td>
-      <td>12.841%</td>
-      <td>116.993%</td>
-      <td>44.486%</td>
-      <td>122.933%</td>
-      <td>0.952</td>
+      <td>7</td>
+      <td>0</td>
+      <td>0</td>
+      <td>206</td>
+      <td>11.51%</td>
+      <td>139.685%</td>
+      <td>109.463%</td>
+      <td>132.083%</td>
+      <td>1.058</td>
     </tr>
   
     
@@ -217,13 +243,15 @@ this document, which have lent themselves to the below results:
       <td>
         <a href="/files/stock_recs.2009.html">2009</a>
       </td>
-      <td>245</td>
-      <td>140</td>
-      <td>19.88%</td>
-      <td>268.279%</td>
-      <td>261.333%</td>
-      <td>263.722%</td>
-      <td>1.017</td>
+      <td>214</td>
+      <td>0</td>
+      <td>0</td>
+      <td>149</td>
+      <td>23.22%</td>
+      <td>234.412%</td>
+      <td>237.174%</td>
+      <td>205.212%</td>
+      <td>1.142</td>
     </tr>
   
     
@@ -231,16 +259,147 @@ this document, which have lent themselves to the below results:
       <td>
         <a href="/files/stock_recs.2008.html">2008</a>
       </td>
-      <td>351</td>
+      <td>357</td>
+      <td>2</td>
+      <td>0</td>
+      <td>220</td>
+      <td>-38.654%</td>
+      <td>133.277%</td>
+      <td>91.781%</td>
+      <td>209.189%</td>
+      <td>0.637</td>
+    </tr>
+  
+    
+    <tr>
+      <td>
+        <a href="/files/stock_recs.2007.html">2007</a>
+      </td>
+      <td>17</td>
+      <td>1</td>
+      <td>0</td>
+      <td>258</td>
+      <td>2.784%</td>
+      <td>192.784%</td>
+      <td>46.341%</td>
+      <td>381.169%</td>
+      <td>0.506</td>
+    </tr>
+  
+    
+    <tr>
+      <td>
+        <a href="/files/stock_recs.2006.html">2006</a>
+      </td>
+      <td>16</td>
+      <td>0</td>
+      <td>0</td>
+      <td>254</td>
+      <td>13.124%</td>
+      <td>74.015%</td>
+      <td>47.312%</td>
+      <td>106.038%</td>
+      <td>0.698</td>
+    </tr>
+  
+    
+    <tr>
+      <td>
+        <a href="/files/stock_recs.2005.html">2005</a>
+      </td>
+      <td>29</td>
+      <td>0</td>
+      <td>0</td>
+      <td>240</td>
+      <td>2.646%</td>
+      <td>75.355%</td>
+      <td>40.273%</td>
+      <td>89.455%</td>
+      <td>0.842</td>
+    </tr>
+  
+    
+    <tr>
+      <td>
+        <a href="/files/stock_recs.2004.html">2004</a>
+      </td>
+      <td>20</td>
+      <td>0</td>
+      <td>0</td>
+      <td>256</td>
+      <td>8.171%</td>
+      <td>14.892%</td>
+      <td>12.134%</td>
+      <td>16.374%</td>
+      <td>0.91</td>
+    </tr>
+  
+    
+    <tr>
+      <td>
+        <a href="/files/stock_recs.2003.html">2003</a>
+      </td>
+      <td>23</td>
+      <td>0</td>
+      <td>0</td>
+      <td>236</td>
+      <td>26.469%</td>
+      <td>107.953%</td>
+      <td>49.474%</td>
+      <td>146.926%</td>
+      <td>0.735</td>
+    </tr>
+  
+    
+    <tr>
+      <td>
+        <a href="/files/stock_recs.2002.html">2002</a>
+      </td>
+      <td>135</td>
+      <td>0</td>
+      <td>0</td>
       <td>217</td>
-      <td>-37.735%</td>
-      <td>153.032%</td>
-      <td>101.984%</td>
-      <td>311.537%</td>
-      <td>0.491</td>
+      <td>-24.038%</td>
+      <td>132.68%</td>
+      <td>90.857%</td>
+      <td>122.741%</td>
+      <td>1.081</td>
+    </tr>
+  
+    
+    <tr>
+      <td>
+        <a href="/files/stock_recs.2001.html">2001</a>
+      </td>
+      <td>76</td>
+      <td>0</td>
+      <td>0</td>
+      <td>253</td>
+      <td>-13.409%</td>
+      <td>74.066%</td>
+      <td>27.273%</td>
+      <td>117.229%</td>
+      <td>0.632</td>
+    </tr>
+  
+    
+    <tr>
+      <td>
+        <a href="/files/stock_recs.2000.html">2000</a>
+      </td>
+      <td>139</td>
+      <td>11</td>
+      <td>0</td>
+      <td>261</td>
+      <td>-12.279%</td>
+      <td>45.065%</td>
+      <td>15.899%</td>
+      <td>85.698%</td>
+      <td>0.526</td>
     </tr>
   
 </table>
+
 </center>
 
 @s When Do We Buy?
@@ -349,17 +508,22 @@ could also lead to a sever price drop. But since we're looking at stocks after
 they have already dropped considerably, we're relying on **mean reversion** to
 push the price up.
 
---- When Do We Buy?
-    @assessor.buy_when :history => 2 do |history|
-      today     = history[-1]
-      yesterday = history[-2]
-    
-      [[today.change_from(yesterday) <= drop,
-        today.change_from(today)     <= drop].any?,
+`today.close >= min` sets a minimum price that we're willing to pay; this
+(generally, historically) prevents us from investing in stocks that are about
+to be delisted (sometimes, not always). It's better to have this than to not.
 
-       today.rank <= rank
-      ].all?
-    end
+--- When Do We Buy?
+      assessor.buy_when :history => 2 do |history|
+        today     = history[-1]
+        yesterday = history[-2]
+      
+        [[today.change_from(yesterday) <= drop,
+          today.change_from(today)     <= drop].any?,
+  
+         today.rank <= rank,
+         today.close >= min
+        ].all?
+      end
 ---
 
 `today.rank` here is the rank of that ticker at the end of that day. It is
@@ -461,14 +625,14 @@ I've found that with a 20% drop, the defaults of $m = -0.02$ and $b = 5.2$ are
 suitable for getting reasonable returns.
 
 --- When Do We Sell?
-    # m = -0.02, b = 5.2
-    @assessor.sell_when do |original, today|
-      days_held = today.trading_days_from original
+      # m = -0.02, b = 5.2
+      assessor.sell_when do |original, today|
+        days_held = today.trading_days_from original
+        
+        sell_point = [@m * days_held + @b, 0].max
       
-      sell_point = [@m * days_held + @b, 0].max
-    
-      today.change_from(original) >= sell_point
-    end
+        today.change_from(original) >= sell_point
+      end
 ---
 
 @s Metrics of Success
@@ -501,256 +665,238 @@ requisite drop being 20% instead (note that some sell signals will occur beyond 
 </span>
 <div id="togglable" style="display: none;">
 <pre>
-loaded 40 transactions
-stats: {:m=>-0.02, :b=>5.2}
-	med. hold:   225 days
-	med. ROI:    0.8086680761099364
-	avg. ROI:    2.165151496553147
-	ROI / hold:  0.009622895540236208
-buying KBH for 0.5
-	cash: 14.5
-	circulation: 15.0
-buying NETI for 0.5
-	cash: 14.0
-	circulation: 15.0
-buying FRO for 0.5
-	cash: 13.5
-	circulation: 15.0
-buying AMPY for 0.5
-	cash: 13.0
-	circulation: 15.0
-buying AMPY for 0.5
-	cash: 12.5
-	circulation: 15.0
-buying AMPY for 0.5
-	cash: 12.0
-	circulation: 15.0
-buying MTL for 0.5
-	cash: 11.5
-	circulation: 15.0
-buying AMPY for 0.5
-	cash: 11.0
-	circulation: 15.0
-buying MTL for 0.5
-	cash: 10.5
-	circulation: 15.0
-buying BBD for 0.5
-	cash: 10.0
-	circulation: 15.0
-buying EGY for 0.5
-	cash: 9.5
-	circulation: 15.0
-buying TWTR for 0.5
-	cash: 9.0
-	circulation: 15.0
-buying NETI for 0.5
-	cash: 8.5
-	circulation: 15.0
-buying BTU for 0.5
-	cash: 8.0
-	circulation: 15.0
-buying MBI for 0.5
-	cash: 7.5
-	circulation: 15.0
-buying FBP for 0.5
-	cash: 7.0
-	circulation: 15.0
-buying AMPY for 0.5
-	cash: 6.5
-	circulation: 15.0
-buying BTU for 0.5
-	cash: 6.0
-	circulation: 15.0
-buying AMPY for 0.5
-	cash: 5.5
-	circulation: 15.0
-buying AMPY for 0.5
-	cash: 5.0
-	circulation: 15.0
-buying AMPY for 0.5
-	cash: 4.5
-	circulation: 15.0
-buying CRK for 0.5
-	cash: 4.0
-	circulation: 15.0
-selling AMPY at 337.647% (\$0.5 => \$2.188)
-	cash: 6.188
-	circulation: 16.688
-selling AMPY at 588.889% (\$0.5 => \$3.444)
-	cash: 9.633
-	circulation: 19.633
-selling AMPY at 490.476% (\$0.5 => \$2.952)
-	cash: 12.585
-	circulation: 22.085
-selling AMPY at 365.0% (\$0.5 => \$2.325)
-	cash: 14.91
-	circulation: 23.91
-selling AMPY at 348.193% (\$0.5 => \$2.241)
-	cash: 17.151
-	circulation: 25.651
-buying RYAM for 0.8550341515454909
-	cash: 16.296
-	circulation: 25.651
-selling AMPY at 280.909% (\$0.5 => \$1.905)
-	cash: 18.201
-	circulation: 27.056
-selling AMPY at 510.843% (\$0.5 => \$3.054)
-	cash: 21.255
-	circulation: 29.61
-buying BTU for 0.9869928956126688
-	cash: 20.268
-	circulation: 29.61
-buying HMY for 0.9869928956126688
-	cash: 19.281
-	circulation: 29.61
-buying HMY for 0.9869928956126688
-	cash: 18.294
-	circulation: 29.61
-buying SID for 0.9869928956126688
-	cash: 17.307
-	circulation: 29.61
-buying HUN for 0.9869928956126688
-	cash: 16.32
-	circulation: 29.61
-buying HUN for 0.9869928956126688
-	cash: 15.333
-	circulation: 29.61
-buying CNX for 0.9869928956126688
-	cash: 14.346
-	circulation: 29.61
-buying IO for 0.9869928956126688
-	cash: 13.359
-	circulation: 29.61
-buying FTK for 0.9869928956126688
-	cash: 12.372
-	circulation: 29.61
-buying FTK for 0.9869928956126688
-	cash: 11.385
-	circulation: 29.61
-buying VIPS for 0.9869928956126688
-	cash: 10.398
-	circulation: 29.61
-buying NETI for 0.9869928956126688
-	cash: 9.411
-	circulation: 29.61
-buying NETI for 0.9869928956126688
-	cash: 8.424
-	circulation: 29.61
-buying CNX for 0.9869928956126688
-	cash: 7.437
-	circulation: 29.61
-buying CLF for 0.9869928956126688
-	cash: 6.45
-	circulation: 29.61
-buying TK for 0.9869928956126688
-	cash: 5.463
-	circulation: 29.61
-buying TK for 0.9869928956126688
-	cash: 4.476
-	circulation: 29.61
-selling NETI at 538.065% (\$0.5 => \$3.19)
-	cash: 7.666
-	circulation: 32.3
-selling NETI at 1023.864% (\$0.987 => \$11.092)
-	cash: 18.759
-	circulation: 42.406
-selling NETI at 643.609% (\$0.5 => \$3.718)
-	cash: 22.477
-	circulation: 45.624
-selling NETI at 1028.867% (\$0.987 => \$11.142)
-	cash: 33.619
-	circulation: 55.778
-selling HMY at 334.971% (\$0.987 => \$4.293)
-	cash: 37.912
-	circulation: 59.085
-selling HMY at 326.285% (\$0.987 => \$4.207)
-	cash: 42.119
-	circulation: 62.305
-selling KBH at 1.105% (\$0.5 => \$0.506)
-	cash: 42.625
-	circulation: 62.311
-selling SID at 291.579% (\$0.987 => \$3.865)
-	cash: 46.489
-	circulation: 65.188
-selling BBD at 0.899% (\$0.5 => \$0.504)
-	cash: 46.994
-	circulation: 65.193
-selling RYAM at 103.846% (\$0.855 => \$1.743)
-	cash: 48.737
-	circulation: 66.081
-selling CLF at 254.375% (\$0.987 => \$3.498)
-	cash: 52.235
-	circulation: 68.591
-selling MBI at 8.254% (\$0.5 => \$0.541)
-	cash: 52.776
-	circulation: 68.633
-selling CNX at 158.451% (\$0.987 => \$2.551)
-	cash: 55.327
-	circulation: 70.197
-selling CNX at 201.415% (\$0.987 => \$2.975)
-	cash: 58.302
-	circulation: 72.185
-selling HUN at 80.867% (\$0.987 => \$1.785)
-	cash: 60.087
-	circulation: 72.983
-selling CRK at 28.801% (\$0.5 => \$0.644)
-	cash: 60.731
-	circulation: 73.127
-selling HUN at 70.16% (\$0.987 => \$1.679)
-	cash: 62.41
-	circulation: 73.819
-selling FBP at 1.633% (\$0.5 => \$0.508)
-	cash: 62.918
-	circulation: 73.827
-selling MTL at 5.642% (\$0.5 => \$0.528)
-	cash: 63.447
-	circulation: 73.856
-selling MTL at 6.634% (\$0.5 => \$0.533)
-	cash: 63.98
-	circulation: 73.889
-selling FTK at 74.076% (\$0.987 => \$1.718)
-	cash: 65.698
-	circulation: 74.62
-selling FTK at 72.313% (\$0.987 => \$1.701)
-	cash: 67.399
-	circulation: 75.334
-selling AMPY at 432.941% (\$0.5 => \$2.665)
-	cash: 70.063
-	circulation: 77.498
-selling IO at 22.119% (\$0.987 => \$1.205)
-	cash: 71.269
-	circulation: 77.717
-selling TK at 8.466% (\$0.987 => \$1.071)
-	cash: 72.339
-	circulation: 77.8
-selling TK at 0.0% (\$0.987 => \$0.987)
-	cash: 73.326
-	circulation: 77.8
-selling VIPS at 0.073% (\$0.987 => \$0.988)
-	cash: 74.314
-	circulation: 77.801
-selling BTU at 0.963% (\$0.5 => \$0.505)
-	cash: 74.819
-	circulation: 77.806
-selling BTU at 12.168% (\$0.987 => \$1.107)
-	cash: 75.926
-	circulation: 77.926
-selling BTU at 0.662% (\$0.5 => \$0.503)
-	cash: 76.429
-	circulation: 77.929
-selling TWTR at 1.324% (\$0.5 => \$0.507)
-	cash: 76.936
-	circulation: 77.936
-selling EGY at 1.224% (\$0.5 => \$0.506)
-	cash: 77.442
-	circulation: 77.942
-selling FRO at 2.999% (\$0.5 => \$0.515)
-	cash: 77.957
-	circulation: 77.957
-	skips:       0
+algorithm: VolatileDrop
+loaded 40 trxs
+	year: 2015
+	drop: -0.2
+stats: {:m=>-0.02, :b=>5.2} (reinvest: true, pieces: 23.0)
+	med. hold:   257
+	med. ROI:    0.2880070429723386
+	avg. ROI:    1.3103290007605894
+	~ ROI/day:   1.0010522195424327
+buying AKS	(2015-01-14) for 0.43478260869565216
+	cash: 9.565
+	circulation: 10.0
+buying KBH	(2015-01-15) for 0.43478260869565216
+	cash: 9.13
+	circulation: 10.0
+buying FRO	(2015-01-30) for 0.43478260869565216
+	cash: 8.696
+	circulation: 10.0
+buying AMPY	(2015-02-12) for 0.43478260869565216
+	cash: 8.261
+	circulation: 10.0
+buying AMPY	(2015-03-11) for 0.43478260869565216
+	cash: 7.826
+	circulation: 10.0
+buying AMPY	(2015-03-12) for 0.43478260869565216
+	cash: 7.391
+	circulation: 10.0
+buying MTL	(2015-03-17) for 0.43478260869565216
+	cash: 6.957
+	circulation: 10.0
+buying AMPY	(2015-03-17) for 0.43478260869565216
+	cash: 6.522
+	circulation: 10.0
+buying MTL	(2015-03-18) for 0.43478260869565216
+	cash: 6.087
+	circulation: 10.0
+buying BBD	(2015-03-30) for 0.43478260869565216
+	cash: 5.652
+	circulation: 10.0
+buying EGY	(2015-04-01) for 0.43478260869565216
+	cash: 5.217
+	circulation: 10.0
+buying TWTR	(2015-04-30) for 0.43478260869565216
+	cash: 4.783
+	circulation: 10.0
+buying BTU	(2015-06-15) for 0.43478260869565216
+	cash: 4.348
+	circulation: 10.0
+buying MBI	(2015-06-30) for 0.43478260869565216
+	cash: 3.913
+	circulation: 10.0
+buying FBP	(2015-07-01) for 0.43478260869565216
+	cash: 3.478
+	circulation: 10.0
+buying BTU	(2015-07-02) for 0.43478260869565216
+	cash: 3.043
+	circulation: 10.0
+buying AMPY	(2015-07-02) for 0.43478260869565216
+	cash: 2.609
+	circulation: 10.0
+buying LKM	(2015-07-08) for 0.43478260869565216
+	cash: 2.174
+	circulation: 10.0
+buying LKM	(2015-07-09) for 0.43478260869565216
+	cash: 1.739
+	circulation: 10.0
+buying AMPY	(2015-07-17) for 0.43478260869565216
+	cash: 1.304
+	circulation: 10.0
+buying AMPY	(2015-07-20) for 0.43478260869565216
+	cash: 0.87
+	circulation: 10.0
+buying AMPY	(2015-08-04) for 0.43478260869565216
+	cash: 0.435
+	circulation: 10.0
+selling AMPY	(2015-08-10) at 588.889% (\$0.435 => \$2.995) [15]
+	cash: 3.43
+	circulation: 12.56
+selling AMPY	(2015-08-10) at 365.0% (\$0.435 => \$2.022) [101]
+	cash: 5.452
+	circulation: 14.147
+selling AMPY	(2015-08-10) at 348.193% (\$0.435 => \$1.949) [104]
+	cash: 7.4
+	circulation: 15.661
+selling AMPY	(2015-08-10) at 337.647% (\$0.435 => \$1.903) [105]
+	cash: 9.303
+	circulation: 17.129
+selling AMPY	(2015-08-10) at 490.476% (\$0.435 => \$2.567) [16]
+	cash: 11.87
+	circulation: 19.262
+selling AMPY	(2015-08-28) at 280.909% (\$0.435 => \$1.656) [137]
+	cash: 13.527
+	circulation: 20.483
+selling AMPY	(2015-08-31) at 510.843% (\$0.435 => \$2.656) [41]
+	cash: 16.182
+	circulation: 22.704
+buying BTU	(2015-09-11) for 0.9871374997497189
+	cash: 15.195
+	circulation: 22.704
+buying HMY	(2015-09-22) for 0.9871374997497189
+	cash: 14.208
+	circulation: 22.704
+buying HMY	(2015-09-23) for 0.9871374997497189
+	cash: 13.221
+	circulation: 22.704
+buying SID	(2015-09-24) for 0.9871374997497189
+	cash: 12.234
+	circulation: 22.704
+buying HUN	(2015-09-30) for 0.9871374997497189
+	cash: 11.247
+	circulation: 22.704
+buying P	(2015-10-26) for 0.9871374997497189
+	cash: 10.26
+	circulation: 22.704
+buying CNX	(2015-10-28) for 0.9871374997497189
+	cash: 9.272
+	circulation: 22.704
+buying IO	(2015-11-05) for 0.9871374997497189
+	cash: 8.285
+	circulation: 22.704
+buying FTK	(2015-11-11) for 0.9871374997497189
+	cash: 7.298
+	circulation: 22.704
+buying FTK	(2015-11-12) for 0.9871374997497189
+	cash: 6.311
+	circulation: 22.704
+buying VIPS	(2015-11-16) for 0.9871374997497189
+	cash: 5.324
+	circulation: 22.704
+buying ATV	(2015-12-04) for 0.9871374997497189
+	cash: 4.337
+	circulation: 22.704
+buying CNX	(2015-12-08) for 0.9871374997497189
+	cash: 3.35
+	circulation: 22.704
+buying ATV	(2015-12-08) for 0.9871374997497189
+	cash: 2.362
+	circulation: 22.704
+buying CLF	(2015-12-16) for 0.9871374997497189
+	cash: 1.375
+	circulation: 22.704
+buying TK	(2015-12-18) for 0.9871374997497189
+	cash: 0.388
+	circulation: 22.704
+selling HMY	(2016-02-24) at 326.285% (\$0.987 => \$4.208) [106]
+	cash: 4.596
+	circulation: 25.925
+selling HMY	(2016-02-24) at 334.971% (\$0.987 => \$4.294) [105]
+	cash: 8.89
+	circulation: 29.232
+selling AKS	(2016-03-07) at 0.498% (\$0.435 => \$0.437) [287]
+	cash: 9.327
+	circulation: 29.234
+selling KBH	(2016-03-18) at 1.105% (\$0.435 => \$0.44) [295]
+	cash: 9.767
+	circulation: 29.239
+selling SID	(2016-04-13) at 291.579% (\$0.987 => \$3.865) [138]
+	cash: 13.632
+	circulation: 32.117
+selling BBD	(2016-05-12) at 0.899% (\$0.435 => \$0.439) [283]
+	cash: 14.071
+	circulation: 32.121
+selling CLF	(2016-06-30) at 254.375% (\$0.987 => \$3.498) [135]
+	cash: 17.569
+	circulation: 34.632
+selling MBI	(2016-07-06) at 8.254% (\$0.435 => \$0.471) [256]
+	cash: 18.039
+	circulation: 34.668
+selling LKM	(2016-07-20) at 0.845% (\$0.435 => \$0.438) [261]
+	cash: 18.478
+	circulation: 34.671
+selling CNX	(2016-07-26) at 158.451% (\$0.987 => \$2.551) [186]
+	cash: 21.029
+	circulation: 36.236
+selling CNX	(2016-07-28) at 201.415% (\$0.987 => \$2.975) [160]
+	cash: 24.005
+	circulation: 38.224
+selling HUN	(2016-08-15) at 80.867% (\$0.987 => \$1.785) [220]
+	cash: 25.79
+	circulation: 39.022
+selling LKM	(2016-08-15) at 5.742% (\$0.435 => \$0.46) [278]
+	cash: 26.25
+	circulation: 39.047
+selling FBP	(2016-08-29) at 1.633% (\$0.435 => \$0.442) [293]
+	cash: 26.692
+	circulation: 39.054
+selling MTL	(2016-09-06) at 5.642% (\$0.435 => \$0.459) [372]
+	cash: 27.151
+	circulation: 39.079
+selling MTL	(2016-09-08) at 6.634% (\$0.435 => \$0.464) [373]
+	cash: 27.615
+	circulation: 39.107
+selling ATV	(2016-10-03) at 133.049% (\$0.987 => \$2.301) [206]
+	cash: 29.915
+	circulation: 40.421
+selling FTK	(2016-10-03) at 74.076% (\$0.987 => \$1.718) [224]
+	cash: 31.633
+	circulation: 41.152
+selling ATV	(2016-10-03) at 157.467% (\$0.987 => \$2.542) [208]
+	cash: 34.175
+	circulation: 42.707
+selling FTK	(2016-10-04) at 72.313% (\$0.987 => \$1.701) [224]
+	cash: 35.876
+	circulation: 43.42
+selling AMPY	(2016-10-24) at 432.941% (\$0.435 => \$2.317) [309]
+	cash: 38.193
+	circulation: 45.303
+selling IO	(2016-11-10) at 22.119% (\$0.987 => \$1.205) [256]
+	cash: 39.399
+	circulation: 45.521
+selling P	(2016-12-02) at 5.312% (\$0.987 => \$1.04) [279]
+	cash: 40.438
+	circulation: 45.573
+selling TK	(2016-12-27) at 8.466% (\$0.987 => \$1.071) [257]
+	cash: 41.509
+	circulation: 45.657
+selling VIPS	(2017-03-15) at 0.073% (\$0.987 => \$0.988) [333]
+	cash: 42.497
+	circulation: 45.658
+selling TWTR	(2018-06-05) at 1.324% (\$0.435 => \$0.441) [780]
+	cash: 42.937
+	circulation: 45.664
+selling EGY	(2018-06-12) at 1.224% (\$0.435 => \$0.44) [805]
+	cash: 43.377
+	circulation: 45.669
+selling FRO	(2019-12-19) at 2.999% (\$0.435 => \$0.448) [1231]
+	cash: 43.825
+	circulation: 45.682
+	skips:       2
+	profits:     10.0 -> 43.825199048484485
+	circulation: 45.681901765625504
 
-	profits:     \$15.0 -> \$77.95687276829435
-	circulation: \$77.95687276829433
 </pre>
 </div>
 
@@ -763,80 +909,197 @@ termed by their $m$ and $b$ components) after a 20% drop and a rank of the top
 --- Metrics for 2018-2020
 "In the cumulative timespan of 2018-2020"
 
-[drop = 20%, m = -0.02, b = 5.2] => ROI: 1.4985018195914688,
-                                    Profits: 130.09068571040072,
-                                    Hold: 211 days
+[drop = 20%, m = -0.02, b = 5.2] => ROI: 0.9839851521267415,
+                                    Profits: 21.912217326647706,
+                                    Hold: 216 days,
+                                    Pieces: 50
 
 Yearly Breakdown
 
 | Timeframe |    m  |  b  | Buys | Median Hold | Skips |  Mean ROI  | Reinvested Profits|
-|-----------|-------|-----|------|-------------|-------|------------|-------------------|
-|   2018    | -0.02 | 5.2 |   31 |        320  |   1   | 1.985966993|  46.2824884012912 |
-|   2019    | -0.02 | 5.2 |   53 |        247  |  22   | 0.794949965|  30.4867642574489 |
-|   2020    | -0.02 | 5.2 |  348 |        197  | 293   | 1.562228336|  45.1841573684472 |
+|-----------|-------|-----|------|-------------|-------|------------|------------|
+|   2018    | -0.02 | 5.2 |   36 |        619  |   0   | -0.14905347|   $8.93 |
+|   2019    | -0.02 | 5.2 |   56 |        258  |   4   | 0.322075814|  $14.18 |
+|   2020    | -0.02 | 5.2 |  326 |        202  | 235   | 1.222808200|  $28.90 |
 ---
 
-And if we change the initial price drop from 20% to 30%:
+@s The Algorithm
 
---- Metrics for 2018-2020 :=
-[drop = 30%, m = -0.02, b = 5.2] => ROI: 1.7578832597251424,
-                                    Profits: 28.76512973580418,
-                                    Hold: 211 days
+While the assessor provides the framework for routinely and cleanly assessing
+the data, and the simulator pairs the algorithm to the assessor, the contents
+of that framework, the actual algorithm, are implemented as subclasses of the
+simulator.
 
-Yearly Breakdown
-| Timeframe |    m  |  b  | Buys | Median Hold | Skips |       Mean ROI     | Reinvested Profits|
-|-----------|-------|-----|------|-------------|-------|--------------------|-------------------|
-|    2018   | -0.02 | 5.2 |   8  |   (unsold)  |   0   | -0.091729607538731 | 14.63308156984507 |
-|    2019   | -0.02 | 5.2 |  19  |      246    |   0   | 0.8834767826743782 | 23.39302943540659 |
-|    2020   | -0.02 | 5.2 | 108  |      197    |  59   | 2.0487223893739896 | 66.04386747735361 |
+--- algos/volatile_drop.rb
+module Algorithms
+  class VolatileDrop < Simulator
+    attr_accessor :m
+    attr_accessor :b
+    attr_accessor :drop
+    attr_accessor :rise # TODO get this out of here
+
+    FOLDER = "volatile_drop"
+
+    # use 23 pieces
+    def initialize(stocks:  nil,
+                   after:   nil,
+                   before:  nil,
+                   drop:   -0.2,
+                   rank:    60,
+                   m:      -0.02,
+                   b:       5.2,
+                   min:     0.4,
+                   **extra)
+      super(:stocks => stocks,
+            :after  => after,
+            :before => before)
+      @drop = drop
+      @m = m
+      @b = b
+  
+      assessor.buy_when :history => 2 do |history|
+        today     = history[-1]
+        yesterday = history[-2]
+      
+        [[today.change_from(yesterday) <= drop,
+          today.change_from(today)     <= drop].any?,
+  
+         today.rank <= rank,
+         today.close >= min
+        ].all?
+      end
+      
+      # for ROI: m = -0.03, b = 3.0
+      # for $$$: m = -0.02, b = 5.2
+      #      or: m = -0.00, b = 0.6
+      #      (those two average roughly the same from 2008-2020)
+      assessor.sell_when do |original, today|
+        days_held = today.trading_days_from original
+        
+        sell_point = [@m * days_held + @b, 0].max
+      
+        today.change_from(original) >= sell_point
+      end
+    end
+  end
+end
 ---
 
 @s The Simulator
 
-While the assessor provides the framework for routinely and cleanly assessing
-the data, the contents of that framework, the actual algorithm, are contained in
-the simulator.
+This will be refactored into the assessor, since it's mostly redirection.
 
 --- simulator.rb
+require './assessor.rb'
+
 class Simulator
-  attr_accessor :results
   attr_accessor :assessor
   attr_accessor :stocks
   attr_accessor :after
   attr_accessor :before
-  attr_accessor :m
-  attr_accessor :b
 
   def initialize(stocks:  nil,
-                 drop:   -0.2,
-                 rank:    60,
-                 m:      -0.02,
-                 b:       5.2,
                  after:   nil,
                  before:  nil)
     @stocks = stocks
     @after  = after
     @before = before
-    @m      = m
-    @b      = b
-
     @assessor = Assessor.new
+  end
 
-    @{When Do We Buy?}
-    
-    @{When Do We Sell?}
+  # TODO rebuild all caches in the commented-out format
+  def cache_name
+    vars = instance_variables - [:@after, :@before, :@stocks, :@assessor]
+
+    #"data/#{self.class::FOLDER}/" +
+    #"#{[after.year.to_s, before.year.to_s].uniq.join "-"}_"+ 
+    #"#{after.to_i}-#{before.to_i}_" +
+    #vars.sort.map {|v| v.to_s[1] + instance_variable_get(v).to_s }.join("_") +
+    #".sim"
+
+    "data/#{self.class::FOLDER}/" +
+    "#{[after.year.to_s, before.year.to_s].uniq.join "-"}_" +
+    vars.map {|v| v.to_s[1] + instance_variable_get(v).to_s }.join("_") +
+    ".sim"
+  end
+
+  def assess_buys
+    @assessor.assess_buys @stocks, :after  => @after,
+                                   :before => @before,
+                                   :force  => @force
+  end
+
+  def assess_sells(partial: false)
+    @assessor.assess_sells :partial => partial
   end
 
   def run
-    @assessor.assess_buys @stocks, :after  => @after,
-                                   :before => @before
+    assess_buys
     assess_sells
   end
 
-  def assess_sells
-    @results = @assessor.assess_sells
+  def results
+    @assessor.results
+  end
+
+  def results=(val)
+    @assessor.results = val
+  end
+
+  def holding
+    @assessor.holding
+  end
+
+  def holding=(val)
+    @assessor.holding = val
+  end
+
+  # Maybe `h[:hold]` should always be filled out?
+  # Same with `h[:latest]`?
+  def still_negative
+    unsold = results.filter {|h| h[:sold] == nil }
+
+    ticks = unsold.map {|h| h[:buy].ticker }
+    #latests = Bar.where(:ticker => ticks)
+    #             .order(Sequel.desc(:date))
+    #             .group(:ticker_id)
+    #             .all
+    latests = ticks.map do |t|
+      [t, Bar.where(:ticker => t)
+             .order(Sequel.desc(:date))
+             .first]
+    end.to_h
+
+    unsold.each do |h|
+      h[:latest] = latests[h[:buy].ticker]
+      h[:ROI]    = h[:latest].change_from h[:buy]
+      h[:hold]   = h[:latest].trading_days_from h[:buy]
+    end
+
+    unsold.filter {|h| h[:ROI] < 0 }
+  end
+
+  def stats
+    statz  = {:date        => after..before,
+              :buys        => results.size,
+              :unsold      => results.filter {|h| h[:sell].nil? }.size,
+              :delisted    => results.filter {|h| h[:delisted] }.size,
+              :median_hold => results.map {|h| h[:hold] || 1000 }.median,
+              :sp500       => spy(after, before),
+              :mean_ROI    => results.map {|h| h[:ROI] }.mean,
+              :median_ROI  => results.map {|h| h[:ROI] }.median,
+              :stddev_ROI  => results.map {|h| h[:ROI] }.standard_deviation
+             }
+    statz[:sharpe] = statz[:mean_ROI] / statz[:stddev_ROI]
+
+    statz
   end
 end
+
+Dir['./algos/*.rb'].each {|f| require f }
+
+Algorithm = eval("Algorithms::#{CONFIG[:algorithm]}")
+
 
 ---
 
@@ -851,6 +1114,9 @@ class Assessor
   attr_accessor :history_requirement
 
   attr_accessor :holding
+  attr_accessor :results
+
+  DELISTING_DEADBAND = 14.days
 
   def buy_when(history: 2, &b)
     @buying_plan = b
@@ -872,10 +1138,8 @@ class Assessor
   def assess_buys(tickers, opts={})
     tids = tickers.map {|t| t.id }
 
-    debut  = opts[:after] || Time.parse('1 march 1900')
-    debut  = debut.is_a?(Time) ? debut : Time.parse(debut.to_s)
-    fin    = opts[:before] || Time.parse(Date.today.to_s)
-    fin    = fin.is_a?(Time) ? fin : Time.parse(fin.to_s)
+    debut  = Time.parse(opts[:after].to_s  || '1 march 1900')
+    fin    = Time.parse(opts[:before].to_s || Date.today.to_s)
 
     bars   = Bar.where(:date => debut..fin, :ticker_id => tids)
                 .order(:ticker_id, Sequel.asc(:date))
@@ -887,11 +1151,11 @@ class Assessor
     # create groups of size `@history_requirement`, and then
     # pass that history to the checker
     # most recent bar is at -1, oldest bar is at 0
-    groups.map do |ticker_id, bars|
+    @holding = groups.map do |ticker_id, bars|
       # assume the history is 
       histories = bars.each_cons history_requirement
 
-      @holding += histories.filter do |history|
+      histories.filter do |history|
 
         # verify that the history is consecutive
         day_deltas = history.each_cons(2).map {|a, b| b.date - a.date }
@@ -902,7 +1166,7 @@ class Assessor
           buy? history
         end
       end.map {|history| history.last }
-    end
+    end.flatten
 
     # `@holding` currently references the days that a decision to buy is made
     # (using the day's closing price), but we don't *actually* buy until the
@@ -912,12 +1176,10 @@ class Assessor
     # This is key because the `Bar#change_from` method operates on the opening
     # price of the earlier day.
     #
-    # If it's `nil` because we're dealing with some HOT OF THE PRESS stock
-    # recommendations, then... I don't really have a plan for that yet.
-    # Then the stock doesn't exist. Send a text, whatever. I need to include
-    # some notification system here.
-    #
-    # TODO include the notification system at this point.
+    # If `bars[index + 1]` is nil because we're dealing with some HOT OF THE
+    # PRESS stock recommendations, then... I don't really have a plan for that
+    # yet.  Then the stock doesn't exist, so just present the stock itself.
+    # It'll stay until the time period is recalculated, which happens often.
     #
     # From here on out, we're dealing with *simulation*.
     @holding = @holding.map do |stock|
@@ -930,25 +1192,60 @@ class Assessor
     end
   end
 
-  def assess_sells
-    sales = @holding.map do |stock|
+  def assess_sells(partial: false)
+    # assumes `@holding` and `@results` are accurately mapped
+    if partial
+      verified = @results.filter {|h| h[:sell] }
+      unverified_stocks = @results.filter {|h| h[:sell].nil? }
+                                  .map    {|h| h[:buy] }
+    else
+      unverified_stocks, verified = @holding, []
+    end
+
+    # Stocks can be delisted, at which point stocks held will be no longer
+    # valid, but then a *new* ticker can start and can *reuse* the old name.
+    # And since any stocks held from the previous incarnation won't be valid
+    # for the new incarnation of the symbol, we need to separate those
+    # instances. We do this by looking for a stretch of 7 days (using the date,
+    # not the trading days, since trading days is calculated based on the
+    # availability of bar information for that specific stock) during which the
+    # stock is not traded (stocks can go intermittently inactive for short
+    # periods of time, but that doesn't imply delistment).
+    unverified = unverified_stocks.map do |stock|
       bars     = Bar.where(:ticker => stock.ticker) { date >= stock.date }
                     .order(Sequel.asc(:date))
                     .all
-      sell_bar = bars.find {|day| sell? stock, day }
+      periods = bars.slice_when do |before, after|
+        after.date - before.date >= DELISTING_DEADBAND
+      end
+
+      # this is the only period that starts from the holding bar
+      range = periods.first
+
+      sell_bar = range.find {|day| sell? stock, day }
+      delisted = if sell_bar
+                   false
+                 else 
+                   Time.now - range.last.date >= DELISTING_DEADBAND
+                 end
 
       {:buy  => stock,
        :sell => sell_bar,
        :hold => sell_bar ? sell_bar.trading_days_from(stock)  : nil,
-       :ROI  => sell_bar ? sell_bar.change_from(stock) : -1 }
+       :ROI  => sell_bar ? sell_bar.change_from(stock) : -1,
+       :delisted => delisted
+      }
     end
+
+    @results = (unverified + verified).sort_by {|h| h[:buy].date }
   end
 
   def assess(tickers, opts={})
     assess_buys tickers, opts
-    assess_sells
+    assess_sells :partial => opts[:partial]
   end
 end
+
 ---
 
 @s Accessing Market Data
@@ -959,15 +1256,15 @@ unresolved issue with their data (January 2018 data for AFL).
 
 --- market.rb
 require 'yaml'
+Dir.chdir File.dirname(File.expand_path(__FILE__))
 CONFIG = YAML.load File.read("config.yml")
 
 require 'open-uri'
 require 'alpaca/trade/api'
 require 'alphavantagerb'
 require './db.rb'
-require './assessor.rb'
 require './simulator.rb'
-require 'statistics'
+require 'kder'
 require 'histogram/array'
 
 @{Configure the Market APIs}
@@ -1012,6 +1309,145 @@ class Alpaca::Trade::Api::Client
       hash[symbol] = json[symbol].map { |bar| Alpaca::Trade::Api::Bar.new(bar) }
     end
   end 
+
+  # Enabling me to use the "qty" query parameter. Playing it extra safe
+  # by not even sending the parameter unless there's a specified number
+  def close_position(symbol: nil, qty: nil)
+    response = delete_request(endpoint,
+                              "v2/positions/#{symbol}#{qty ? "?qty=#{qty}" : ""}")
+    raise NoPositionForSymbol,
+          JSON.parse(response.body)['message'] if response.status == 404
+
+    Position.new(JSON.parse(response.body))
+  end
 end
+
+@{Market Abstraction}
+---
+
+This is what I use to download stock data. No need to stay at the lower levels
+of abstraction when all I want to do is download and install the bars.
+
+--- Market Abstraction
+module Market
+  module Stock
+    extend self
+
+    CLOSE = "16:00" # closing time of the markets
+    DELAY = 15 * 60 # how long to wait (in sec) before grabbing data
+
+    # Alpaca download but don't install
+    def download(tickers, opts={})
+      span = opts.delete(:span) || 'day'
+      opts[:limit] ||= 1000
+
+      opts.each do |k, v| 
+        if [String, Date, DateTime, Time].include? v.class
+          opts[k] = DateTime.parse(v.to_s).to_s
+        end
+      end
+
+      # `CLIENT.bars` returns a hash, so this will also merge them all
+      # into one. key collision will only happen if the key is duplicated
+      # in the `ticker` argument.
+      symbols = tickers.map {|t| t.symbol }
+      data    = symbols.each_slice(50).map do |ticks|
+        ALP_CLIENT.bars span, ticks, opts
+      end.inject({}) {|h, v| h.merge v }
+
+      # strip out any bar that could be from today's incomplete data
+      data.each do |sym, bars|
+        bars.delete_if do |bar|
+          bar.date == Time.parse(Date.today.to_s) &&
+          Time.now < (Time.parse(CLOSE) + DELAY)
+        end
+      end
+
+      # provide a hash so that we can get the ID without
+      # fetching the symbol from the DB
+      tids = tickers.map {|t| [t.symbol, t] }.to_h
+
+      # Put the data in a hash format so that it's consistent with the
+      # AlphaVantage style and allows for easy use with DB#multi_insert
+      data.map do |sym, bars|
+        [sym, bars.map do |bar|
+          {:date   => bar.time,
+           :open   => bar.open,
+           :high   => bar.high,
+           :low    => bar.low,
+           :close  => bar.close,
+           :volume => bar.volume,
+           :span   => 'day',
+           :ticker_id => tids[sym].id
+          }
+        end]
+      end.to_h
+    end
+
+    def install(tickers, opts={})
+      return {} if opts[:after] == Time.parse(Date.today.to_s)
+      return {} if opts[:after] == Time.parse(Date.today.to_s) - 1.day &&
+                   Time.now < (Time.parse(CLOSE) + DELAY)
+
+      updates = download tickers, opts
+      DB[:bars].multi_insert updates.values.flatten
+
+      updates
+    end
+
+    # can only do one stock at a time
+    # AlphaVantage
+    def download_stock(ticker, after: '1900-01-01', before: Date.today.strftime("%Y-%m-%d"))
+      stock  = AV_CLIENT.stock :symbol => ticker.symbol
+      series = stock.timeseries :outputsize => 'full'
+
+      bars = series.output['Time Series (Daily)']
+      bars = bars.filter {|k, bar| k > after && k < before }
+
+      bars.map do |k, bar|
+        {:date   => Time.parse(k),
+         :open   => bar['1. open'].to_f,
+         :high   => bar['2. high'].to_f,
+         :low    => bar['3. low'].to_f,
+         :close  => bar['4. close'].to_f,
+         :volume => bar['5. volume'].to_i,
+         :span   => 'day',
+         :ticker_id => ticker.id
+        }
+      end
+    end
+
+    def install_stock(stock, **kwargs)
+      data = download_stock stock, **kwargs
+      DB[:bars].multi_insert data
+    end
+  end
+
+  module Futures
+    def download(future: nil, after: '1900-01-01', before: Date.today.strftime("%Y-%m-%d"))
+      url = "https://query1.finance.yahoo.com/v7/finance/download/" +
+            "#{future.ymbol}?" +
+            "period1=#{after.to_i}&" +
+            "period2=#{before.to_i}&" +
+            "interval=1d&events=history&includeAdjustedClose=true"
+      user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_2_3) " +
+                   "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 " +
+                   "Safari/605.1.15"
+      data = URI.open(url, "User-Agent" => user_agent) do |site|
+        site.read
+      end
+
+      data.split("\n").map {|line| line.split "," }.map do |line|
+        {:date  => Time.parse(line[0]),
+         :open  => line[1].to_f,
+         :high  => line[2].to_f,
+         :low   => line[3].to_f,
+         :close => line[5].to_f,
+         :volume => line[6].to_f}
+      end
+    end
+  end
+end
+
 ---
 

@@ -10,13 +10,26 @@ class Bar < Sequel::Model
     num == 1 ? bars[1] : bars[1..num] # `bars[0]` is `self`
   end
 
+  # if there aren't `num` days of bars available, it returns nil
   def prev(num=1)
     bars = Bar.where(:date   => (date - (10 + num * 1.4).days.ceil)..date,
                      :ticker => ticker)
               .order(Sequel.asc(:date))
               .limit(num + 1)
               .all
-    num == 1 ? bars[-2] : bars[-(num + 1)..-2] # `bars[-1]` is `self`
+    if num == 1
+      bars[-2]
+    else
+      # this will return nil if num exceeds the array bounds, hence
+      # the below condition
+      #
+      # Though I'm not sure if I agree with it:
+      #   a = []
+      #   a[-0..-2] # => []
+
+      earliest = num + 1 > bars.size ? bars.size : num + 1
+      bars[-(earliest)..-2] # `bars[-1]` is `self`
+    end
   end
 
   def inspect
@@ -25,12 +38,17 @@ class Bar < Sequel::Model
 
   # NYSE delists you if you close at < $1.00 for 30 consecutive days
   # NASDAQ is $1.47
+  #
+  # consecutive days trading under `min`
   def days_under_trading_min(min=1.0)
-    history = prev 30
-    history.slice_when {|b, a| b.close >= min || a.close >= min }
-           .filter {|bs| bs.all? {|b| b.close < min } }
-           .last
-           .size
+    history = prev 60
+    res = history.slice_when {|b, a| b.close >= min || a.close >= min }.to_a
+
+    if res.last.all? {|b| b.close < min }
+      res.last.size
+    else
+      0
+    end
   end
 
   # GREAT trick here: the goal is to figure out how many records

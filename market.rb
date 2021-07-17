@@ -7,7 +7,6 @@ require 'alpaca/trade/api'
 require 'alphavantagerb'
 require './db.rb'
 require './simulator.rb'
-#require 'statistics' # only used by the mse/r^2 methods which aren't currently in use. this package is in conflict with the kder package
 require 'kder'
 require 'histogram/array'
 
