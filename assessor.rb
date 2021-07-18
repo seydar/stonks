@@ -1,3 +1,5 @@
+require 'parallel'
+
 class Assessor
   attr_accessor :buying_plan
   attr_accessor :selling_plan
@@ -41,6 +43,7 @@ class Assessor
     # create groups of size `@history_requirement`, and then
     # pass that history to the checker
     # most recent bar is at -1, oldest bar is at 0
+    #@holding = Parallel.map(groups) do |ticker_id, bars|
     @holding = groups.map do |ticker_id, bars|
       # assume the history is 
       histories = bars.each_cons history_requirement

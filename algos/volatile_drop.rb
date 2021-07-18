@@ -7,14 +7,14 @@ module Algorithms
 
     FOLDER = "volatile_drop"
 
-    # use 23 pieces
+    # use 30 pieces
     def initialize(stocks:  nil,
                    after:   nil,
                    before:  nil,
                    drop:   -0.2,
                    rank:    60,
-                   m:      -0.02,
-                   b:       5.2,
+                   m:      -0.03,
+                   b:       3.0,
                    min:     0.4,
                    **extra)
       super(:stocks => stocks,
@@ -36,15 +36,7 @@ module Algorithms
         ].all?
       end
       
-      # for ROI: m = -0.03, b = 3.0
-      # for $$$: m = -0.02, b = 5.2
-      #      or: m = -0.00, b = 0.6
-      #      (those two average roughly the same from 2008-2020)
-      #
-      # honestly i've done a terrible job of evaluating the different
-      # sell signals
-      #
-      # TODO suck less
+      # m = -0.03, b = 3.0
       assessor.sell_when do |original, today|
         days_held = today.trading_days_from original
         

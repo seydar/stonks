@@ -15,7 +15,7 @@ Usage:
   opt :cached, "Use cached results"
   opt :year, "Which year to model", :type => :string
   opt :cash, "How much money to start with", :default => 10.0
-  opt :pieces, "How many pieces to divy the circulating cash to", :default => 50.0
+  opt :pieces, "How many pieces to divy the circulating cash to", :default => 30.0
   opt :drop, "What drop to look for in a buy signal", :type => :float #, :default => -0.2
   opt :rise, "What rise to look for in a buy signal", :type => :float #, :default => 0.25
   opt :slope, "Slope for the sell curve", :short => "-m", :type => :float#, :default => -0.02
