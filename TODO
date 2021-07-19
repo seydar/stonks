@@ -1,7 +1,7 @@
 BUGS
 -----------------------------------
-o   2015: TIER appears 6 times (wrong), only marked as delisted once (also wrong)
-    -> same with BTU @ 2015-07-02
+o   Parallel assessment doesn't work
+    -> well, it's just CPU-bound
 
 TODO
 -----------------------------------
@@ -54,4 +54,8 @@ x   Sometimes, script/invest will end up with a negative circulation value
 x   When rebuilding caches for the website, only recalculate the ones that
     are still unsold (i.e. partial rebuild)
     -> Watch out for hot-off-the-press buys? Will that introduce a bug?
+x   2015: TIER appears 6 times (wrong), only marked as delisted once (also wrong)
+    -> same with BTU @ 2015-07-02
+x   Bar#prev doesn't work
+    -> Ticker[:symbol => 'CCV'].latest_bar.prev.next != Ticker[:symbol => 'CCV'].latest_bar
 

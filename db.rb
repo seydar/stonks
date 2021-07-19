@@ -6,7 +6,7 @@ require 'upsert'
 
 ENV['UPSERT_DEBUG'] = "false"
 
-DB = Sequel.connect "sqlite://#{CONFIG[:DB][:path]}", :preconnect => true
+DB = Sequel.connect "sqlite://#{CONFIG[:DB][:path]}"
 
 DB.create_table? :bars do
   primary_key :id

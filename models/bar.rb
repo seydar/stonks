@@ -15,7 +15,7 @@ class Bar < Sequel::Model
     bars = Bar.where(:date   => (date - (10 + num * 1.4).days.ceil)..date,
                      :ticker => ticker)
               .order(Sequel.asc(:date))
-              .limit(num + 1)
+              .limit((10 + num * 1.4).ceil)
               .all
     if num == 1
       bars[-2]
