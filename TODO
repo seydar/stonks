@@ -20,7 +20,10 @@ o   You buy at the next day's opening... but wouldn't you also be selling
     closing)
 o   Use Class#inherited to track available algorithms so that we don't have
     to do this weird text-to-constant eval magic
-o   Identify delisted stocks as those with a 7-day break in trading
+o   Daily valuations of a portfolio
+    -> Given the 2020 portfolio, what would the ROI be at for every day of
+       the year?
+o   Merge Simulator and Assessor
 
 DONE
 -----------------------------------
@@ -58,4 +61,5 @@ x   2015: TIER appears 6 times (wrong), only marked as delisted once (also wrong
     -> same with BTU @ 2015-07-02
 x   Bar#prev doesn't work
     -> Ticker[:symbol => 'CCV'].latest_bar.prev.next != Ticker[:symbol => 'CCV'].latest_bar
+x   Identify delisted stocks as those with a 7-day break in trading
 
