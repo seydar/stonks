@@ -5,10 +5,12 @@ CONFIG = YAML.load File.read("config.yml")
 require 'open-uri'
 require 'alpaca/trade/api'
 require 'alphavantagerb'
-require './db.rb'
-require './simulator.rb'
 require 'kder'
 require 'histogram/array'
+
+require_relative 'db.rb'
+require_relative 'simulator.rb'
+require_relative "multithreading.rb"
 
 Alpaca::Trade::Api.configure do |config|
   config.endpoint   = "https://api.alpaca.markets"
