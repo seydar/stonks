@@ -29,7 +29,6 @@ NYSE.each do |sym|
     date = Time.parse(DateTime.strptime(tds[0], "%m/%d/%Y").to_s)
 
     next if Split.where(:ticker_id => sym.id,
-                        :ratio     => tds[-1],
                         :date      => date).count > 0
 
     Split.create :ticker_id => sym.id,
