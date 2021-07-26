@@ -59,10 +59,10 @@ DB.create_table? :orders do
   boolean :complete
 end
 
-require './models/ticker.rb'
-require './models/split.rb'
-require './models/bar.rb'
-require './models/account.rb'
+require_relative 'models/ticker.rb'
+require_relative 'models/split.rb'
+require_relative 'models/bar.rb'
+require_relative 'models/account.rb'
 
 class Alpaca::Trade::Api::Bar
   def date; @time; end
