@@ -10,7 +10,6 @@ require 'histogram/array'
 
 require_relative 'db.rb'
 require_relative 'simulator.rb'
-require_relative "multithreading.rb"
 
 Alpaca::Trade::Api.configure do |config|
   config.endpoint   = "https://api.alpaca.markets"
