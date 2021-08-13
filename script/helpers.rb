@@ -49,6 +49,10 @@ def T(val)
   Time.parse(val.to_s)
 end
 
+def DT(val)
+  DateTime.parse(val.to_s)
+end
+
 class Array
   def median
     sort[size / 2]
@@ -155,6 +159,8 @@ def buy(year: nil, stocks: NYSE, **kwargs)
   sim
 end
 
+# This mostly looks ugly because of the print statements.
+# Not sure how to fix that.
 def profit(results, circulation: 10.0, pieces: 10, reinvest: true, debug: false)
   timeline = results.inject([]) do |o, h|
     o << {:action => :buy, :stock => h[:buy]}
