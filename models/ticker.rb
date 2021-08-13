@@ -122,15 +122,17 @@ class Ticker < Sequel::Model
       next if split.applied
 
       unnorm_size = DB[:bars].where(:ticker_id => id,
-                                    :date => (split.date - 30 * 86400)..split.date)
+                                    :date => Time.parse('1 jan 1900')..
+                                             (split.date - 1.day))
                              .count
 
       if unnorm_size >= 2
+        # The following line only serves to get the day of the split and the
+        # day before
         unnormal = DB[:bars].where(:ticker_id => id,
                                    :date => (split.date - 30 * 86400)..split.date)
                             .order(Sequel.asc(:date))
                             .all
-
 
         # I should've been saving the ratio I use the whole time, but I only
         # thought to do it after I'd already erased the original work
