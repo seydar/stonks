@@ -102,6 +102,28 @@ class Simulator
 
     statz
   end
+
+  def daily_rois
+    portfolio = []
+    
+    # for every day of the year
+    (DT(after)..DT(before)).map do |date|
+      # Get the latest bar for each stock in our portfolio
+      portfolio.each {|h| h[:current] = h[:current].next }
+    
+      # See if we've added any stocks to our portfolio
+      portfolio += results.filter {|h| h[:buy].date == T(date.to_s) }
+                          .map    {|h| {:original => h[:buy],
+                                        :current  => h[:buy]} }
+    
+      # Evaluate our portfolio
+      roi = portfolio.map {|h| h[:current].change_from h[:original] }
+
+      # Do the stupid check because of `NaN` when the array is empty
+      # Now would be a good time for Python's `[] == False` stance 
+      (roi.empty? ? [0] : roi).mean
+    end
+  end
 end
 
 Dir['./algos/*.rb'].each {|f| require f }
