@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 
 # Build all of the caches
-(2000..2021).each do |year|
-  `script/build_cache -p -y #{year}`
+(2010..2021).each do |year|
+  `script/build_cache -y #{year}`
   puts "built #{year}"
 end
 

@@ -53,7 +53,7 @@ class Account < Sequel::Model
                           :qty    => order.quantity
 
     # Add the profits to the circulation (for reinvestment)
-    self.circulation += hash[:sell].close - h[:buy].open
+    self.circulation += hash[:sell].close - hash[:buy].open
 
     # Associate a sell bar with the order
     order.sold_id = hash[:sell].id

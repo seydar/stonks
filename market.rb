@@ -31,7 +31,7 @@ class Alpaca::Trade::Api::Client
     response = get_request(data_endpoint, "v1/bars/#{timeframe}", opts)
     json = JSON.parse(response.body)
     json.keys.each_with_object({}) do |symbol, hash|
-      hash[symbol] = json[symbol].map { |bar| Alpaca::Trade::Api::Bar.new(bar) }
+      hash[symbol] = json[symbol].map { |bar| ::Alpaca::Trade::Api::Bar.new(bar) }
     end
   end 
 
@@ -44,7 +44,7 @@ class Alpaca::Trade::Api::Client
     json = JSON.parse(response.body)
     p json
     json.keys.each_with_object({}) do |symbol, hash|
-      hash[symbol] = json[symbol].map { |bar| Alpaca::Trade::Api::Bar.new(bar) }
+      hash[symbol] = json[symbol].map { |bar| ::Alpaca::Trade::Api::Bar.new(bar) }
     end
   end 
 
@@ -56,7 +56,7 @@ class Alpaca::Trade::Api::Client
     raise NoPositionForSymbol,
           JSON.parse(response.body)['message'] if response.status == 404
 
-    Position.new(JSON.parse(response.body))
+    ::Alpaca::Trade::Api::Position.new(JSON.parse(response.body))
   end
 end
 

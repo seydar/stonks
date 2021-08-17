@@ -71,6 +71,8 @@ end
 # the buy day for a hot-off-the-press buy signal will be today, and
 # then when it's no longer hot-off-the-press, it changes to be the next day
 # (still "today"), so it looks like another new buy
+#
+# TODO change this to mark new sells as those who don't have sell orders in
 latest_date = NYSE[5].latest_bar.date
 new_buys  = sim.results.filter {|h| h[:buy].date >= latest_date }
 new_sells = sim.results.filter {|h| h[:sell] && h[:sell].date >= latest_date }
