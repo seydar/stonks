@@ -136,21 +136,19 @@ class Ticker < Sequel::Model
 
         # I should've been saving the ratio I use the whole time, but I only
         # thought to do it after I'd already erased the original work
-        split.ratio = if split.ratio.is_a? Numeric
-                        split.ratio
-                      else
-                        unnormal[-1][:open] / unnormal[-2][:close]
-                      end
+        unless split.ratio.is_a? Numeric
+          split.ratio = unnormal[-1][:open] / unnormal[-2][:close]
+        end
 
         puts "#{symbol}: #{splits.size} splits" if debug
         puts "\tupdating #{unnorm_size} bars before #{split.date}" if debug
 
         DB[:bars].where(:ticker_id => id,
                         :date => Time.parse('1 jan 1900')..(split.date - 1.day))
-                 .update(:close => Sequel[:close] * ratio,
-                         :open  => Sequel[:open]  * ratio,
-                         :high  => Sequel[:high]  * ratio,
-                         :low   => Sequel[:low]   * ratio)
+                 .update(:close => Sequel[:close] * split.ratio,
+                         :open  => Sequel[:open]  * split.ratio,
+                         :high  => Sequel[:high]  * split.ratio,
+                         :low   => Sequel[:low]   * split.ratio)
       end
 
       split.applied = true
