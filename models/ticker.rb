@@ -136,8 +136,11 @@ class Ticker < Sequel::Model
 
         # I should've been saving the ratio I use the whole time, but I only
         # thought to do it after I'd already erased the original work
-        ratio = unnormal[-1][:open] / unnormal[-2][:close]
-        split.ratio = ratio
+        split.ratio = if split.ratio.is_a? Numeric
+                        split.ratio
+                      else
+                        unnormal[-1][:open] / unnormal[-2][:close]
+                      end
 
         puts "#{symbol}: #{splits.size} splits" if debug
         puts "\tupdating #{unnorm_size} bars before #{split.date}" if debug

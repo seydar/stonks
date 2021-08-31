@@ -109,7 +109,9 @@ class Simulator
     # for every day of the year
     (DT(after)..DT(before)).map do |date|
       # Get the latest bar for each stock in our portfolio
-      portfolio.each {|h| h[:current] = h[:current].next }
+      # TODO this doesn't accurately represent what happens to delisted
+      # stocks
+      portfolio.each {|h| h[:current] = h[:current].next || h[:current] }
     
       # See if we've added any stocks to our portfolio
       portfolio += results.filter {|h| h[:buy].date == T(date.to_s) }
