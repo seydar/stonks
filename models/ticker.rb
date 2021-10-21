@@ -122,8 +122,7 @@ class Ticker < Sequel::Model
       next if split.applied
 
       unnorm_size = DB[:bars].where(:ticker_id => id,
-                                    :date => Time.parse('1 jan 1900')..
-                                             (split.date - 1.day))
+                                    :date => (split.date - 30 * 86400)..split.date)
                              .count
 
       if unnorm_size >= 2
