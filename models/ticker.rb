@@ -132,6 +132,11 @@ class Ticker < Sequel::Model
                                    :date => (split.date - 30 * 86400)..split.date)
                             .order(Sequel.asc(:date))
                             .all
+        lasku = DB[:bars].where(:ticker_id => id,
+                                :date => Time.parse('1 jan 1900')..
+                                         (split.date - 1.day))
+                         .count
+
 
         # I should've been saving the ratio I use the whole time, but I only
         # thought to do it after I'd already erased the original work
@@ -139,8 +144,8 @@ class Ticker < Sequel::Model
           split.ratio = unnormal[-1][:open] / unnormal[-2][:close]
         end
 
-        puts "#{symbol}: #{splits.size} splits" if debug
-        puts "\tupdating #{unnorm_size} bars before #{split.date}" if debug
+        puts "#{symbol}: #{splits.size} total splits" if debug
+        puts "\tupdating #{lasku} bars before #{split.date}" if debug
 
         DB[:bars].where(:ticker_id => id,
                         :date => Time.parse('1 jan 1900')..(split.date - 1.day))
