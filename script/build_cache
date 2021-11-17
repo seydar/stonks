@@ -56,9 +56,12 @@ require "/home/ari/servers/auberge.rb" if File.exist? "/home/ari/servers/auberge
 # NYSE[5] is an arbitrary selection
 latest_date = NYSE[5].latest_bar.date
 
+extras = ['LCID'].map {|sym| Ticker[:symbol => sym] }
+
 puts "downloading data after #{latest_date}..."
 updates = Market::Stock.install NYSE, :after => latest_date
 spy_ups = Market::Stock.install [SPY], :after => SPY.latest_bar.date
+extras  = Market::Stock.install extras, :after => latest_date
 
 updates = (updates.values + spy_ups.values).flatten
 

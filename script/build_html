@@ -24,9 +24,11 @@ def text_ari(buy: [], sell: [])
                          :body => "buy #{str}"
     end
 
+    # 11/17/21 no more buying, i'm too fucking broke
+
     # do the automatic buy
-    ari = Account.first
-    buy.each {|b| ari.buy b[:buy] }
+    #ari = Account.first
+    #buy.each {|b| ari.buy b[:buy] }
   end
 
   unless sell.empty?
