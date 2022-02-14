@@ -5,9 +5,9 @@ require 'erb'
 
 require "/home/ari/servers/auberge.rb" if File.exist? "/home/ari/servers/auberge.rb"
 
-START = "1 jan #{ARGV[0] || 2021}"
+START = "1 jan #{ARGV[0] || 2022}"
 FIN   = ARGV[0] ? "31 dec #{ARGV[0]}" : Date.today.strftime("%d %b %Y")
-KIND  = ARGV[0] || "2021"
+KIND  = ARGV[0] || "2022"
 
 # Ensure that previous orders are completed so that they can be properly sold
 Account.all.map {|acc| acc.complete! }

@@ -4,7 +4,7 @@ require './script/helpers.rb'
 require 'erb'
 
 years = {}
-(2000..2021).each do |year|
+(2000..2022).each do |year|
   years[year] = simulate(:year => year).results
   years[year].each do |h|
     sell_date = h[:sell] ? h[:sell].date : h[:buy].ticker.latest_bar.date

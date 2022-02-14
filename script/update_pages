@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 # Build all of the caches
-(2010..2021).each do |year|
+(2010..2022).each do |year|
   `script/build_cache -y #{year}`
   puts "built #{year}"
 end
@@ -11,7 +11,7 @@ end
 puts "built summary table"
 
 # now generate the HTML
-(2000..2020).each do |year|
+(2000..2021).each do |year|
   puts `script/build_html #{year}`
 end
 
